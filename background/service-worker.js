@@ -38,20 +38,34 @@ async function syncFromStorage() {
     throw new Error("Site exception limit exceeded (100).");
   }
 
-  await chrome.declarativeNetRequest.updateEnabledRulesets({
-    enableRulesetIds: enabled ? [RULESET_ID] : [],
-    disableRulesetIds: enabled ? [] : [RULESET_ID]
-  });
+  // Read actual browser state before mutating rules. Re-applying unchanged
+  // dynamic rules on every popup open creates avoidable work and a brief
+  // remove/re-add window in which a trusted site could get blocked.
+  const activeRulesets = await chrome.declarativeNetRequest.getEnabledRulesets();
+  const currentlyEnabled = activeRulesets.includes(RULESET_ID);
+  if (currentlyEnabled !== enabled) {
+    await chrome.declarativeNetRequest.updateEnabledRulesets({
+      enableRulesetIds: enabled ? [RULESET_ID] : [],
+      disableRulesetIds: enabled ? [] : [RULESET_ID]
+    });
+  }
 
   const existing = await chrome.declarativeNetRequest.getDynamicRules();
-  const ourIds = existing
+  const managed = existing
     .filter((rule) => rule.id >= FIRST_SITE_RULE_ID && rule.id < FIRST_SITE_RULE_ID + MAX_SITES)
-    .map((rule) => rule.id);
-
-  await chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: ourIds,
-    addRules: enabled ? allowlistedSites.map(siteRule) : []
-  });
+    .sort((a, b) => a.id - b.id);
+  const desired = enabled ? allowlistedSites.map(siteRule) : [];
+  const signature = (rules) => rules.map((rule) => [
+    rule.id, rule.priority, rule.action.type,
+    (rule.condition.requestDomains || []).join(","),
+    (rule.condition.resourceTypes || []).join(",")
+  ].join("|")).join(";");
+  if (signature(managed) !== signature(desired)) {
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: managed.map((rule) => rule.id),
+      addRules: desired
+    });
+  }
   return { enabled, allowlistedSites };
 }
 
@@ -68,7 +82,8 @@ async function handleMessage(message) {
   }
 
   if (message.type === "GET_STATUS") {
-    return queueSync();
+    // Reading the popup must not rewrite Chrome DNR rules.
+    return getState();
   }
   if (message.type === "SET_ENABLED") {
     if (typeof message.enabled !== "boolean") throw new Error("Expected boolean enabled.");
