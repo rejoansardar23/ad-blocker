@@ -46,7 +46,8 @@
   async function change(message) {
     if (busy) return;
     busy = true;
-    render();
+    // Do not redraw the old saved checkbox state inside its change event:
+    // restoring it synchronously makes a real user click appear to revert.
     try {
       state = await send(message);
       siteInput.value = "";

@@ -83,7 +83,7 @@ async function setEnabled(options, enabled) {
   if ((await input.isChecked()) !== enabled) {
     if (enabled) await input.check();
     else await input.uncheck();
-    await options.locator("#status").getByText("Saved.", { exact: false }).waitFor();
+    await options.locator("#status").filter({ hasText: "Saved." }).waitFor();
   }
 }
 
@@ -115,7 +115,7 @@ try {
   const options = await context.newPage();
   await options.goto("chrome-extension://" + extensionId + "/options/options.html");
   await options.locator("#enabled").waitFor({ state: "visible" });
-  await options.locator("#status").getByText("Settings loaded.", { exact: false }).waitFor();
+  await options.locator("#status").filter({ hasText: "Settings loaded." }).waitFor();
   assert.equal(await options.locator("#enabled").isChecked(), true, "New installs must start enabled");
 
   const website = await context.newPage();
@@ -140,7 +140,7 @@ try {
     await context.waitForEvent("serviceworker", { timeout: 20000 });
   const restored = await context.newPage();
   await restored.goto("chrome-extension://" + new URL(resumedWorker.url()).host + "/options/options.html");
-  await restored.locator("#status").getByText("Settings loaded.", { exact: false }).waitFor();
+  await restored.locator("#status").filter({ hasText: "Settings loaded." }).waitFor();
   assert.equal(await restored.locator("#enabled").isChecked(), true);
   assert.equal(await restored.locator("#sites li").filter({ hasText: "publisher.test" }).count(), 1);
   console.log("All Chromium MV3 smoke tests passed; ad/control request counts:", counts);
