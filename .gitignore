@@ -1,4 +1,4 @@
-# Anticipated build outputs after the application is scaffolded
+# Generated distribution and test artifacts
 node_modules/
 dist/
 build/
@@ -8,7 +8,7 @@ test-results/
 .cache/
 .tmp/
 
-# Local secrets / environment
+# Local credentials and secrets
 .env
 .env.*
 !.env.example
@@ -17,7 +17,7 @@ test-results/
 *.p12
 *.crx
 
-# Editor and system junk
+# OS and editor files
 .DS_Store
 Thumbs.db
 .idea/

@@ -1,0 +1,29 @@
+name: Build and validate Chrome extension
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run static checks and unit tests
+        run: npm run check
+      - name: Build unpacked Chrome extension
+        run: npm run build
+      - name: Save installable unpacked build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ad-blocker-chrome-unpacked
+          path: dist/chrome/
+          if-no-files-found: error

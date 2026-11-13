@@ -1,57 +1,52 @@
-# Test strategy and evidence requirements
+# Testing and release evidence (current + planned)
 
-**Current state:** no test runner or extension code exists yet. These are requirements for the build team.
+**State:** Node-native structural checks, unit tests and a build script are present; GitHub Actions is configured. **No live Chrome/Chromium integration test has yet been recorded.** Current implementation is a development preview.
 
-## Testing pyramid
+## Commands
 
-1. **Unit:** URL/domain normalization, rule priority and exceptions, settings schema, parser coverage, local state migration.
-2. **Fixture/integration:** synthetic local pages with known allow/block resources and cosmetic classes, dynamic DOM changes, exception reversibility.
-3. **Extension/browser:** load unpacked build in Playwright Chromium, assert Manifest V3 startup, toggle behavior, DNR effects, persistence, popup/options navigation.
-4. **Compatibility:** real sites sampled ethically and consistently, including normal page functions, sign-in interfaces without capturing credentials, media playback with appropriate caveats.
-5. **Performance:** memory, CPU, build/rule footprint, page load and injection overhead compared against a no-extension baseline.
-6. **Security/privacy:** permission review, script injection surfaces, dependency risk, remote code checks, unexpected outbound connections.
+```bash
+npm run verify   # JSON/manifest/files and JS syntax checks
+npm run test     # Node unit tests for domain logic and mock service worker
+npm run check    # both of the above
+npm run build    # validate then copy unpacked extension to dist/chrome
+```
 
-## Minimum automated P0 gates
+Node.js 20+ required. No `npm install` necessary for present scripts.
 
-- TypeScript typecheck and lint (once tooling exists).
-- License/dependency report; explicit review of new dependencies.
-- Build a valid MV3 manifest and static-rule JSON.
-- DNR fixture: expected request blocked, neighboring benign request not blocked.
-- Global disable/re-enable and per-site exception behavior.
-- Storage versioning across reopen/restart.
-- Cosmetic fixture: intended element hidden, legitimate content visible.
-- Popup controls wired to real runtime behavior.
-- No unapproved outbound analytics/telemetry.
-- CI artifact installs in a known tested Chromium version.
+## What the existing tests measure
 
-## Benchmark design
+- Hostname normalization and safe exact/subdomain exception matching.
+- Mocked service-worker global toggles, DNR ruleset selection and dynamic allowAllRequests generation.
+- Invalid command/input handling.
+- Packaging consistency of manifest, JS files and DNR JSON.
 
-Record test timestamp, browser and extension versions, OS/environment, filter-list versions, list configuration, network conditions, workload, warm/cold caches, sample count and which requests/ads were actually measured. Run baseline and tested extension under comparable conditions; ensure the same test website state and deterministic synthetic fixtures.
+Mock-based unit tests **do not** prove Chrome rules work in a browser or that real websites are safe.
 
-Measure: blocked eligible requests, false positives, breakages, script/CPU overhead, memory, install/package size, enabled rules and recovery from failed updates. Do not infer visual-ad absence from request count alone.
+## Next verification gate (required)
 
-Use medians and distributions where possible. Do not publish “100% ads blocked”, “10x faster”, or “most users” without current reproducible evidence. Chrome per-request debug API access is limited for published extensions; **do not fake exact production counters**.
+1. Load `dist/chrome` into a pinned Chrome/Chromium build 121+; record actual browser version.
+2. Use a synthetic HTTP(S) test site and a reserved `.test` ad hostname, track request errors before/after enabled flag.
+3. Test trusted top-level site reload and confirm no blocked subrequests when allowAllRequests matches.
+4. Test removal of trust and blocking restoration after reload.
+5. Test global pause/resume including cosmetic hiding; service worker suspension and browser restart.
+6. Verify popup/options controls, no errors in extension service worker console, keyboard operation and proper disclosures.
+7. Test normal page content isn't hidden or broken.
+8. Save Chromium build version, commands, logs and failures in PR.
 
-## Browser cases
+## Later testing pyramid
 
-- New install with no settings
-- Existing settings after extension upgrade
-- Pause/re-enable globally
-- Exception for one site and restore
-- Site with same-origin and cross-origin assets
-- Multiple tabs and tab changes
-- SPA/dynamic ads inserted after load
-- Safe domains / malicious patterns (use synthetic test domains)
-- Rule budget exceeded and rule update failed
-- Browser restart and service-worker suspension
-- Offline update fallback
-- Keyboard-only and screen-reader navigability
+- Unit tests of list parsing, DNR priorities, schema migrations and exceptions.
+- Browser fixture tests for blocking, cosmetic selectors and dynamically inserted nodes.
+- Compatibility test pages for ordinary sites, SPA navigation, safe media playback and legitimate widgets.
+- Performance comparisons against no-extension baseline and pinned competitive extensions.
+- Security/privacy audits of permissions, imported filters, source provenance, remote executable code, outbound network behavior and build chain.
 
-## Evidence for pull requests
+## Benchmark integrity
 
-Record exact commands, test output summary, links to CI run, versions, limitations and manual verification cases. If test cannot run in Codex Cloud, mark it “not run” and provide clear human steps. Screenshots are supporting material, not proof of filter efficacy.
+Record test dates, exact Chrome/extension versions, enabled lists, domain tests, OS/hardware, repetition counts and run conditions. Compare same controlled workloads independently (not overlapping blockers in one profile). Report medians/distributions and breakages. **Never invent exact counts or claim 100% video-ad blocking.** MV3 production visibility into matched rules is restricted.
 
-## Supporting references
+## External references
 
-- [Playwright: test Chrome extensions](https://playwright.dev/docs/chrome-extensions)
-- [Chrome declarativeNetRequest](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest)
+- [Playwright browser extension testing](https://playwright.dev/docs/chrome-extensions)
+- [Chrome declarativeNetRequest API](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest)
+- [Competitive methodology](COMPETITIVE_BENCHMARK.md)

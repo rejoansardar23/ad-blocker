@@ -1,49 +1,41 @@
-# Start here: project orientation
+# Start here — no chat history required
 
-**Reading time:** roughly 15 minutes. This file is written for developers who have not seen the project's ChatGPT planning conversation.
+This repository holds a first **original-code Chrome MV3 development preview** and a longer-term plan for a market-competitive ad blocker. It is not a finished or independently browser-validated product.
 
-## What are we building?
+## First 10 minutes
 
-We want an independent, commercial-capable ad-blocking product that aspires to compete with leading market offerings. The initial deliverable is a reliable **Chrome Manifest V3 extension**. The longer-term vision includes multi-browser support, with desktop and DNS products evaluated later as distinct deployments.
+1. Read [README](../README.md) for the mission and current status.
+2. Follow [developer setup](DEVELOPER_SETUP.md) to run `npm run check`, `npm run build` and load `dist/chrome`.
+3. Read the [ordered 60-task checklist](IMPLEMENTATION_CHECKLIST.md) and [feature matrix](FEATURE_MATRIX.md) to see what is present versus still required.
+4. Review [architecture](ARCHITECTURE.md), [security/privacy](SECURITY_PRIVACY.md), and [reuse/licensing](REUSE_AND_LICENSES.md) before touching engine code.
+5. Read [AGENTS.md](../AGENTS.md) if using Codex Cloud or other AI coding agents.
+6. Submit a scoped issue with acceptance criteria; follow [CONTRIBUTING](../CONTRIBUTING.md).
 
-## What exists right now?
+## What we are building
 
-As of 13 November 2026, only project planning and contributor documentation are present. No codebase, filtering engine, UI, test infrastructure, verified third-party import, Chrome Web Store listing or benchmark is completed. **All proposed features are planned**, not shipped.
+An independent, privacy-first ad blocker competing on **measured** network filtering, tracker protection, low website breakage, resource overhead and user controls with AdGuard/uBlock/Ghostery. Chrome is the first target; Edge and Firefox are later, and desktop/DNS products require distinct engineering.
 
-## What decisions have we made?
+## What exists in the initial code milestone
 
-- Start with a single modular GitHub repository rather than merging whole codebases.
-- Reuse legally compatible, well-maintained components **only when they provide measurable benefit**.
-- Evaluate Very Good AdBlock as an MIT-licensed *candidate foundation*, but first verify actual repository state, dependency licenses, build reproducibility and testing.
-- Evaluate Ghostery's adblocker library for potential selective integration, rather than assuming multiple engines help.
-- Reference AdGuard and uBlock projects for behavior and benchmark criteria, not automatically import their GPL-covered code into proprietary modules.
-- Prioritize low breakage, privacy, reliable blocking and speed over raw feature count.
-- Develop with Codex Cloud where possible, but require real browser verification and human review.
+- Manifest V3 extension package with locally bundled DNR rules.
+- Background worker connecting local preferences to global and per-site filtering.
+- Popup/options UI, deliberately narrow cosmetic selectors and domain validation.
+- Node-native tests, validation/build scripts and GitHub Actions workflow.
+- Comprehensive project strategy and new-developer documentation.
 
-## Reading order
+**Not yet verified:** Chrome/Chromium installation, real network-blocking behavior, UI behavior in a browser, performance and compatibility. **Not yet built:** comprehensive filter lists, auto-updates, advanced custom rules/element picker, production release.
 
-1. [Vision](VISION.md): product mission, success and non-goals.
-2. [Product spec](PRODUCT_SPEC.md): users, scope and quality bar.
-3. [Feature matrix](FEATURE_MATRIX.md): priorities and explicitly planned status.
-4. [Architecture](ARCHITECTURE.md): proposed package boundaries, MV3 constraints.
-5. [Reuse and licenses](REUSE_AND_LICENSES.md): upstream candidates and legal review gates.
-6. [Roadmap](ROADMAP.md): incremental milestones.
-7. [Testing](TESTING.md) + [competitive benchmarks](COMPETITIVE_BENCHMARK.md): how to prove functionality.
-8. [Security and privacy](SECURITY_PRIVACY.md) + [Decisions](DECISIONS.md).
-9. [Codex workflow](CODEX_WORKFLOW.md), [AGENTS](../AGENTS.md), [Contributing](../CONTRIBUTING.md).
+## Product decisions
 
-## First contribution: Milestone 0
+- One main repository with modular boundaries.
+- Start with a small original dependency-free implementation; do a pinned-comparison audit before importing another engine.
+- Very Good AdBlock, Unblock and Ghostery SDK are candidates to investigate, not imported dependencies.
+- AdGuard/uBlock are competitive references, not freely combinable code.
+- Licensing and downstream commercial distribution conditions need an explicit owner decision.
+- No fabricated “blocked ad” counters or guaranteed video ad support.
 
-Open a scoped proposal with a reproducible upstream audit. For each candidate, capture upstream commit, license text, dependency/data licenses, latest maintenance signal, build/install instructions, automated test result, Chrome MV3 support and gaps. Recommend one foundation with evidence and record an ADR.
+## First contribution
 
-Only after that review should the initial extension shell and actual blocking tests be written. Never tell users a feature works based on an unverified vendor description.
+Run the current checks, make the first Chromium fixture test pass, audit the license/permissions, and record the result in the [checklist](IMPLEMENTATION_CHECKLIST.md). For the next features, insist on a reuse audit instead of a rewrite.
 
-## Set up today
-
-Clone using GitHub: https://github.com/rejoansardar23/ad-blocker
-
-There are no app dependencies or build commands yet. Do **not** run npm install or expect a browser extension build to exist from this documentation-only revision. When scaffolding is added, update this page with pinned tool versions, exact commands, expected outputs and troubleshooting.
-
-## Need help?
-
-Open a GitHub issue using the research, feature or bug template; never post passwords, tokens, private browsing URLs or vulnerability details in public issues.
+For the long-term scope see [Vision](VISION.md), [Product Spec](PRODUCT_SPEC.md), [Roadmap](ROADMAP.md), [Competitor benchmarks](COMPETITIVE_BENCHMARK.md), [Codex Workflow](CODEX_WORKFLOW.md), and [Decision Log](DECISIONS.md).

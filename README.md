@@ -1,58 +1,74 @@
-# Ad Blocker — Open Project Handbook
+# Ad Blocker — Chrome MV3 Development Preview
 
-> **Status (13 November 2026): Planning and documentation only.** This repository does not yet contain a working browser extension, production filtering engine, released application, or independently measured benchmark.
+> **Version 0.1.0 · Early implementation · 13 November 2026**  
+> A small, original-code browser extension foundation now exists. **It has not yet passed recorded live Chrome/Chromium end-to-end tests and is not production ready.** Full AdGuard/uBlock/Ghostery feature parity is a long-term goal, not a current claim.
 
-## The mission
+## Vision
 
-Build an independently branded, privacy-first ad-blocking software platform that can credibly compete with leading products such as AdGuard, uBlock Origin / uBlock Origin Lite, Ghostery, AdBlock and Adblock Plus. Competition means *measurable blocking quality, low website breakage, privacy, resource efficiency, usability and reliable updates* — not inflated feature claims.
+Build a market-competitive, independently branded, privacy-first ad-blocking software platform, starting with Chrome Manifest V3. Compete on **measured blocking quality, low website breakage, efficient resource use, privacy and user experience**. Use AI coding agents such as Codex Cloud and compatible open-source components only when they reduce total effort without compromising legality, security or maintainability.
 
-Start with a Chrome Manifest V3 extension; design reusable packages so Edge and Firefox may follow, then evaluate desktop and DNS-based products as **separate future work**. We intend to develop with Codex Cloud and human contributors, keep costs low, reuse legally compatible open-source work, and avoid rewriting solved problems.
+**New developer?** Start with [START HERE](docs/START_HERE.md) and the **[60-step implementation checklist](docs/IMPLEMENTATION_CHECKLIST.md)**. You do **not** need the original planning chat.
 
-## Start here (new developers and AI coding agents)
+## Current code: what is actually here
 
-1. [START HERE](docs/START_HERE.md) — reading order, repository status, and first contribution.
-2. [Vision and success criteria](docs/VISION.md) — the why, boundaries and product values.
-3. [Product specification](docs/PRODUCT_SPEC.md) and [Feature matrix](docs/FEATURE_MATRIX.md) — planned functionality and definition of done.
-4. [Architecture](docs/ARCHITECTURE.md) — proposed MV3 design and limits.
-5. [Reuse and licenses](docs/REUSE_AND_LICENSES.md) — evaluate external repositories *before copying anything*.
-6. [Roadmap](docs/ROADMAP.md) and [Research backlog](docs/RESEARCH_BACKLOG.md) — implementation order and open decisions.
-7. [Quality and benchmarks](docs/TESTING.md) — evidence needed for claims.
-8. [Security and privacy](docs/SECURITY_PRIVACY.md) — safety requirements.
-9. [Codex workflow](docs/CODEX_WORKFLOW.md) and [AGENTS.md](AGENTS.md) — efficient AI-assisted development.
-10. [Contribution guide](CONTRIBUTING.md) and [Security policy](SECURITY.md).
+| Capability | Code state | Required proof |
+|---|---|---|
+| Chrome Manifest V3 package | Added | Load in Chrome |
+| Bundled sample blocking rules (few ad networks) | Added | Real browser request fixture |
+| Global protection toggle | Added | Browser + restart |
+| Per-site trusted website list | Added | Browser reload and subdomain scenarios |
+| Basic cosmetic CSS | Added | Safe hiding/no false positives |
+| Popup, options and local settings | Added | Chrome UI interaction |
+| Node unit tests and structural checks | Added | Run `npm run check` / CI |
+| Dependency-free extension packaging | Added | Run `npm run build` / Chrome |
+| Comprehensive filter-list support, tracker modes, custom rules, element picker | Not yet built | Milestones P1 |
+| Chrome Store release, Chrome/Firefox/desktop/DNS products | Not yet built | Separate approval/testing |
 
-See also [competitive benchmark plan](docs/COMPETITIVE_BENCHMARK.md) and [decision log](docs/DECISIONS.md).
+This is a **starter ruleset**, not a market-leading blocker yet. No telemetry or remote code is implemented. Do not make unsupported claims of 100% blocking, exact ad counts or YouTube ad removal.
 
-## Scope and priorities
+## Quick start
 
-**P0 — first reliable extension:** valid MV3 package, DNR network blocking, rule build/validation, local settings, protection switch, per-site exceptions, essential cosmetic filtering, permissions review, tests, install instructions.
+Requires **Node.js 20+** and Chrome/Chromium 121+ for testing.
 
-**P1 — competitive extension:** quality filter-list management, custom rules, element picker, user controls, diagnostics, accessible dashboard, update/rollback strategy, performance measurements.
+```bash
+git clone https://github.com/rejoansardar23/ad-blocker.git
+cd ad-blocker
+npm run check
+npm run build
+```
 
-**P2 — research/expansion:** advanced anti-tracking, optional nuisance filters, video-site best-effort handling, Edge/Firefox compatibility, desktop and DNS products. Different platforms have different capabilities; none is promised in the MVP.
+Open `chrome://extensions` → enable **Developer mode** → **Load unpacked** → select `dist/chrome`.
 
-See the [feature matrix](docs/FEATURE_MATRIX.md) for status. **All features are planned until code and tests demonstrate otherwise.**
+**There is no need to run `npm install`:** these scripts use built-in Node APIs and the extension contains no third-party runtime packages. The Chrome/browser smoke tests are still a pending verification gate. See [developer setup](docs/DEVELOPER_SETUP.md).
 
-## Approach: one product, reuse selectively
+## Documentation map
 
-- Maintain **one main modular monorepo** for product code and documentation. This is the current architecture recommendation, not evidence the packages already exist.
-- Evaluate [Very Good AdBlock](https://github.com/chrisbbreuer/very-good-adblock) as a *candidate foundation*, not an approved/verified dependency.
-- Evaluate [Ghostery adblocker](https://github.com/ghostery/adblocker), [WXT](https://github.com/wxt-dev/wxt), [AGLint](https://github.com/AdguardTeam/AGLint), and maintained filter lists where they demonstrably reduce maintenance.
-- Use [AdGuard Browser Extension](https://github.com/AdguardTeam/AdguardBrowserExtension), [uBlock Origin](https://github.com/gorhill/uBlock), and [uBlock Origin Lite](https://github.com/uBlockOrigin/uBOL-home) as implementation/benchmark references, **not as license-free code to merge**.
-- Never install several overlapping filtering engines just to increase the feature count; benchmark integration cost and benefits first.
+- **[START_HERE.md](docs/START_HERE.md)** — orientation for humans and AI developers.
+- **[IMPLEMENTATION_CHECKLIST.md](docs/IMPLEMENTATION_CHECKLIST.md)** — 60 sequential tasks with status.
+- [VISION.md](docs/VISION.md) — competitive goals and principles.
+- [PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md) / [FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md) — product requirements and verified/planned states.
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) — existing request/permission design and future modules.
+- [ROADMAP.md](docs/ROADMAP.md) — phase delivery and exit gates.
+- [REUSE_AND_LICENSES.md](docs/REUSE_AND_LICENSES.md) / [REUSE_AUDIT_TEMPLATE.md](docs/REUSE_AUDIT_TEMPLATE.md) — public repository evaluation before integration.
+- [TESTING.md](docs/TESTING.md) / [COMPETITIVE_BENCHMARK.md](docs/COMPETITIVE_BENCHMARK.md) — quality proof and competitor benchmarking.
+- [SECURITY_PRIVACY.md](docs/SECURITY_PRIVACY.md) / [SECURITY.md](SECURITY.md) — security, privacy and vulnerability disclosures.
+- [CODEX_WORKFLOW.md](docs/CODEX_WORKFLOW.md) / [AGENTS.md](AGENTS.md) — Codex Cloud instructions and credit-saving workflow.
+- [DEVELOPER_SETUP.md](docs/DEVELOPER_SETUP.md) / [RELEASE_GUIDE.md](docs/RELEASE_GUIDE.md) — local workflow and future releases.
+- [DECISIONS.md](docs/DECISIONS.md) / [RESEARCH_BACKLOG.md](docs/RESEARCH_BACKLOG.md) — open decisions and research.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — how to propose scoped, testable changes.
 
-## Current state and next milestone
+## Reuse strategy and competitor references
 
-The initial repository contained only the heading “ad-blocker”. This commit documents the agreed vision and contributor workflow. **No runnable extension has been built by this documentation commit.**
+We propose **one main modular product repo**, not a blind merge of several GPL codebases. The current minimal implementation is original code without imported upstream engines. Before larger features, audit possible foundations [Very Good AdBlock](https://github.com/chrisbbreuer/very-good-adblock), [Unblock](https://github.com/adyoi/unblock), [Ghostery's adblocker SDK](https://github.com/ghostery/adblocker), [WXT](https://github.com/wxt-dev/wxt) and filtering datasets. Use [AdGuard](https://github.com/AdguardTeam/AdguardBrowserExtension) and [uBlock Origin](https://github.com/gorhill/uBlock) as competitor references, not license-free source.
 
-**Milestone 0 (first engineering contribution):** audit candidate foundations and licenses, document verified facts, choose a foundation, create reproducible build/test scaffolding, and deliver the smallest genuinely working Chrome MV3 package. Do not claim tested behavior until tests have run.
+**Ownership/license warning:** the repo is public, but a project-wide source license is not yet selected. The founder must decide licensing/distribution and external contribution terms before a public release or major third-party code import. Original code ownership does not imply ownership of upstream components.
 
-## Ownership, visibility and licensing
+## Next milestone (Codex Cloud)
 
-This repository is **public**. Public visibility does **not** automatically grant permission to reuse source. A project-wide license has **not yet been selected**; maintainers must make a deliberate licensing decision before accepting substantive external code contributions or publishing binaries. Third-party software, filter subscriptions, and data sets have their **own** obligations. See [Reuse and licenses](docs/REUSE_AND_LICENSES.md).
+1. Run `npm run check` and `npm run build`; capture CI evidence and fix failures.
+2. Load build in real Chrome and test DNR block/allow and pause/allowlist/restore cases.
+3. Perform security and permission review; record results in the checklist.
+4. Audit compatible existing engines and filter data before rebuilding more features.
+5. Only then expand toward a competitive filter compiler and coverage benchmark.
 
-## Contributing
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md). Propose a scoped issue, show a reuse audit, implement with tests, and submit a reviewable pull request. Security issues should be reported privately via [SECURITY.md](SECURITY.md).
-
-**Product philosophy:** deliver fewer verified capabilities rather than many unchecked claims.
+**The goal is real working software, not a feature checklist without evidence.**

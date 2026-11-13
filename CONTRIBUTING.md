@@ -1,32 +1,27 @@
-# Contributing to Ad Blocker
+# Contributing
 
-Thank you for helping build a competitive, privacy-first ad blocker. This repository currently contains **planning documentation**, not a working extension. Before coding, read [START HERE](docs/START_HERE.md), [Vision](docs/VISION.md), [Roadmap](docs/ROADMAP.md), and [AGENTS.md](AGENTS.md).
+This is an **early Chrome Manifest V3 development preview** with real source code, but no independently recorded browser verification or production release. The mission is to compete with market leaders through privacy-first, dependable blocking. Read [START HERE](docs/START_HERE.md), [the 60-task checklist](docs/IMPLEMENTATION_CHECKLIST.md), [AGENTS.md](AGENTS.md) and [the developer setup](docs/DEVELOPER_SETUP.md).
 
-## Before contributing
+## How to contribute
 
-1. Check existing issues, the [feature matrix](docs/FEATURE_MATRIX.md) and [research backlog](docs/RESEARCH_BACKLOG.md).
-2. Open an issue describing the problem, expected behavior, alternatives and acceptance criteria.
-3. For a proposed library, filter list or code reuse, include its upstream URL, pinned version/commit, license, data license, dependencies, maintenance status, security risks and why reusing it is preferable.
-4. Wait for a maintainer decision on **code licensing and contribution terms** before submitting substantive code. The repository has no project-wide license yet; public visibility is not permission to redistribute others' work.
+1. Check existing issues and [feature matrix](docs/FEATURE_MATRIX.md).
+2. Propose a scoped issue with user problem, acceptance tests, Chrome constraints, data/permission impact and reuse alternatives.
+3. For any proposed library or ruleset, specify pinned commit/version, license, dependencies, provenance and security maintenance.
+4. Agree with maintainer on **contribution and project-wide licensing** before submitting substantial external code. This public repository does not yet have a project-wide license; visibility is not a broad license to redistribute source.
+5. Work on a branch, submit a small PR and use the template with commands actually run and resulting evidence.
 
-Documentation fixes and factual research with sources are appropriate early contributions.
+## Quality bar
 
-## Pull requests
+- Run `npm run check` and `npm run build` for current source changes.
+- Do relevant browser integration tests (if unavailable, say so and document manual steps).
+- Keep existing valid functionality; no needless rewrites or duplicate filter engines.
+- Do not invent ad-blocking statistics, browser compatibility or competitive performance numbers.
+- Review new permissions, imported filter-data terms, update paths and browser breakage.
+- Do not commit keys, user browsing data, private information, unlicensed assets or remote executable code.
+- Update checklist, feature matrix and ADRs with tested results.
 
-- Work in a dedicated branch. Keep changes small and focused.
-- Describe why the change matters, how it was tested, any privacy/permissions effects and any third-party notices.
-- Update related docs and acceptance criteria; do not mark planned features as implemented without test evidence.
-- Never add private information, leaked lists, copyrighted content without rights, telemetry or bundled third-party source without review.
-- Use the pull request template; maintainers may request a design or licensing review before merge.
+Documentation improvements, security reviews, build reproduction and browser fixture tests are especially welcome. Bugs that disclose security vulnerabilities should follow [SECURITY.md](SECURITY.md), not a public issue.
 
-## Review quality bar
+## Conduct
 
-Every user-visible behavior needs an acceptance test or clear manual verification plan. Ensure unchanged behavior stays tested. For browser extension changes, test Chrome MV3 behavior, rule budgets, site exceptions and restart persistence where relevant. Benchmark claims require methodology and saved results.
-
-## Code of conduct
-
-Be constructive, specific and respectful. Review ideas rather than individuals. Don't harass contributors or expose private browsing details. Flag security problems privately as described in [SECURITY.md](SECURITY.md).
-
-## First contributions
-
-Useful first tasks: clarify documentation, verify third-party project licenses, reproduce upstream build instructions, establish initial extension scaffolding, create local synthetic test pages, or design performance/compatibility test cases. Don't promise a feature is complete based only on a README.
+Contribute constructively, keep reviews technical and respectful, protect users' privacy and explain decisions with reproducible evidence.

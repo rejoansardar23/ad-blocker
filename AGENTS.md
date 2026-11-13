@@ -1,57 +1,43 @@
-# Instructions for Codex Cloud and other coding agents
+# Coding agent instructions (Codex Cloud / GPT-6 Astra)
 
-Read [README.md](README.md), [docs/START_HERE.md](docs/START_HERE.md), and [docs/DECISIONS.md](docs/DECISIONS.md) before changing files. This repository is an early-stage *documented plan*, not a completed application. Treat plans and vendor README claims as hypotheses to verify.
+**Read first:** [README](README.md), [START_HERE](docs/START_HERE.md), [IMPLEMENTATION_CHECKLIST](docs/IMPLEMENTATION_CHECKLIST.md), [ARCHITECTURE](docs/ARCHITECTURE.md), [DECISIONS](docs/DECISIONS.md).
 
-## Mission and constraints
+This repo contains a **minimal original Chrome MV3 implementation**, Node check/build scripts, unit tests and a comprehensive aspirational roadmap. It is **not** a finished, Chrome-browser-validated product. Inspect repository state before claiming a feature exists.
 
-- Build a market-competitive, privacy-first ad blocker starting with Chrome Manifest V3.
-- Keep all implementation in this single repository unless maintainers approve splitting projects.
-- Preserve user ownership of *original* code and branding; do not claim ownership of imported upstream code.
-- Prefer free and reproducible tools; do not incur charges, deploy services, publish releases or enable data collection without explicit maintainer approval.
-- Codex Cloud may build/test code but must not imply it has installed anything in a user's local Chrome.
-- Keep extensions compatible with Chrome MV3 and Chrome Web Store policies. No remotely hosted executable code or speculative extension permissions.
-- **Do not silently copy GPL-covered source code into a proposed proprietary implementation.**
+## Your mission
 
-## Mandatory cycle for EVERY engineering task
+Build a market-competitive, independently branded, privacy-first ad blocker starting with Chrome. Optimize for blocking accuracy, low breakage, minimum permissions, performance, reliable updates and trustworthy tests. Avoid wasting credits building or integrating what working code already provides.
 
-1. **Inspect:** list existing functionality, tests, third-party licenses and current branch; never assume files exist.
-2. **Reuse audit:** search approved compatible dependencies before rewriting substantial functionality; record KEEP / INTEGRATE / ADAPT / BUILD / DEFER / REJECT and why.
-3. **Plan narrowly:** define smallest increment, exact acceptance criteria, test method, expected risks.
-4. **Implement:** make focused edits; avoid unrelated rewrites, migrations and broad formatting churn.
-5. **Verify:** run available automated checks; attempt real Chromium extension tests when available; document all unrun tests.
-6. **Report:** list changed files, commands and outcomes, tested limitations, unresolved questions and next task.
+## Rules you must follow
 
-Do not mark a feature “done” until its acceptance criteria and relevant tests pass. If Cloud cannot access a compatible browser/display, say that and provide manual verification instructions.
+1. **Inspect before coding.** Read actual source, docs, test outputs and current branch; never assume a feature is complete from its README.
+2. **Run available checks immediately:** `npm run check`, `npm run build`. Report exact results, errors and environment. No `npm install` is needed for present scripts.
+3. **Do real browser tests:** load `dist/chrome` in Chromium/Chrome, prove sample DNR blocking/allow, site exceptions, pause/restart, popup/options, cosmetic CSS. If browser testing is unavailable, say so and document manual work.
+4. **Maintain documented status:** update [FEATURE_MATRIX](docs/FEATURE_MATRIX.md) and [IMPLEMENTATION_CHECKLIST](docs/IMPLEMENTATION_CHECKLIST.md) only with evidence. UI/code presence is not Chrome test success.
+5. **License before import:** the repo is public but unlicensed as a whole; product/distribution rights require owner decision. Do not copy GPL-covered source into an intended proprietary distribution, and audit independent filter-list data licenses.
+6. **Review reuse:** compare keep/integrate/adapt/build/defer/reject options before major functionality. Pin upstream commit/version, license and security/maintenance status. Avoid overlapping engines without measured benefit.
+7. **Privacy and security:** no remote executable JS, telemetry, browsing history logs, token commits, unapproved external services, excessive permissions, or silent spending.
+8. **Scope discipline:** small PRs, reproducible commands, regression tests, and verifiable acceptance criteria. Do not migrate frameworks or redesign UI just to create activity.
+9. **No exaggerated claims:** no fake block counts, 100% video ad blocking, superiority rankings or production readiness without proof.
+10. **No unapproved publishing:** don't submit to extension stores, pay fees, change repo visibility, distribute binaries as final, or deploy services without maintainer approval.
 
-## Documentation is a contract
+## Main technical files
 
-- Update [docs/FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md) when scope or verified status changes.
-- Update [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) when implementation diverges from the proposal.
-- Add decisions, rationale and alternatives to [docs/DECISIONS.md](docs/DECISIONS.md).
-- Update [docs/REUSE_AND_LICENSES.md](docs/REUSE_AND_LICENSES.md) with any new third-party package, source, rule list, version, copyright notices and license obligations.
-- Record verified benchmarks with date, environment and artifacts; do not invent blocking percentages or performance claims.
+- `manifest.json`: Chrome MV3 config.
+- `rules/starter.json`: limited static DNR blocked domains.
+- `background/service-worker.js`: enabled flag, domain exceptions, dynamic allowAllRequests.
+- `shared/domain.js`: site validation/matching.
+- `content/cosmetic.js`: narrow CSS hiding.
+- `popup/` and `options/`: working-control code, pending real-browser validation.
+- `scripts/` and `tests/`: verification and build.
+- `.github/workflows/checks.yml`: automatic CI.
 
-## Initial engineering priorities
+## Exact first engineering task
 
-1. Decide the licensing/distribution strategy and audit foundations.
-2. Reproduce the selected candidate's builds/tests (or justify original build).
-3. Establish a minimal working MV3 extension with declarativeNetRequest, safe sample rules, local state and a popup.
-4. Add reliable cosmetic filtering and site exceptions.
-5. Implement filter-list compilation, testing and updates incrementally.
-6. Benchmark accuracy, breakage, privacy and performance.
+Validate this first commit's code, fix any failures, and add **a genuine Chromium integration test** of the packaged extension. Include failed and passing test evidence. Make sure trusted-site exception priority works on Chrome navigation/reload, and global pause affects both network filtering and CSS.
 
-## Security requirements
+Then finish the phase-0 licensing/foundation audit before importing third-party filtering engines or lists.
 
-Avoid broad host permissions unless necessary and justified. Do not collect browsing histories, log full URLs by default, introduce analytics or remote code. Do not commit credentials, signing keys, account data, real browsing histories or production secrets. Use GitHub's private security reporting for vulnerabilities.
+## Done criteria
 
-## Effective use of Codex credits
-
-- Read before writing; do not re-implement already working features.
-- Choose one filter runtime for each browser target unless measured evidence shows benefit from another.
-- Prefer current repo tooling over framework migrations.
-- Ask a precise question only when a missing product/legal choice prevents safe progress; otherwise document a reversible assumption and complete a small useful task.
-- Keep PRs small, include reproducible tests, and stop expanding scope after the acceptance criteria pass.
-
-## Deliverable for initial pull requests
-
-A newcomer should be able to clone, follow exact documented commands, reproduce tests, understand what is implemented vs planned, and install a verified extension when the build exists. Until then, clearly mark the setup as **not yet implemented**.
+Every completed feature needs merged source, reproducible build/test evidence, verified Chrome behavior where relevant, security/license review and updated docs. Report limitations and next smallest improvement. See [Codex workflow](docs/CODEX_WORKFLOW.md).

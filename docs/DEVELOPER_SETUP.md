@@ -1,42 +1,62 @@
-# Developer setup and first implementation task
+# Developer setup — development preview
 
-**Important:** The repository currently contains only documentation. There is no package.json, manifest.json, installable extension, npm dependency tree or test runner. Do not assume setup commands exist.
+**State:** basic original MV3 source code exists as of 13 Nov 2026. No external runtime or build dependencies. Chrome/browser end-to-end validation is not yet recorded.
 
-## Current setup
+## Prerequisites
 
-1. Clone: https://github.com/rejoansardar23/ad-blocker
-2. Read [START_HERE.md](START_HERE.md), [ARCHITECTURE.md](ARCHITECTURE.md), [REUSE_AND_LICENSES.md](REUSE_AND_LICENSES.md) and [DECISIONS.md](DECISIONS.md).
-3. Open an issue for a scoped research/engineering task. Avoid committing copied project code before license/distribution review.
-4. Use a branch for changes; submit a PR with evidence according to [CONTRIBUTING.md](../CONTRIBUTING.md).
+- Node.js **20 or newer** (Node.js 22 recommended for CI parity).
+- Chrome / Chromium version 121+ to test a Manifest V3 extension.
+- Git and a shell. No paid hosting, domain or API keys required.
 
-## First engineering bootstrap (proposed)
+## Clone, validate and build
 
-- Decide candidate baseline and verify licenses, bundle dependencies and build reproducibility.
-- Add toolchain versions (Node.js, package manager) and lockfile.
-- Create valid MV3 manifest, DNR JSON and a minimal popup tied to real settings.
-- Add a synthetic two-resource fixture proving block and allow behavior.
-- Add automated checks and CI for supported build/test paths.
-- Add exact commands here for installing packages, building, testing and loading unpacked extension.
-- Verify Chrome permissions, service worker lifecycle, and restart/allowlist behavior.
-- Mark features as implemented **only** after passing tests.
+```bash
+git clone https://github.com/rejoansardar23/ad-blocker.git
+cd ad-blocker
+npm run check
+npm run build
+```
 
-## Required onboarding quality
+`npm run check` validates the manifest, file references, DNR JSON, JavaScript syntax and Node unit tests. `npm run build` copies only the extension runtime to `dist/chrome`. No `npm install` is required for these commands.
 
-A new contributor should be able to:
-- identify actual shipped code vs aspirational features;
-- install pinned dependencies using one documented command;
-- run checks and understand failures;
-- load the built extension in Chromium/Chrome with no missing files;
-- reproduce a known blocked request;
-- see license and security policies;
-- find a small open issue with acceptance criteria.
+## Install in Chrome
 
-Do not describe the product as ready for use until the above steps are demonstrably true.
+1. Open `chrome://extensions`.
+2. Turn **Developer mode** on.
+3. Click **Load unpacked**.
+4. Select **dist/chrome** (not the repo's docs directory).
+5. Open an ordinary HTTP(S) page and select the extension action.
+6. Toggle protection and trusted-site settings; reload the tab after per-site changes.
 
-## Common misconceptions
+Chrome may display broad site-access notices because cosmetic content scripts match HTTP(S) pages. Browser-internal pages are intentionally unsupported. Report installation failures with Chrome version and redacted error output.
 
-- A public GitHub repo is not permission to reuse third-party code.
-- An MIT licensed starting project may include assets/data/dependencies governed by other terms.
-- “Chrome + Firefox” in a project's README is not proof of tested portability.
-- Browser MV3 cannot guarantee all video ads or entire-device ad blocking.
-- A nice popup without real DNR rules is only a UI prototype.
+## What works by design
+
+- A small packaged DNR ruleset for a handful of known ad-network domains; this is not a full filter subscription.
+- Global protection toggle backed by `chrome.storage.local` and DNR ruleset enabling/disabling.
+- Domain-based site allowlisting through dynamic `allowAllRequests` rules that take effect on frame navigation/reload.
+- A narrow cosmetic CSS rule for common ad placeholders, disabled on trusted sites.
+- Local options interface to add/remove trusted websites.
+
+**Verification warning:** the list above describes implemented code paths, not yet independently proven browser success. Use the [implementation checklist](IMPLEMENTATION_CHECKLIST.md) and [testing strategy](TESTING.md).
+
+## Browser smoke test to record
+
+- On a test page, load a JavaScript/image request to `https://ads.adblocker.test/asset.js` (a reserved test domain), and a benign same-site fixture; confirm target reports browser block-by-client versus benign request.
+- Disable protection and reload; confirm the target is no longer blocked *by the extension* (DNS resolution still fails for reserved `.test` domains).
+- Allowlist test page's domain, reload, and confirm request behaviors and absence of cosmetic CSS.
+- Remove exception and reload; confirm blocking restored.
+- Restart Chrome and confirm persisted state.
+- Record browser version, console errors and exact result; do not claim verification before this is run.
+
+## Troubleshooting
+
+- **Extension won't load:** use `dist/chrome` produced by build, inspect `chrome://extensions` errors, run `npm run verify`.
+- **Popup says unavailable:** browser internal pages (`chrome://`, Web Store, etc.) cannot be filtered the same way.
+- **Site exception didn't apply:** reload the affected tab to re-evaluate the top-level frame's allow rule.
+- **Ad still visible:** starter rules only cover selected domains and selectors; expand after legal list audit and measured tests.
+- **Browser API error:** inspect the extension service worker console and include redacted details in an issue.
+
+## Security, licensing and contributions
+
+This public repository has no final project-wide source license selected. Do not import third-party application code without compatible licensing and attribution review. See [REUSE_AND_LICENSES](REUSE_AND_LICENSES.md), [SECURITY](../SECURITY.md), and [CONTRIBUTING](../CONTRIBUTING.md).

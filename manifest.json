@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Ad Blocker — Development Preview",
+  "version": "0.1.0",
+  "description": "Local-first Chrome ad blocker with a small bundled starter ruleset. Early development preview.",
+  "minimum_chrome_version": "121",
+  "permissions": ["declarativeNetRequest", "storage", "activeTab"],
+  "action": {
+    "default_title": "Ad Blocker",
+    "default_popup": "popup/popup.html"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "options_page": "options/options.html",
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "starter_rules",
+        "enabled": true,
+        "path": "rules/starter.json"
+      }
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["shared/domain.js", "content/cosmetic.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

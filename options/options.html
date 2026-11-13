@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Ad Blocker Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <span class="symbol" aria-hidden="true">◆</span>
+      <div>
+        <h1>Ad Blocker</h1>
+        <p>Settings · Development preview 0.1</p>
+      </div>
+    </header>
+    <main>
+      <section class="card">
+        <div class="line">
+          <div>
+            <h2>Network protection</h2>
+            <p>Enable or disable bundled Chrome DNR rules and cosmetic hiding.</p>
+          </div>
+          <label class="toggle">
+            <input id="enabled" type="checkbox" disabled>
+            <span>On</span>
+          </label>
+        </div>
+        <p class="small">This early preview includes a small offline starter list, not complete commercial-grade filtering.</p>
+      </section>
+      <section class="card">
+        <h2>Trusted websites</h2>
+        <p>When a website is trusted, blocking is paused for that site's frames after reloading the page. Subdomains of an entry are included.</p>
+        <form id="add-form">
+          <label for="site">Website hostname or URL</label>
+          <div class="formrow">
+            <input id="site" type="text" autocomplete="off" placeholder="example.com" required>
+            <button type="submit">Add website</button>
+          </div>
+        </form>
+        <ul id="sites" aria-live="polite"></ul>
+        <p id="empty">No trusted websites yet.</p>
+      </section>
+      <section class="card">
+        <h2>Privacy and limitations</h2>
+        <p>Settings are stored locally. This build does not send your browsing history to a server. Ad-blocking statistics are intentionally not shown because accurate production counters are not available from all MV3 filtering paths.</p>
+        <p>Chrome's developer mode and site-permission warnings are expected for this early extension. Not every ad network, site layout or video ad is blocked.</p>
+      </section>
+      <p id="status" role="status">Loading settings…</p>
+    </main>
+    <footer>Built for privacy, reliability and transparent testing.</footer>
+  </div>
+  <script src="../shared/domain.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

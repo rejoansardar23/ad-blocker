@@ -1,0 +1,32 @@
+:root { color-scheme: dark; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #0b1220; color: #f5f7ff; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.layout { max-width: 770px; margin: 0 auto; padding: 26px 22px; }
+header { display: flex; gap: 15px; align-items: center; margin: 0 0 28px; }
+.symbol { background: #224179; border-radius: 14px; padding: 10px 14px; color: #9fc1ff; font-size: 26px; }
+header h1 { font-size: 25px; margin: 0; }
+header p { margin: 5px 0 0; color: #aab7cd; }
+.card { border: 1px solid #2a3851; background: #141f33; border-radius: 17px; margin-bottom: 16px; padding: 24px; }
+h2 { font-size: 18px; margin: 0 0 12px; }
+p { color: #b3bed3; line-height: 1.6; font-size: 13px; }
+.line { display: flex; gap: 20px; justify-content: space-between; align-items: center; }
+.line p { margin: 0; }
+.small { font-size: 12px; margin-bottom: 0; }
+.toggle { white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.toggle input { width: 19px; height: 19px; accent-color: #3cc68f; }
+label { color: #dbe6f9; font-size: 13px; display: block; margin-bottom: 9px; }
+.formrow { display: flex; gap: 9px; }
+input[type="text"] { background: #0a1526; border: 1px solid #435371; border-radius: 8px; color: white; min-width: 0; flex: 1; padding: 10px 11px; }
+button { background: #2d61b7; border: 1px solid #3f79d8; color: white; border-radius: 8px; padding: 10px 13px; cursor: pointer; }
+button:hover { background: #3970ca; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+input:focus-visible, button:focus-visible { outline: 2px solid #9dc4ff; outline-offset: 3px; }
+ul { padding: 0; margin: 15px 0 0; list-style: none; }
+li { display: flex; justify-content: space-between; align-items: center; gap: 15px; border-bottom: 1px solid #2a3952; padding: 10px 2px; }
+li span { overflow-wrap: anywhere; }
+li button { background: #443149; border-color: #74475a; }
+#empty { margin: 12px 0 0; font-style: italic; }
+#status { min-height: 20px; margin: 14px 0; }
+#status.error { color: #ffaaaa; }
+footer { color: #8795b2; font-size: 12px; margin-top: 25px; }
+@media (max-width: 520px) { .layout { padding: 18px 12px; } .card { padding: 16px; } .formrow { flex-direction: column; } }

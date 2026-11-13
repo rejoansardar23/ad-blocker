@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Ad Blocker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <span class="brandmark" aria-hidden="true">◆</span>
+      <div class="brand">
+        <strong>Ad Blocker</strong>
+        <small>Development preview · v0.1</small>
+      </div>
+      <span id="badge" class="badge">Loading…</span>
+    </header>
+
+    <section class="hero" aria-live="polite">
+      <div class="shield" aria-hidden="true">⬡</div>
+      <h1 id="headline">Checking protection…</h1>
+      <p id="subtitle">Small, bundled starter ruleset. Your settings stay on this device.</p>
+    </section>
+
+    <section class="control" aria-label="Protection settings">
+      <div class="control-copy">
+        <strong>Block known ads</strong>
+        <span>Toggle network and cosmetic filtering</span>
+      </div>
+      <label class="switch">
+        <input id="enabled" type="checkbox" aria-label="Enable ad blocking" disabled>
+        <span class="track"></span>
+      </label>
+    </section>
+
+    <section class="sitebox" aria-label="Current website">
+      <div class="site-top">
+        <span class="eyebrow">CURRENT WEBSITE</span>
+        <strong id="site-label">Detecting site…</strong>
+      </div>
+      <div class="control compact">
+        <div class="control-copy">
+          <strong>Block on this site</strong>
+          <span>Trusted sites can be excluded</span>
+        </div>
+        <label class="switch">
+          <input id="site-enabled" type="checkbox" aria-label="Block ads on current site" disabled>
+          <span class="track"></span>
+        </label>
+      </div>
+    </section>
+
+    <p id="notice" class="notice" role="status">Changes to website exceptions require reloading the page.</p>
+    <button id="reload" class="reload" type="button" hidden>Reload current page</button>
+    <footer>
+      <button id="settings" class="textbtn" type="button">Settings &amp; trusted websites</button>
+      <span class="footer-note">No browsing telemetry</span>
+    </footer>
+  </main>
+  <script src="../shared/domain.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

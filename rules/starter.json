@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": { "type": "block" },
+    "condition": {
+      "requestDomains": ["doubleclick.net", "googlesyndication.com", "googleadservices.com"],
+      "resourceTypes": ["script", "image", "sub_frame", "xmlhttprequest", "media", "ping"]
+    }
+  },
+  {
+    "id": 2,
+    "priority": 1,
+    "action": { "type": "block" },
+    "condition": {
+      "requestDomains": ["adnxs.com", "criteo.com", "taboola.com", "outbrain.com", "rubiconproject.com"],
+      "resourceTypes": ["script", "image", "sub_frame", "xmlhttprequest", "media", "ping"]
+    }
+  },
+  {
+    "id": 3,
+    "priority": 1,
+    "action": { "type": "block" },
+    "condition": {
+      "requestDomains": ["scorecardresearch.com", "quantserve.com", "demdex.net"],
+      "resourceTypes": ["script", "image", "sub_frame", "xmlhttprequest", "ping"]
+    }
+  },
+  {
+    "id": 4,
+    "priority": 1,
+    "action": { "type": "block" },
+    "condition": {
+      "requestDomains": ["ads.adblocker.test"],
+      "resourceTypes": ["script", "image", "sub_frame", "xmlhttprequest"]
+    }
+  }
+]
