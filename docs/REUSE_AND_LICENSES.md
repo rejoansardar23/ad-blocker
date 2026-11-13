@@ -23,7 +23,7 @@
 | uBlock Origin Lite | https://github.com/uBlockOrigin/uBOL-home | MV3 filter architecture reference | verify source/license | REFERENCE ONLY |
 | Ghostery extension | https://github.com/ghostery/ghostery-extension | privacy UX reference | verify source/license | REFERENCE ONLY |
 
-**Important:** Labels such as “reported MIT” are *previous research leads*, not current pinned-license verification. There is no imported upstream code in this documentation commit. Neither GitHub publicity nor permissive branding automatically licenses third-party bundled data.
+**Important:** Labels such as “reported MIT” are *previous research leads*, not current pinned-license verification. The current development-preview code is original and has no imported upstream filtering engine; this documentation and implementation commit does not approve any of the candidates. Neither GitHub publicity nor permissive branding automatically licenses third-party bundled data.
 
 ## Ownership and licensing policy
 

@@ -1,6 +1,6 @@
 # Security policy
 
-**Project stage:** planning only; no production release currently exists.
+**Project stage:** early Chrome MV3 development-preview source code; no production release or completed browser-security audit yet.
 
 ## Reporting
 

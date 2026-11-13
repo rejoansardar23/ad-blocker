@@ -11,8 +11,8 @@
 | Narrow cosmetic hiding | P0 | Source present | content CSS; verify no site breakage |
 | Popup and options controls | P0 | Source present | browser functional review needed |
 | Local preferences, no explicit telemetry | P0 | Source present | privacy review and outbound-traffic check |
-| Node unit, structural checks and build | P0 | Source present | `npm run check`, `npm run build`; CI evidence pending |
-| CI build artifact | P0 | Workflow added | verify GitHub Actions result |
+| Node unit, structural checks and build | P0 | CI verified | [Passing run](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) on commit `4a069f6` |
+| CI build artifact | P0 | CI verified | GitHub Actions uploaded `ad-blocker-chrome-unpacked`; browser install still unverified |
 | Real Chromium integration tests | P0 | Planned | browser fixture |
 | Complete site compatibility and accessibility review | P0 | Planned | multiple pages, screen reader |
 | Imported license-reviewed filter sources | P1 | Planned | provenance and attribution |

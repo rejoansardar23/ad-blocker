@@ -27,7 +27,7 @@
 - [x] **016** Add a functional, accessible-first popup and options control wiring.
 - [x] **017** Add Node-native unit/structural tests and build script, without downloading dependencies.
 - [x] **018** Add GitHub Actions validation workflow and packaged-build artifact creation.
-- [ ] **019** Run automated CI successfully on the exact merged commit; fix any failing tests.
+- [x] **019** Run automated CI successfully on the exact merged commit; fix any failing tests. **Evidence:** [GitHub Actions run 43469964379](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) on commit `4a069f6638fd801e091cddf270ebadb8b65abf55` (unit tests, structural checks, build and artifact upload passed).
 - [ ] **020** Install unpacked output in real Chromium/Chrome and verify manifest and permissions.
 - [ ] **021** Confirm blocked and allowed network requests with a controlled synthetic website.
 - [ ] **022** Test global pause/resume, per-site exceptions, reload and Chrome restart.

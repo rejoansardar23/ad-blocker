@@ -19,12 +19,16 @@ Build a market-competitive, independently branded, privacy-first ad-blocking sof
 | Per-site trusted website list | Added | Browser reload and subdomain scenarios |
 | Basic cosmetic CSS | Added | Safe hiding/no false positives |
 | Popup, options and local settings | Added | Chrome UI interaction |
-| Node unit tests and structural checks | Added | Run `npm run check` / CI |
-| Dependency-free extension packaging | Added | Run `npm run build` / Chrome |
+| Node unit tests and structural checks | CI verified | [Passing GitHub Actions run](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) |
+| Dependency-free extension packaging | CI verified | GitHub Actions artifact; Chrome load still unverified |
 | Comprehensive filter-list support, tracker modes, custom rules, element picker | Not yet built | Milestones P1 |
 | Chrome Store release, Chrome/Firefox/desktop/DNS products | Not yet built | Separate approval/testing |
 
 This is a **starter ruleset**, not a market-leading blocker yet. No telemetry or remote code is implemented. Do not make unsupported claims of 100% blocking, exact ad counts or YouTube ad removal.
+
+## Verified CI build
+
+The [successful validation/build run](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) ran structural checks, Node unit tests and the package build and uploaded the `ad-blocker-chrome-unpacked` artifact. It has **not** proved live Chrome filtering, reload behavior or website compatibility.
 
 ## Quick start
 

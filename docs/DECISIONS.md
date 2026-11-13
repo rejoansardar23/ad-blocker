@@ -34,7 +34,7 @@ This log distinguishes **accepted direction**, **proposals** and **unresolved ow
 
 ## D-004 — Reuse starting point
 
-**State:** open / requires reproducible audit
+**State:** open / requires reproducible audit. A small original MV3 source implementation now exists as a control baseline; no third-party engine has been imported.
 
 **Candidates:** Very Good AdBlock (possible permissive foundation), Unblock (small foundation), original small MV3 build. Ghostery SDK may be selectively evaluated.
 

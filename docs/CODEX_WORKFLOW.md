@@ -9,8 +9,8 @@ We want to build a strong, independent ad blocker with minimal wasted coding cre
 ## First-run orientation
 
 1. Read README, START_HERE, VISION, PRODUCT_SPEC, FEATURE_MATRIX, ARCHITECTURE, REUSE_AND_LICENSES, ROADMAP, DECISIONS, TESTING.
-2. Inspect exact files present; early revision is documentation-only.
-3. Report what is **verified** vs a proposal from the project conversation.
+2. Inspect exact files present; the repository now includes original MV3 source, a service worker, popup/options, scripts and Node tests.
+3. Report what is **verified** vs a proposal from the project conversation. A small Chrome MV3 preview and passing Node CI exist; live Chrome tests are still pending.
 4. Check git status, branch and available tests. Protect existing code and uncommitted changes.
 5. Explain what cannot be run in the current Codex Cloud environment.
 6. Do not make external purchases, publish extensions, deploy services, change repository visibility or upload user data without explicit authorization.
