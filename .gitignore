@@ -1,0 +1,25 @@
+# Anticipated build outputs after the application is scaffolded
+node_modules/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+.cache/
+.tmp/
+
+# Local secrets / environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.crx
+
+# Editor and system junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
