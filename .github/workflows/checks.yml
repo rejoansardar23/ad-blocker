@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    timeout-minutes: 25
     steps:
       - name: Check out sources
         uses: actions/checkout@v4
@@ -17,11 +18,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Install pinned test dependencies
+        run: npm install --no-audit --no-fund
       - name: Run static checks and unit tests
         run: npm run check
       - name: Build unpacked Chrome extension
         run: npm run build
+      - name: Install Playwright Chromium for extension tests
+        run: npx playwright install --with-deps chromium
+      - name: Run real Chromium extension smoke tests
+        run: npm run test:e2e
       - name: Save installable unpacked build
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ad-blocker-chrome-unpacked
