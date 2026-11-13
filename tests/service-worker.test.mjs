@@ -58,7 +58,7 @@ function setup() {
     },
     async install() { onInstalled(); await this.send({ type: "GET_STATUS" }); },
     snapshot() {
-      return { stored: { ...stored }, dynamic: JSON.parse(JSON.stringify(dynamic)), lastRuleset, enabledRulesets: [...enabledRulesets], staticUpdateCount, dynamicUpdateCount };
+      return { stored: { ...stored }, dynamic: JSON.parse(JSON.stringify(dynamic)), lastRuleset: JSON.parse(JSON.stringify(lastRuleset)), enabledRulesets: JSON.parse(JSON.stringify(enabledRulesets)), staticUpdateCount, dynamicUpdateCount };
     }
   };
 }
