@@ -21,6 +21,8 @@
     // Restrict exceptions to ordinary DNS hostnames; IP literals and internal
     // browser pages are deliberately not supported in the first release.
     if (host.length > 253 || !/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(host)) return null;
+    // IP literals are not yet valid site exceptions in this preview.
+    if (/^[0-9]+(?:[.][0-9]+){3}$/.test(host)) return null;
     return host;
   }
 

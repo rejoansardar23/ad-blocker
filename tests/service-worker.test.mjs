@@ -35,7 +35,7 @@ function setup() {
       onMessage: { addListener(callback) { onMessage = callback; } }
     }
   };
-  const sandbox = { chrome, console };
+  const sandbox = { chrome, console, URL };
   vm.createContext(sandbox);
   sandbox.importScripts = () => vm.runInContext(shared, sandbox);
   vm.runInContext(worker, sandbox);
