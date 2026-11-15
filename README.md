@@ -55,6 +55,7 @@ Open `chrome://extensions` → enable **Developer mode** → **Load unpacked** �
 - [ROADMAP.md](docs/ROADMAP.md) — phase delivery and exit gates.
 - [REUSE_AND_LICENSES.md](docs/REUSE_AND_LICENSES.md) / [REUSE_AUDIT_TEMPLATE.md](docs/REUSE_AUDIT_TEMPLATE.md) — public repository evaluation before integration.
 - **[FOUNDATION_AUDIT.md](docs/FOUNDATION_AUDIT.md)** — preliminary pinned audit of existing engine and selected candidates.
+- **[TWO_PRIMARY_REPOS_EVALUATION.md](docs/TWO_PRIMARY_REPOS_EVALUATION.md)** — pinned 18-repository source study, EXACTLY TWO primary references, evidence, licensing and phased ADR.
 - **[OPEN_SOURCE_REFERENCE_REPOS.txt](docs/OPEN_SOURCE_REFERENCE_REPOS.txt)** — complete list of previously suggested public repositories to study.
 - [TESTING.md](docs/TESTING.md) / [COMPETITIVE_BENCHMARK.md](docs/COMPETITIVE_BENCHMARK.md) — quality proof and competitor benchmarking.
 - [SECURITY_PRIVACY.md](docs/SECURITY_PRIVACY.md) / [SECURITY.md](SECURITY.md) — security, privacy and vulnerability disclosures.
