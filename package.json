@@ -7,9 +7,13 @@
     "verify": "node scripts/verify.mjs",
     "test": "node --test tests/*.test.mjs",
     "check": "npm run verify && npm run test",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "test:e2e": "node tests/chromium-smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.65.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }
