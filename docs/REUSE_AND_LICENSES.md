@@ -67,3 +67,8 @@ Create a source-verified comparative audit of Very Good AdBlock vs Unblock vs a 
 - [Choose a License](https://choosealicense.com/)
 - [SPDX license list](https://spdx.org/licenses/)
 - [Chrome Web Store program policies](https://developer.chrome.com/docs/webstore/program-policies/)
+
+
+## Extended pinned-reference decision (15 Nov 2026)
+
+The [full 18-repository review](TWO_PRIMARY_REPOS_EVALUATION.md) pins actual public source revisions and selects **exactly two primary study repositories**: gorhill/uBlock (MV3 architecture, GPL reference-only) and ghostery/adblocker (parser semantics, MPL; integration unapproved). This supersedes treating Very Good AdBlock and Unblock as preferred unexamined bases. Neither source tree, derived data, or dependencies have been incorporated into this product. The owner's distribution/source license and upstream data/notice audits remain gating.
