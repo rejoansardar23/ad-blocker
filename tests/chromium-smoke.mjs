@@ -142,18 +142,36 @@ try {
   await checkPage(website, { adLoaded: false, cosmeticHidden: true });
   assert.equal(counts.ad, 0, "Blocked ad fixture should never hit local server");
 
+  // Two concurrently open extension views must reflect storage writes without
+  // reopening them. Opening popup.html as a tab tests its view script, not the
+  // Chrome toolbar popup presentation.
+  const mirror = await context.newPage();
+  await mirror.goto("chrome-extension://" + extensionId + "/options/options.html");
+  await mirror.locator("#status").filter({ hasText: "Settings loaded." }).waitFor();
+  const popupView = await context.newPage();
+  await popupView.goto("chrome-extension://" + extensionId + "/popup/popup.html");
+  await popupView.locator("#badge").filter({ hasText: "Protected" }).waitFor();
+
   await setEnabled(options, false);
+  await mirror.waitForFunction(() => document.querySelector("#enabled")?.checked === false);
+  await popupView.locator("#badge").filter({ hasText: "Paused" }).waitFor();
   await website.waitForFunction(() => getComputedStyle(document.querySelector("#ad-box")).display !== "none");
   assert.equal(await website.locator("#ad-blocker-cosmetic").count(), 1, "Pause must not remove page-owned content before navigation");
   await checkPage(website, { adLoaded: true, cosmeticHidden: false });
   assert.ok(counts.ad > 0, "Paused extension should allow the fake ad fixture");
 
   await setEnabled(options, true);
+  await mirror.waitForFunction(() => document.querySelector("#enabled")?.checked === true);
+  await popupView.locator("#badge").filter({ hasText: "Protected" }).waitFor();
   await setTrusted(options, "publisher.test", true);
+  await mirror.waitForFunction(() => [...document.querySelectorAll("#sites li")]
+    .some((item) => item.textContent.includes("publisher.test")));
   await checkPage(website, { adLoaded: true, cosmeticHidden: false });
   await checkPage(website, { host: "news.publisher.test", adLoaded: true, cosmeticHidden: false });
   await checkPage(website, { host: "notpublisher.test", adLoaded: false, cosmeticHidden: true });
   await setTrusted(options, "publisher.test", false);
+  await mirror.waitForFunction(() => ![...document.querySelectorAll("#sites li")]
+    .some((item) => item.textContent.includes("publisher.test")));
   await checkPage(website, { adLoaded: false, cosmeticHidden: true });
 
   // Persistence after closing Chromium and launching the same user-data-dir.
