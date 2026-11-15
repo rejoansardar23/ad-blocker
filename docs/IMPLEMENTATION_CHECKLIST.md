@@ -95,3 +95,11 @@
 5. Complete accessibility, manual installation and alpha packaging before closing 024–025.
 
 **Important:** This remains a small starter blocker, not full AdGuard/uBlock parity, comprehensive tracker filtering, or guaranteed video ad removal.
+
+
+## Verification addendum — live settings consistency (15 Nov 2026)
+
+- The **60 original items retain their existing completion states**. The exact merged baseline [CI run 43724956889](https://github.com/rejoansardar23/ad-blocker/actions/runs/43724956889) has 14/14 Node tests, 10/10 synthetic Chromium cases, an unpacked build and a passing high-severity dependency audit.
+- [Draft PR #20](https://github.com/rejoansardar23/ad-blocker/pull/20) adds cross-view popup/options synchronization and negative/pending-save regressions for issue #5. [PR CI run 43728775822](https://github.com/rejoansardar23/ad-blocker/actions/runs/43728775822) passed 20/20 Node tests and 10/10 Chromium cases on the first implementation commit. **Do not mark checklist 024 or 038 complete yet.**
+- [Detailed audit of all 18 pinned candidates and exactly two selected primary study repositories](TWO_PRIMARY_REPOS_EVALUATION.md). Source/license study does **not** close 004–010: owner choice, transitive audits, comparative builds, measured benchmarks and approval are still pending.
+- Next P0: review and merge #20 after final branch CI; reproduce background DNR storage/API failure disagreement and concurrent allowlist writes before proposing a targeted fix; then manual Chrome popup/accessibility/security audit.
