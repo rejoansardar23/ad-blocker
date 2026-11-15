@@ -73,3 +73,10 @@ If blocked, create an issue stating evidence, choices and a recommendation, not 
 ## Progress tracking
 
 The [60-step checklist](IMPLEMENTATION_CHECKLIST.md) remains the high-level product goal and issue tasks are the implementation queue. Only mark completed after merged source, tested behavior and documentation evidence. Planned tasks do not imply work in the background; Codex runs only when explicitly tasked.
+
+
+## Active scoped PR — settings consistency / source research (15 Nov 2026)
+
+**[PR #20: live popup/options synchronization](https://github.com/rejoansardar23/ad-blocker/pull/20)** is a draft review for issue #5, not an already-merged deliverable. It preserves existing DNR and cosmetic engines and adds no dependencies or permissions. Source: popup/options JS plus UI and Chromium regression tests; full [CI at initial implementation commit](https://github.com/rejoansardar23/ad-blocker/actions/runs/43728775822) green (20 Node tests, 10 Chromium cases). After documentation commits, **recheck the new PR head SHA and CI** before approval.
+
+The [18-candidate study and EXACTLY TWO primary reference selections](TWO_PRIMARY_REPOS_EVALUATION.md) proposes gorhill/uBlock/platform/mv3 and ghostery/adblocker as research scopes, **not imported components**. Owner decisions on license and third-party data remain open; issue #2 is not complete. After PR #20, first reproduce and address worker DNR error recovery and concurrent site writes under issue #5; defer list/engine imports until the license/provenance gate is approved.
