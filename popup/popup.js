@@ -13,6 +13,8 @@
   let site = null;
   let currentState = null;
   let pending = false;
+  let refreshEpoch = 0;
+  let refreshQueued = false;
 
   async function request(message) {
     const response = await chrome.runtime.sendMessage(message);
@@ -41,8 +43,32 @@
     siteInput.disabled = pending || !site || !on;
   }
 
+  // Another options page or popup may modify protection while this is open.
+  // Do not replace a pending user's selection with a stale read.
+  function refreshState() {
+    if (pending) {
+      refreshQueued = true;
+      return;
+    }
+    const epoch = ++refreshEpoch;
+    request({ type: "GET_STATUS" })
+      .then((saved) => {
+        if (pending) {
+          refreshQueued = true;
+          return;
+        }
+        if (epoch !== refreshEpoch) return;
+        currentState = saved;
+        render();
+      })
+      .catch((error) => {
+        if (epoch === refreshEpoch) message("Could not refresh settings: " + error.message, true);
+      });
+  }
+
   async function change(messageData) {
     if (pending) return;
+    ++refreshEpoch;
     pending = true;
     // Preserve the clicked value while blocking additional edits until saved.
     enabledInput.disabled = true;
@@ -59,6 +85,10 @@
     } finally {
       pending = false;
       render();
+      if (refreshQueued) {
+        refreshQueued = false;
+        refreshState();
+      }
     }
   }
 
@@ -82,7 +112,8 @@
       activeTabId = Number.isInteger(tab?.id) ? tab.id : null;
       site = globalThis.AdBlockerDomain.normalizeSite(tab?.url || "");
       siteLabel.textContent = site || "Unavailable on this page";
-      currentState = await request({ type: "GET_STATUS" });
+      const initialState = await request({ type: "GET_STATUS" });
+      if (!currentState) currentState = initialState;
       render();
       message(site ? "A page reload applies site-level exceptions." : "Site controls require an http(s) website.");
     } catch (error) {
@@ -91,6 +122,12 @@
       message(error.message, true);
     }
   }
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && ("enabled" in changes || "allowlistedSites" in changes)) {
+      refreshState();
+    }
+  });
 
   init();
 })();
