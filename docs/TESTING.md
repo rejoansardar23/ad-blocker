@@ -51,3 +51,10 @@ Record test dates, exact Chrome/extension versions, enabled lists, domain tests,
 - [Playwright browser extension testing](https://playwright.dev/docs/chrome-extensions)
 - [Chrome declarativeNetRequest API](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest)
 - [Competitive methodology](COMPETITIVE_BENCHMARK.md)
+
+
+## Exact-commit CI evidence — 15 Nov 2026
+
+- Upstream main **10c877039de4f7c41122f882d731a187df6f8a0d**: [run 43724956889](https://github.com/rejoansardar23/ad-blocker/actions/runs/43724956889) passed npm ci, 14 Node tests, build, npm audit (0 reported), and 10 synthetic Chromium fixtures. Node v22.23.4, Chromium v158.0.8127.18.
+- Settings consistency [PR #20](https://github.com/rejoansardar23/ad-blocker/pull/20): [run 43728775822](https://github.com/rejoansardar23/ad-blocker/actions/runs/43728775822) passed 20 Node tests, build, 10 Chromium fixtures. Added second options view and popup.html-as-tab UI synchronization checks. **Only the PR implementation revision was tested by this run; re-run CI for later documentation commits before merge.**
+- Local container has Node v22.16.0 and /usr/bin/chromium but cannot clone GitHub because external DNS resolution fails. The npm/Chromium results above are GitHub Actions evidence, **not local runs**. No full accessibility/manual toolbar popup or representative real-world benchmark has been run.
