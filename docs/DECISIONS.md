@@ -70,3 +70,14 @@ The [pinned foundation audit](FOUNDATION_AUDIT.md) recommends KEEP for the exist
 - Risks and tradeoffs:
 - Validation/rollback plan:
 - Evidence/PR:
+
+
+## D-008 — Two pinned study repositories; keep current MV3 runtime
+
+**Date:** 15 Nov 2026. **State:** proposed engineering direction; owner licensing/distribution approval pending. **Source:** [18-candidate comparison](TWO_PRIMARY_REPOS_EVALUATION.md).
+
+**Choice:** retain the existing original static-DNR + dynamic-exceptions + cosmetic runtime. Study exactly TWO primary external source trees: (1) [gorhill/uBlock at 591b5ac](https://github.com/gorhill/uBlock/tree/591b5ac8006b496b3307bcd1963b552a7b46f138), especially platform/mv3, as a **GPL-3.0 architectural reference only**; (2) [ghostery/adblocker at 6f0610b](https://github.com/ghostery/adblocker/tree/6f0610bf5eec1f31c4975ce0e707cdf47023e5b5), **MPL-2.0**, for parser/filter syntax and offline compiler feasibility, not as a second runtime matcher.
+
+**Alternatives rejected/deferred:** large GPL extension import, Very Good AdBlock's GPL-labeled bundled data and Bun/Stacks migration, Unblock's broader permissions, unbenchmarked overlapping engines, automatic WXT migration.
+
+**Tradeoffs:** original runtime is tested on synthetic fixtures and small; coverage remains poor until legally sourced lists and robust DNR compilation are added. No imported code or data authorized. Review with reproducible compatibility/size/performance tests before future adoption, and retain explicit rollback. Owner must decide source/distribution license and contributor terms.
