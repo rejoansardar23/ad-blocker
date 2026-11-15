@@ -39,3 +39,7 @@ An independent, privacy-first ad blocker competing on **measured** network filte
 Run the current checks and Chromium suite, follow the dependency queue, audit the license/permissions, and record verified results in the [checklist](IMPLEMENTATION_CHECKLIST.md). For the next features, insist on a reuse audit instead of a rewrite.
 
 For the long-term scope see [Vision](VISION.md), [Product Spec](PRODUCT_SPEC.md), [Roadmap](ROADMAP.md), [Competitor benchmarks](COMPETITIVE_BENCHMARK.md), [Codex Workflow](CODEX_WORKFLOW.md), and [Decision Log](DECISIONS.md).
+
+## Current source-reuse study (15 Nov 2026)
+
+Read [Two primary source references and full 18-repository assessment](TWO_PRIMARY_REPOS_EVALUATION.md) **before** proposing parser/engine imports. The chosen primary study scopes are uBlock Origin's MV3 source (GPL reference-only) and Ghostery's adblocker SDK (MPL; no import approved). Read the new D-008 proposal in [Decisions](DECISIONS.md), then the active [PR #20](https://github.com/rejoansardar23/ad-blocker/pull/20) for independently eligible settings consistency fixes. The 60-step checklist remains the status authority; research is not a shipped feature.
