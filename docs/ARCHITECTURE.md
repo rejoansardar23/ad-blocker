@@ -76,3 +76,9 @@ There is no project-wide source license yet. Do not add third-party filtering co
 - Establish a benchmark corpus, performance budgets and a transparent production statistic strategy.
 
 See [DECISIONS](DECISIONS.md), [REUSE_AND_LICENSES](REUSE_AND_LICENSES.md), [TESTING](TESTING.md) and [IMPLEMENTATION_CHECKLIST](IMPLEMENTATION_CHECKLIST.md).
+
+## Pending architecture decision / live UI fix (15 Nov 2026)
+
+The [18-repository study and proposed D-008](TWO_PRIMARY_REPOS_EVALUATION.md) recommends retaining this native-DNR runtime and studying gorhill/uBlock platform/mv3 (GPL reference-only) and ghostery/adblocker (MPL parser abstractions, not a drop-in MV3 DNR adapter). **Do not add an overlapping filtering engine or third-party filter data without source/license approval and benchmark proof.**
+
+The popup/options views in baseline main only read persisted state at initialization. [Draft PR #20](https://github.com/rejoansardar23/ad-blocker/pull/20) subscribes both to local storage changes and re-reads canonical worker state, with versioned async UI refresh responses and a deferred refresh while saving. This is a focused **pending PR**, not merged code, until review and final-head CI pass.
