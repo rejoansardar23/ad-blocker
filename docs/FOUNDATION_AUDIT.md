@@ -40,3 +40,10 @@ The repository still has no project-wide source license. Choose the intended dir
 - [ ] Approved architecture/import ADR
 
 Original-code security and settings maintenance can proceed because its prerequisite foundation is merged. Filter-source/compiler issues depend on this unresolved gate and remain pending. Publishing, commercial release and expanded permissions remain separately approval-gated.
+
+
+## Extended 18-source study — 15 November 2026
+
+[Full pinned comparison and EXACTLY TWO primary study repositories](TWO_PRIMARY_REPOS_EVALUATION.md) now supplements this *partial* foundation audit. Selected study boundaries: (1) gorhill/uBlock platform/mv3 for declarative rule compilation, priorities and content registration (GPL-3.0, **reference only**), and (2) ghostery/adblocker for filter parsing and engine boundaries (MPL-2.0, **no import approved**). Seventeen candidate root licenses were read; EasyList data/list licensing remains unverified. No competitor build, transitive dependency scan or performance comparison was performed. KEEP the existing native-DNR runtime pending approved legal and measurable migration decisions.
+
+The exact post-integration main commit 10c877039de4f7c41122f882d731a187df6f8a0d passed [CI](https://github.com/rejoansardar23/ad-blocker/actions/runs/43724956889) with 14 Node tests and 10 Chromium fixtures. The independently eligible settings synchronization change is under review in [PR #20](https://github.com/rejoansardar23/ad-blocker/pull/20); its [CI](https://github.com/rejoansardar23/ad-blocker/actions/runs/43728775822) passed 20 Node tests and 10 Chromium fixtures, but is not a merged feature.
