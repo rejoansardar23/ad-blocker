@@ -1,7 +1,7 @@
 # Ad Blocker — Chrome MV3 Development Preview
 
 > **Version 0.1.0 · Early implementation · 13 November 2026**  
-> A small, original-code browser extension foundation now exists. **It has not yet passed recorded live Chrome/Chromium end-to-end tests and is not production ready.** Full AdGuard/uBlock/Ghostery feature parity is a long-term goal, not a current claim.
+> A small, original-code browser extension foundation now exists. **The synthetic Playwright Chromium MV3 test suite has passed, but broad real-world browser compatibility and production readiness are NOT verified.** Full AdGuard/uBlock/Ghostery feature parity is a long-term goal, not a current claim.
 
 ## Vision
 
@@ -13,11 +13,11 @@ Build a market-competitive, independently branded, privacy-first ad-blocking sof
 
 | Capability | Code state | Required proof |
 |---|---|---|
-| Chrome Manifest V3 package | Added | Load in Chrome |
-| Bundled sample blocking rules (few ad networks) | Added | Real browser request fixture |
-| Global protection toggle | Added | Browser + restart |
-| Per-site trusted website list | Added | Browser reload and subdomain scenarios |
-| Basic cosmetic CSS | Added | Safe hiding/no false positives |
+| Chrome Manifest V3 package | Chromium CI verified | Test real users' Chrome environments separately |
+| Bundled sample blocking rules (few ad networks) | Synthetic Chromium fixture verified | Extend filter coverage only after license review |
+| Global protection toggle | Synthetic Chromium CI verified | More browser/profile compatibility tests later |
+| Per-site trusted website list | Chromium CI verified on fixture | Subdomain/real-site variations need more tests |
+| Basic cosmetic CSS | Fixture CI verified | Broad false-positive testing still required |
 | Popup, options and local settings | Added | Chrome UI interaction |
 | Node unit tests and structural checks | CI verified | [Passing GitHub Actions run](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) |
 | Dependency-free extension packaging | CI verified | GitHub Actions artifact; Chrome load still unverified |
@@ -54,6 +54,7 @@ Open `chrome://extensions` → enable **Developer mode** → **Load unpacked** �
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) — existing request/permission design and future modules.
 - [ROADMAP.md](docs/ROADMAP.md) — phase delivery and exit gates.
 - [REUSE_AND_LICENSES.md](docs/REUSE_AND_LICENSES.md) / [REUSE_AUDIT_TEMPLATE.md](docs/REUSE_AUDIT_TEMPLATE.md) — public repository evaluation before integration.
+- **[OPEN_SOURCE_REFERENCE_REPOS.txt](docs/OPEN_SOURCE_REFERENCE_REPOS.txt)** — complete list of previously suggested public repositories to study.
 - [TESTING.md](docs/TESTING.md) / [COMPETITIVE_BENCHMARK.md](docs/COMPETITIVE_BENCHMARK.md) — quality proof and competitor benchmarking.
 - [SECURITY_PRIVACY.md](docs/SECURITY_PRIVACY.md) / [SECURITY.md](SECURITY.md) — security, privacy and vulnerability disclosures.
 - [CODEX_WORKFLOW.md](docs/CODEX_WORKFLOW.md) / [AGENTS.md](AGENTS.md) — Codex Cloud instructions and credit-saving workflow.

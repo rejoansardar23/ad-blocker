@@ -1,27 +1,24 @@
 # Codex Cloud — Review, test and merge guide
 
-Open [docs/PR_EXECUTION_QUEUE.md](../docs/PR_EXECUTION_QUEUE.md) before picking tasks. This project expects a **human-approved** licensing choice and reviewable code commits. Codex may perform tests and merges when connected and authorized by the owner; this document is not an autonomous background job.
+Read [the ordered execution queue](../docs/PR_EXECUTION_QUEUE.md), [AGENTS.md](../AGENTS.md) and [open-source reference catalog](../docs/OPEN_SOURCE_REFERENCE_REPOS.txt).
 
-## First task: PR #3
+## Completed and validated
+- PR #3: Chromium MV3 smoke test plus tested Playwright dependency lockfile, merged 15 Nov 2026. Validation: https://github.com/rejoansardar23/ad-blocker/actions/runs/43709953216
+- PR #4: idempotent DNR updates and safe cosmetic stylesheet handling, updated to include PR #3 and merged 15 Nov 2026. Validation: https://github.com/rejoansardar23/ad-blocker/actions/runs/43710088283
+- PR #17: this documentation + reference catalog, still subject to review/merge until GitHub reports it merged.
 
-1. Read `AGENTS.md`, `README.md`, PR #3 description and diff.
-2. Check out PR #3's head branch and run `npm install --no-audit --no-fund`, `npm run check`, `npm run build`, `npx playwright install --with-deps chromium` and `npm run test:e2e`.
-3. Generate/commit a reproducible `package-lock.json` if absent, switch CI from `npm install` to `npm ci` once the lock is verified. Test again.
-4. Read browser logs and inspect the synthetic fixture; protect user data and avoid real ad server traffic.
-5. Confirm CI passes on the final head commit and merge PR #3 only then.
+## Next task
 
-## Next task: PR #4
+The next dependency gate is [Issue #2](https://github.com/rejoansardar23/ad-blocker/issues/2): research reusable software, dependency/data licenses, maintenance, and advise the owner on project-wide source and distribution licensing. **Do not unilaterally add a LICENSE, import GPL-covered code into proprietary modules, or publish commercially.**
 
-1. Update PR #4 with latest main after #3 merges.
-2. Inspect rule idempotency, managed-rule ID ranges and cosmetic style ownership.
-3. Run the full **combined** Node and Chromium test suite from #3.
-4. Check for regressions, conflicts and unnecessary permissions; correct and retest.
-5. Merge only when green and review requirements are satisfied.
+After #2, follow the issue sequence in `docs/PR_EXECUTION_QUEUE.md`. For each real implementation PR:
+1. Re-read current source, user-visible requirements and approved decisions.
+2. Record KEEP/INTEGRATE/ADAPT/BUILD/DEFER/REJECT comparison and pinned upstream commit/license.
+3. Implement the smallest working increment.
+4. Run `npm ci --no-audit --no-fund`, `npm run check`, `npm run build`, `npx playwright install --with-deps chromium` (if needed), and `npm run test:e2e`.
+5. Fix regressions, cite CI artifacts, review security/privacy/permissions/licenses.
+6. Merge only when validated; update [60-step checklist](../docs/IMPLEMENTATION_CHECKLIST.md) with actual evidence.
 
-## Future tasks
+## Codex prompt
 
-Execute the [ordered queue](../docs/PR_EXECUTION_QUEUE.md) one issue at a time. Create a real implementation PR and test evidence; do not pre-open empty pull requests. The license audit issue is an approval gate before copying upstream code or filter datasets.
-
-## Prompt for Codex Cloud
-
-> Inspect the connected `rejoansardar23/ad-blocker` repository. Read `AGENTS.md`, `docs/PR_EXECUTION_QUEUE.md`, `docs/IMPLEMENTATION_CHECKLIST.md` and `.github/CODEX_REVIEW_GUIDE.md`. Start with PR #3. Review and test its real implementation, fix issues, and merge only if all required checks pass. Then update/retest/merge PR #4. After both merges, follow the linked GitHub issues in the documented order; preserve existing working code, audit any reused components' licenses, and only mark features complete when verified. Do not change licensing, publish extensions, incur expenses or collect browsing histories without explicit owner permission. Report test commands, links and blockers after each milestone.
+> Continue the connected `rejoansardar23/ad-blocker` repository from the latest main branch. PRs #3 and #4 are merged and tested. Read AGENTS.md, docs/PR_EXECUTION_QUEUE.md, docs/OPEN_SOURCE_REFERENCE_REPOS.txt, and docs/REUSE_AND_LICENSES.md. Start with Issue #2's pinned reuse and licensing audit, do not reimplement an existing solution without justification, and do not change product licensing or distribute unapproved code. Proceed through the implementation issues one tested PR at a time, always reporting commands/results and any owner decision needed.

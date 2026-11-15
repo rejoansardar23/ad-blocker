@@ -1,6 +1,6 @@
 # Master implementation checklist — strictly ordered
 
-**Updated:** 13 Nov 2026. **Target:** compete credibly with leading ad blockers through measurable, privacy-first reliability.
+**Updated:** 15 Nov 2026. **Target:** compete credibly with leading ad blockers through measurable, privacy-first reliability.
 
 **Status key:** [x] = documentation or source artifact present; [ ] = still pending/requires verification. The presence of source code is **not** a claim that it passed Chromium tests. See [FEATURE_MATRIX](FEATURE_MATRIX.md). Do not skip licensing/security gates before shipping.
 
@@ -29,8 +29,8 @@
 - [x] **018** Add GitHub Actions validation workflow and packaged-build artifact creation.
 - [x] **019** Run automated CI successfully on the exact merged commit; fix any failing tests. **Evidence:** [GitHub Actions run 43469964379](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) on commit `4a069f6638fd801e091cddf270ebadb8b65abf55` (unit tests, structural checks, build and artifact upload passed).
 - [ ] **020** Install unpacked output in real Chromium/Chrome and verify manifest and permissions.
-- [ ] **021** Confirm blocked and allowed network requests with a controlled synthetic website.
-- [ ] **022** Test global pause/resume, per-site exceptions, reload and Chrome restart.
+- [x] **021** Confirm blocked and allowed network requests with a controlled synthetic website. Evidence: [PR #3 Chromium CI](https://github.com/rejoansardar23/ad-blocker/actions/runs/43709953216).
+- [x] **022** Test global pause/resume, per-site exceptions, reload and Chromium restart with an isolated profile. Evidence: [PR #3 Chromium CI](https://github.com/rejoansardar23/ad-blocker/actions/runs/43709953216). Broader browser matrices still pending.
 - [ ] **023** Verify cosmetic hiding and legitimate UI on multiple fixture pages.
 - [ ] **024** Run accessibility, permission and security reviews and fix blockers.
 - [ ] **025** Create a developer-installable alpha ZIP with tested install instructions.

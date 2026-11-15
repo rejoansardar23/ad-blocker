@@ -1,9 +1,8 @@
-/* Keep cosmetic selectors intentionally narrow to avoid damaging websites.
- * This stylesheet is removed when protection is paused or the site is trusted.
+/* Narrow, local cosmetic rules. Keep a reference to the style node we own.
+ * Page content can use the same IDs as ours; never remove page-owned nodes.
  */
 (function () {
   "use strict";
-  const STYLE_ID = "ad-blocker-cosmetic";
   const CSS = [
     "ins.adsbygoogle",
     "[id^='div-gpt-ad-']",
@@ -11,20 +10,23 @@
   ].join(", ") + " { display: none !important; }";
 
   let state = { enabled: true, allowlistedSites: [] };
+  let ownStyle = null;
 
   function apply() {
     const active = state.enabled !== false &&
       !globalThis.AdBlockerDomain.isAllowlisted(location.hostname, state.allowlistedSites);
-    const current = document.getElementById(STYLE_ID);
+
     if (!active) {
-      if (current) current.remove();
+      if (ownStyle?.isConnected) ownStyle.remove();
+      ownStyle = null;
       return;
     }
-    if (current || !document.documentElement) return;
+
+    if (ownStyle?.isConnected || !document.documentElement) return;
     const element = document.createElement("style");
-    element.id = STYLE_ID;
     element.textContent = CSS;
     document.documentElement.appendChild(element);
+    ownStyle = element;
   }
 
   async function refresh() {
@@ -41,7 +43,6 @@
   refresh();
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== "local") return;
-    if ("enabled" in changes || "allowlistedSites" in changes) refresh();
+    if (area === "local" && ("enabled" in changes || "allowlistedSites" in changes)) refresh();
   });
 })();

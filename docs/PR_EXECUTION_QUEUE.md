@@ -1,17 +1,17 @@
 # Ordered implementation and pull-request execution queue
 
-**Updated:** 13 November 2026. **Owner:** repository maintainer. **Goal:** implement and validate a competitive Chrome MV3 ad blocker by merging one tested, reviewable increment at a time.
+**Updated:** 15 November 2026. **Owner:** repository maintainer. **Goal:** implement and validate a competitive Chrome MV3 ad blocker by merging one tested, reviewable increment at a time.
 
-The GitHub issues below represent **future PR scopes**, not already-written code. Do not create empty PRs for unfinished features. New implementation PRs should be opened only when there is a real diff and the preceding gates are satisfied. Final license and commercial distribution decisions belong to the owner.
+The [public repository study catalog](OPEN_SOURCE_REFERENCE_REPOS.txt) collects all previously suggested candidate projects. The GitHub issues below represent **future PR scopes**, not already-written code. Do not create empty PRs for unfinished features. New implementation PRs should be opened only when there is a real diff and the preceding gates are satisfied. Final license and commercial distribution decisions belong to the owner.
 
-## Merge these existing PRs first
+## Verified and merged PR milestones
 
-| Order | Artifact | Contents | Required review before merge |
+| Order | Artifact | Contents | Verification |
 |---|---|---|---|
-| 01 | [PR #3](https://github.com/rejoansardar23/ad-blocker/pull/3) | Real Playwright Chromium DNR/cosmetic/allowlist tests and settings checkbox fix | CI green; verify e2e logs, generate and commit a reproducible npm lockfile, review test fixture safety |
-| 02 | [PR #4](https://github.com/rejoansardar23/ad-blocker/pull/4) | Avoid redundant DNR rewrites, safer cosmetic style ownership, unit tests | Merge after #3; update against main, rerun full combined Chromium CI and review compatibility |
+| 01 | [PR #3](https://github.com/rejoansardar23/ad-blocker/pull/3) | Real Playwright Chromium DNR/cosmetic/allowlist tests and settings checkbox fix | MERGED 15 Nov 2026; [Playwright CI passed](https://github.com/rejoansardar23/ad-blocker/actions/runs/43709953216); npm ci with lockfile |
+| 02 | [PR #4](https://github.com/rejoansardar23/ad-blocker/pull/4) | Avoid redundant DNR rewrites, safer cosmetic style ownership, unit tests | MERGED 15 Nov 2026; [combined Chromium CI passed](https://github.com/rejoansardar23/ad-blocker/actions/runs/43710088283) |
 
-These PRs are **ready for review, not merged**. The maintainer plans for Codex to review, test and merge. No actor should merge around failed required checks or bypass security/license gates.
+PR #3 and #4 have been merged after green checks. Continue with the owner-controlled license audit and remaining issues. Future PRs must not bypass required checks, security reviews or licensing gates.
 
 ## Complete work in this order
 
