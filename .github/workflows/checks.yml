@@ -19,7 +19,9 @@ jobs:
         with:
           node-version: "22"
       - name: Install pinned test dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
+      - name: Verify lockfile remains unchanged
+        run: git diff --exit-code -- package-lock.json
       - name: Run static checks and unit tests
         run: npm run check
       - name: Build unpacked Chrome extension

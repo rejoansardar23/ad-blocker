@@ -5,7 +5,7 @@ This suite tests the locally packaged Manifest V3 build without external ad serv
 ## Run
 
 - Use Node.js 22.
-- Run `npm install --no-audit --no-fund` to install the exact-pinned `playwright` development dependency.
+- Run `npm ci --no-audit --no-fund` to install the lockfile-pinned `playwright` development dependency.
 - Run `npm run build`.
 - Run `npx playwright install --with-deps chromium` (Linux CI; on your OS use `npx playwright install chromium`).
 - Run `npm run test:e2e`.
