@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "references": [
+    { "path": "../adblocker/tsconfig.json" },
+    { "path": "../adblocker-content/tsconfig.json" }
+  ],
+  "include": [
+    "./src/**/*.ts",
+    "./test/**/*.ts",
+  ]
+}

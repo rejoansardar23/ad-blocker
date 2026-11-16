@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "references": [
+    { "path": "../adblocker-electron/tsconfig.json" }
+  ],
+  "files": [
+    "./src/index.ts"
+  ]
+}

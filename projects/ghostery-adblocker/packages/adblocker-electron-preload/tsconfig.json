@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "references": [
+    { "path": "../adblocker-content/tsconfig.json" }
+  ],
+  "files": [
+    "./src/index.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "./dist",
+  },
+}

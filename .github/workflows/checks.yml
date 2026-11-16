@@ -30,6 +30,10 @@ jobs:
         run: npm audit --audit-level=high
       - name: Run static checks and unit tests
         run: npm run check
+      - name: Verify extracted ZIP source integrity
+        run: npm run verify:archives
+      - name: Build and test ZIP-derived uBlock Node engine
+        run: npm run test:ublock
       - name: Build unpacked Chrome extension
         run: npm run build
       - name: Install Playwright Chromium for extension tests
