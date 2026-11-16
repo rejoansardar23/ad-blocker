@@ -8,6 +8,8 @@
   const status = document.getElementById("status");
   let state = null;
   let busy = false;
+  let refreshEpoch = 0;
+  let refreshQueued = false;
 
   async function send(message) {
     const response = await chrome.runtime.sendMessage(message);
@@ -43,8 +45,33 @@
     }
   }
 
+  // Keep open settings windows in sync, without overwriting an unsaved click.
+  // Epochs discard responses that were started before a newer write/refresh.
+  function refreshState(initial = false) {
+    if (busy) {
+      refreshQueued = true;
+      return;
+    }
+    const epoch = ++refreshEpoch;
+    send({ type: "GET_STATUS" })
+      .then((saved) => {
+        if (busy) {
+          refreshQueued = true;
+          return;
+        }
+        if (epoch !== refreshEpoch) return;
+        state = saved;
+        render();
+        if (initial) show("Settings loaded.");
+      })
+      .catch((error) => {
+        if (epoch === refreshEpoch) show("Could not refresh settings: " + error.message, true);
+      });
+  }
+
   async function change(message) {
     if (busy) return;
+    ++refreshEpoch;
     busy = true;
     // Do not redraw the old saved checkbox state inside its change event:
     // restoring it synchronously makes a real user click appear to revert.
@@ -63,6 +90,10 @@
     } finally {
       busy = false;
       render();
+      if (refreshQueued) {
+        refreshQueued = false;
+        refreshState();
+      }
     }
   }
 
@@ -80,7 +111,11 @@
     change({ type: "SET_SITE_ALLOWED", site, allowed: true });
   });
 
-  send({ type: "GET_STATUS" })
-    .then((saved) => { state = saved; render(); show("Settings loaded."); })
-    .catch((error) => show(error.message, true));
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && ("enabled" in changes || "allowlistedSites" in changes)) {
+      refreshState();
+    }
+  });
+
+  refreshState(true);
 })();

@@ -10,6 +10,7 @@
 | Per-site allowlist using frame rules | P0 | Chromium fixture verified | Reload, subdomain boundaries, removal and restart |
 | Narrow cosmetic hiding | P0 | Chromium fixture verified | Reversible CSS and page-owned node collision tests; broad site compatibility remains open |
 | Popup and options controls | P0 | Partly verified | Browser options controls and Node pending/error tests; actual toolbar popup and accessibility review remain open |
+| Cross-window popup/options settings synchronization | P0 | **Implemented in draft PR #20; not merged** | [PR #20 CI](https://github.com/rejoansardar23/ad-blocker/actions/runs/43728775822): 20 Node tests and 10 Chromium fixture cases pass; manual toolbar popup/a11y pending |
 | Local preferences, no explicit telemetry | P0 | Source present | privacy review and outbound-traffic check |
 | Node unit, structural checks and build | P0 | CI verified | [Passing run](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) on commit `4a069f6` |
 | CI build artifact | P0 | CI verified | GitHub Actions artifact; automated Chromium loading verified; manual alpha installation pending |
@@ -36,3 +37,5 @@ See [full ordered implementation checklist](IMPLEMENTATION_CHECKLIST.md) and [Pr
 ## Meaning of “done”
 
 Only mark Done after the code is merged, relevant tests pass, Chrome behavior is verified where applicable, license and security implications are resolved, and results are linked. A source file or attractive UI is not sufficient.
+
+[Source-verified 18-candidate comparison and two primary reference choices](TWO_PRIMARY_REPOS_EVALUATION.md) is a research artifact, **not** a feature shipped or a license approval.

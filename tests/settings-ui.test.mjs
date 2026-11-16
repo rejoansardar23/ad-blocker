@@ -28,10 +28,14 @@ async function setup(page) {
   get("add-form").querySelector = () => submit;
   get("sites").querySelectorAll = () => get("sites").children.flatMap((item) => item.children.slice(1));
   const saved = { enabled: true, allowlistedSites: [] };
+  let onStorageChanged;
   let resolveWrite;
   let rejectWrite;
   const writes = [];
   const chrome = {
+    storage: {
+      onChanged: { addListener(listener) { onStorageChanged = listener; } }
+    },
     runtime: {
       async sendMessage(message) {
         if (message.type === "GET_STATUS") return { ok: true, state: { ...saved } };
@@ -58,7 +62,13 @@ async function setup(page) {
   return {
     get, submit, writes,
     succeed: () => resolveWrite(),
-    fail: () => rejectWrite()
+    fail: () => rejectWrite(),
+    async externalChange(values, area = "local") {
+      if (area === "local") Object.assign(saved, values);
+      const changes = Object.fromEntries(Object.entries(values).map(([key, newValue]) => [key, { newValue }]));
+      onStorageChanged(changes, area);
+      await tick();
+    }
   };
 }
 
@@ -94,5 +104,50 @@ for (const page of ["options", "popup"]) {
     assert.equal(toggle.checked, true);
     assert.equal(toggle.disabled, false);
     assert.match(app.get(page === "options" ? "status" : "notice").textContent, /Storage unavailable/);
+  });
+}
+
+for (const page of ["options", "popup"]) {
+  test(page + " updates its controls when another extension view changes settings", async () => {
+    const app = await setup(page);
+    assert.equal(app.get("enabled").checked, true);
+    await app.externalChange({ enabled: false, allowlistedSites: ["publisher.test"] });
+    assert.equal(app.get("enabled").checked, false, "External pause must update the open view");
+    if (page === "options") {
+      assert.deepEqual(app.get("sites").children.map((item) => item.children[0].textContent), ["publisher.test"]);
+    } else {
+      assert.equal(app.get("site-enabled").checked, false, "Externally trusted site must update the popup");
+    }
+    await app.externalChange({ enabled: true, allowlistedSites: [] });
+    assert.equal(app.get("enabled").checked, true, "External resume must update the open view");
+    if (page === "popup") assert.equal(app.get("site-enabled").checked, true);
+  });
+
+  test(page + " does not overwrite an in-flight user click with an external update", async () => {
+    const app = await setup(page);
+    const toggle = app.get("enabled");
+    toggle.checked = false;
+    toggle.listeners.change();
+    await app.externalChange({ enabled: true, allowlistedSites: ["publisher.test"] });
+    assert.equal(toggle.checked, false, "Pending click must remain visible");
+    assert.equal(toggle.disabled, true);
+    app.succeed();
+    await tick();
+    await tick();
+    assert.equal(toggle.checked, false);
+    assert.equal(toggle.disabled, false);
+    if (page === "options") {
+      assert.deepEqual(app.get("sites").children.map((item) => item.children[0].textContent), ["publisher.test"]);
+    } else {
+      assert.equal(app.get("site-enabled").checked, false);
+    }
+  });
+
+  test(page + " ignores changes from unrelated storage areas", async () => {
+    const app = await setup(page);
+    await app.externalChange({ enabled: false }, "sync");
+    assert.equal(app.get("enabled").checked, true);
+    await app.externalChange({ unrelated: 42 });
+    assert.equal(app.get("enabled").checked, true);
   });
 }

@@ -48,3 +48,8 @@ Nothing in this file is a verified implementation claim. Each issue should be re
 - License/privacy/security consequences
 - Recommendation and evidence
 - Follow-up issue / ADR update
+
+
+## Evidence update (15 Nov 2026)
+
+[Two primary repositories / complete 18-source inventory](TWO_PRIMARY_REPOS_EVALUATION.md) captures 18 pinned HEADs and source trees, 17 root license reads, and current DNR/Playwright documentation. This reduces *identification* uncertainty, not build/benchmark/security or dataset-license uncertainty. All unchecked items above remain open until their stated acceptance evidence and owner decisions are recorded. Priority: GitHub PR #20 settings consistency, then service-worker failure/concurrency tests under issue #5.
