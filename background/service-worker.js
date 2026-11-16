@@ -4,17 +4,35 @@
 importScripts("../shared/domain.js");
 
 const { normalizeSite } = globalThis.AdBlockerDomain;
-const DEFAULTS = Object.freeze({ enabled: true, allowlistedSites: [] });
+const DEFAULTS = Object.freeze({ enabled: true, allowlistedSites: Object.freeze([]) });
 const RULESET_ID = "starter_rules";
 const FIRST_SITE_RULE_ID = 100000;
 const MAX_SITES = 100;
 let syncQueue = Promise.resolve();
 
+function sameSites(left, right) {
+  return Array.isArray(left) && left.length === right.length &&
+    left.every((site, index) => site === right[index]);
+}
+
 async function getState() {
   const saved = await chrome.storage.local.get(DEFAULTS);
-  const allowlistedSites = [...new Set((Array.isArray(saved.allowlistedSites)
-    ? saved.allowlistedSites : []).map(normalizeSite).filter(Boolean))].sort();
-  return { enabled: saved.enabled !== false, allowlistedSites };
+  const state = {
+    enabled: typeof saved.enabled === "boolean" ? saved.enabled : DEFAULTS.enabled,
+    allowlistedSites: [...new Set((Array.isArray(saved.allowlistedSites)
+      ? saved.allowlistedSites : []).map(normalizeSite).filter(Boolean))]
+      .sort()
+      .slice(0, MAX_SITES)
+  };
+  const repairs = {};
+  if (saved.enabled !== state.enabled) repairs.enabled = state.enabled;
+  if (!sameSites(saved.allowlistedSites, state.allowlistedSites)) {
+    repairs.allowlistedSites = state.allowlistedSites;
+  }
+  if (Object.keys(repairs).length > 0) {
+    await chrome.storage.local.set(repairs);
+  }
+  return state;
 }
 
 // DNR allowAllRequests rules match a top-level/subframe navigation and allow
@@ -112,6 +130,10 @@ async function handleMessage(message) {
     else next.delete(site);
     if (next.size > MAX_SITES) throw new Error("Maximum 100 website exceptions.");
     await chrome.storage.local.set({ allowlistedSites: [...next].sort() });
+    return queueSync();
+  }
+  if (message.type === "RESET_SETTINGS") {
+    await chrome.storage.local.set({ enabled: true, allowlistedSites: [] });
     return queueSync();
   }
   throw new Error("Unknown operation: " + message.type);

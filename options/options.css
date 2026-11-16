@@ -25,8 +25,12 @@ ul { padding: 0; margin: 15px 0 0; list-style: none; }
 li { display: flex; justify-content: space-between; align-items: center; gap: 15px; border-bottom: 1px solid #2a3952; padding: 10px 2px; }
 li span { overflow-wrap: anywhere; }
 li button { background: #443149; border-color: #74475a; }
+.danger { flex-shrink: 0; background: #443149; border-color: #74475a; }
+.danger:hover { background: #5b3b4b; }
+.recovery h2 { margin-bottom: 6px; }
+.recovery p { margin: 0; }
 #empty { margin: 12px 0 0; font-style: italic; }
 #status { min-height: 20px; margin: 14px 0; }
 #status.error { color: #ffaaaa; }
 footer { color: #8795b2; font-size: 12px; margin-top: 25px; }
-@media (max-width: 520px) { .layout { padding: 18px 12px; } .card { padding: 16px; } .formrow { flex-direction: column; } }
+@media (max-width: 520px) { .layout { padding: 18px 12px; } .card { padding: 16px; } .formrow, .recovery { flex-direction: column; align-items: stretch; } }

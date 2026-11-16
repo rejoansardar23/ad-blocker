@@ -5,6 +5,7 @@
   const empty = document.getElementById("empty");
   const form = document.getElementById("add-form");
   const siteInput = document.getElementById("site");
+  const reset = document.getElementById("reset");
   const status = document.getElementById("status");
   let state = null;
   let busy = false;
@@ -26,6 +27,7 @@
     enabled.disabled = busy;
     siteInput.disabled = busy;
     form.querySelector("button").disabled = busy;
+    reset.disabled = busy;
     list.replaceChildren();
     empty.hidden = state.allowlistedSites.length > 0;
     for (const site of state.allowlistedSites) {
@@ -43,7 +45,7 @@
     }
   }
 
-  async function change(message) {
+  async function change(message, successText = "Saved. Reload affected tabs to apply website exceptions.") {
     if (busy) return;
     busy = true;
     // Do not redraw the old saved checkbox state inside its change event:
@@ -51,12 +53,13 @@
     enabled.disabled = true;
     siteInput.disabled = true;
     form.querySelector("button").disabled = true;
+    reset.disabled = true;
     for (const button of list.querySelectorAll("button")) button.disabled = true;
     show("Saving…");
     try {
       state = await send(message);
       siteInput.value = "";
-      show("Saved. Reload affected tabs to apply website exceptions.");
+      show(successText);
     } catch (error) {
       show(error.message, true);
       try { state = await send({ type: "GET_STATUS" }); } catch {}
@@ -78,6 +81,11 @@
       return;
     }
     change({ type: "SET_SITE_ALLOWED", site, allowed: true });
+  });
+
+  reset.addEventListener("click", () => {
+    if (!confirm("Restore default settings and remove all trusted websites?")) return;
+    change({ type: "RESET_SETTINGS" }, "Default settings restored. Reload open tabs to apply them.");
   });
 
   send({ type: "GET_STATUS" })

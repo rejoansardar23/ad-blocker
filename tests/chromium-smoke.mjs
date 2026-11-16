@@ -181,7 +181,12 @@ try {
   assert.equal(await pausedOptions.locator("#enabled").isChecked(), false, "Global pause must survive restart");
   const pausedWebsite = await context.newPage();
   await checkPage(pausedWebsite, { adLoaded: true, cosmeticHidden: false });
-  await setEnabled(pausedOptions, true);
+  await setTrusted(pausedOptions, "publisher.test", true);
+  pausedOptions.once("dialog", (dialog) => dialog.accept());
+  await pausedOptions.getByRole("button", { name: "Restore default settings" }).click();
+  await pausedOptions.locator("#status").filter({ hasText: "Default settings restored." }).waitFor();
+  assert.equal(await pausedOptions.locator("#enabled").isChecked(), true, "Recovery must re-enable protection");
+  assert.equal(await pausedOptions.locator("#sites li").count(), 0, "Recovery must remove trusted sites");
   await checkPage(pausedWebsite, { adLoaded: false, cosmeticHidden: true });
   console.log("All Chromium MV3 smoke tests passed; ad/control request counts:", counts);
 } finally {

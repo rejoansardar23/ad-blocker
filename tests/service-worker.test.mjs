@@ -9,20 +9,21 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const worker = readFileSync(path.join(root, "background/service-worker.js"), "utf8");
 const shared = readFileSync(path.join(root, "shared/domain.js"), "utf8");
 
-function setup() {
-  const stored = { enabled: true, allowlistedSites: [] };
+function setup(initial = {}) {
+  const stored = { enabled: true, allowlistedSites: [], ...initial };
   let dynamic = [];
   let lastRuleset = null;
   let enabledRulesets = ["starter_rules"];
   let dynamicUpdateCount = 0;
   let staticUpdateCount = 0;
+  let storageWriteCount = 0;
   let onMessage = null;
   let onInstalled = null;
   const chrome = {
     storage: {
       local: {
         async get(defaults) { return { ...defaults, ...stored }; },
-        async set(changes) { Object.assign(stored, changes); }
+        async set(changes) { storageWriteCount++; Object.assign(stored, changes); }
       },
       onChanged: { addListener() {} }
     },
@@ -59,7 +60,7 @@ function setup() {
     async install() { onInstalled(); await this.send({ type: "GET_STATUS" }); },
     seedDynamic(rules) { dynamic = JSON.parse(JSON.stringify(rules)); },
     snapshot() {
-      return { stored: { ...stored }, dynamic: JSON.parse(JSON.stringify(dynamic)), lastRuleset: JSON.parse(JSON.stringify(lastRuleset)), enabledRulesets: JSON.parse(JSON.stringify(enabledRulesets)), staticUpdateCount, dynamicUpdateCount };
+      return { stored: JSON.parse(JSON.stringify(stored)), dynamic: JSON.parse(JSON.stringify(dynamic)), lastRuleset: JSON.parse(JSON.stringify(lastRuleset)), enabledRulesets: JSON.parse(JSON.stringify(enabledRulesets)), storageWriteCount, staticUpdateCount, dynamicUpdateCount };
     }
   };
 }
@@ -69,8 +70,24 @@ test("status reads do not rewrite installed rules", async () => {
   const result = await app.send({ type: "GET_STATUS" });
   assert.equal(result.ok, true);
   assert.equal(result.state.enabled, true);
+  assert.equal(app.snapshot().storageWriteCount, 0);
   assert.equal(app.snapshot().staticUpdateCount, 0);
   assert.equal(app.snapshot().dynamicUpdateCount, 0);
+});
+
+test("status reads repair malformed stored settings", async () => {
+  const app = setup({
+    enabled: "false",
+    allowlistedSites: ["Example.COM", "bad domain", "example.com", 42, "news.example.com"]
+  });
+  const result = await app.send({ type: "GET_STATUS" });
+  assert.equal(result.ok, true);
+  assert.deepEqual(JSON.parse(JSON.stringify(result.state)), {
+    enabled: true,
+    allowlistedSites: ["example.com", "news.example.com"]
+  });
+  assert.deepEqual(app.snapshot().stored, JSON.parse(JSON.stringify(result.state)));
+  assert.equal(app.snapshot().storageWriteCount, 1);
 });
 
 test("site exceptions create and remove allowAllRequests DNR rules", async () => {
@@ -91,6 +108,21 @@ test("pause disables static rules and restores them on resume", async () => {
   await app.send({ type: "SET_ENABLED", enabled: true });
   assert.deepEqual(app.snapshot().lastRuleset.enableRulesetIds, ["starter_rules"]);
   assert.equal(app.snapshot().staticUpdateCount, 2);
+});
+
+test("reset restores defaults and removes only managed exception rules", async () => {
+  const app = setup();
+  await app.send({ type: "SET_SITE_ALLOWED", site: "example.com", allowed: true });
+  const managed = app.snapshot().dynamic[0];
+  const unrelated = { ...managed, id: 42 };
+  await app.send({ type: "SET_ENABLED", enabled: false });
+  app.seedDynamic([unrelated, managed]);
+
+  const result = await app.send({ type: "RESET_SETTINGS" });
+  assert.equal(result.ok, true);
+  assert.deepEqual(app.snapshot().stored, { enabled: true, allowlistedSites: [] });
+  assert.deepEqual(app.snapshot().enabledRulesets, ["starter_rules"]);
+  assert.deepEqual(app.snapshot().dynamic, [unrelated]);
 });
 
 test("rejects invalid site and invalid global toggle types", async () => {
