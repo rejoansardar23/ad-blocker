@@ -39,6 +39,8 @@ Remaining structure concerns: preserve one current status owner per document; ke
 
 ## Current code and validation
 
+CORE-01 is implemented: open popup/options views subscribe to relevant local changes, read canonical worker state, defer refresh while saving, and discard older responses or failures. Twenty new Node regressions pass; total suite count is now 50. Real Chromium passes ten original scenarios plus five live-view checkpoints. The popup page is loaded in a tab for logic testing; toolbar presentation/accessibility remains manual. The next implementation is CORE-02's reproduced concurrent-site-write race.
+
 `src/extension/manifest.json` declares one MV3 service worker, popup, options, shared/content scripts, and starter DNR rules. The worker validates local state and reconciles Chrome rules; UI sends messages to it; page-side cosmetics use an owned reversible stylesheet. The runtime ships no Node package dependencies. `scripts/build.mjs` copies only this source tree to `dist/chrome`.
 
 Baseline tests passed locally: 18 Node tests and ten Chromium page scenarios on Node 24.22.1 / Chromium 158.0.8127.18. The audit checkpoint adds twelve tooling regressions: 30 total tests pass, plus CI browser validation. [Baseline report](docs/testing/BASELINE_TEST_REPORT.md) and [current evidence](docs/testing/TEST_EVIDENCE.md) preserve exact scopes. Formal Stable-toolbar, accessibility, outbound-traffic, performance, real-site, and platform evidence remain separate open gates.
@@ -109,7 +111,7 @@ Status meanings: **Ready** can start from current `main`; **Blocked** needs a de
 
 | ID | Status / dependency | Deliverable and acceptance evidence |
 |---|---|---|
-| `CORE-01` | **Ready** | Implement live popup/options synchronization as a focused current-main PR. External storage changes refresh both views; pending edits and stale responses are protected; Node tests cover both UIs; Chromium opens two extension views and proves sync. Compare PR #20 but do not carry unrelated research into the feature PR. |
+| `CORE-01` | **COMPLETED** | Current-path UI synchronization, pending-edit protection, stale response/failure epochs, twenty new Node regressions, and five Chromium checkpoints. PR #20's unrelated old docs were excluded. |
 | `CORE-02` | **Ready after or alongside CORE-01** | Serialize complete settings mutations, not only DNR reconciliation. Interleaved add/add, add/remove, toggle/site, and reset/site operations produce deterministic results; a rejected operation does not poison the queue; regression tests reproduce and fix the lost-update race. |
 | `CORE-03` | **Blocked by CORE-02** | Make storage/DNR failure behavior consistent. Inject failures from enabled-ruleset and dynamic-rule APIs; UI reports the failure honestly; status does not claim unapplied protection; retry/restart converges; unrelated browser rules remain intact. |
 | `CORE-04` | **Blocked by CORE-02/03** | Add a versioned settings schema and migrations. Preserve current data, safely repair corrupt/partial state, define future-version behavior, and test install/startup/storage changes after worker suspension. |
@@ -210,7 +212,7 @@ Every task record must name an accountable role, issue/PR, state, dependencies, 
 
 ### Recommended work for the next coding tool
 
-Start with `CORE-01` unless the maintainer assigns a different unblocked task. The tool must inspect current `main` and draft PR #20, preserve useful attribution, and make one focused, tested change containing only settings-view synchronization and its tests, using the delivery method the owner requested. It must not merge PR #20 wholesale or execute anything in `AnalyseFuture/`.
+Start with `CORE-02` unless the maintainer assigns a different unblocked task. `CORE-01` now carries the useful synchronization approach from PR #20 with attribution and current regressions. Do not merge that old mixed-scope PR wholesale or execute anything in `AnalyseFuture/`.
 
 After `CORE-01`, the safe reliability order is:
 

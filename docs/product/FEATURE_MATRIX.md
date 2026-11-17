@@ -14,7 +14,7 @@
 | Node unit, structural checks and build | P0 | CI verified | 30 Node/tooling tests at audit checkpoint, plus literal boundary/link guards |
 | Settings reset and malformed-state repair | P0 | Chromium + Node verified | Confirmed recovery, cancel, invalid state normalization, unrelated-rule preservation |
 | Complete static inventory and quarantine hashes | P0 | Verified | All tracked files accounted for; 1,384 snapshot file hashes + 2 ZIP hashes match; upstream authenticity remains unknown |
-| Live popup/options synchronization | P0 | Not yet implemented | PR #20 reviewed; focused current-path port is the next feature |
+| Live popup/options synchronization | P0 | Node + Chromium verified | External local changes refresh open views; pending edits, stale reads/failures, initial races and reset status have regressions; five browser checkpoints |
 | CI build artifact | P0 | CI verified | GitHub Actions artifact; automated Chromium loading verified; manual alpha installation pending |
 | Real Chromium integration tests | P0 | CI verified | 10 synthetic cases using locked Playwright 1.65.0 |
 | Complete site compatibility and accessibility review | P0 | Planned | multiple pages, screen reader |

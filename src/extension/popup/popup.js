@@ -13,6 +13,8 @@
   let site = null;
   let currentState = null;
   let pending = false;
+  let refreshEpoch = 0;
+  let refreshQueued = false;
 
   async function request(message) {
     const response = await chrome.runtime.sendMessage(message);
@@ -41,8 +43,41 @@
     siteInput.disabled = pending || !site || !on;
   }
 
+  // Keep open views current (first-party PR #20), but never let an older read
+  // overwrite a pending selection, a newer state, or the latest save result.
+  function refreshState() {
+    if (pending) {
+      refreshQueued = true;
+      return;
+    }
+    const epoch = ++refreshEpoch;
+    request({ type: "GET_STATUS" })
+      .then((saved) => {
+        if (epoch !== refreshEpoch) return;
+        if (pending) {
+          refreshQueued = true;
+          return;
+        }
+        const firstLoad = currentState === null;
+        currentState = saved;
+        render();
+        if (firstLoad) {
+          message(site ? "A page reload applies site-level exceptions." : "Site controls require an http(s) website.");
+        }
+      })
+      .catch((error) => {
+        if (epoch !== refreshEpoch || pending) return;
+        if (currentState === null) {
+          badge.textContent = "Error";
+          headline.textContent = "Could not load settings";
+        }
+        message("Could not refresh settings: " + error.message, true);
+      });
+  }
+
   async function change(messageData) {
     if (pending) return;
+    ++refreshEpoch;
     pending = true;
     // Preserve the clicked value while blocking additional edits until saved.
     enabledInput.disabled = true;
@@ -59,6 +94,10 @@
     } finally {
       pending = false;
       render();
+      if (refreshQueued) {
+        refreshQueued = false;
+        refreshState();
+      }
     }
   }
 
@@ -82,15 +121,20 @@
       activeTabId = Number.isInteger(tab?.id) ? tab.id : null;
       site = globalThis.AdBlockerDomain.normalizeSite(tab?.url || "");
       siteLabel.textContent = site || "Unavailable on this page";
-      currentState = await request({ type: "GET_STATUS" });
       render();
-      message(site ? "A page reload applies site-level exceptions." : "Site controls require an http(s) website.");
+      refreshState();
     } catch (error) {
       badge.textContent = "Error";
       headline.textContent = "Could not load settings";
       message(error.message, true);
     }
   }
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && ("enabled" in changes || "allowlistedSites" in changes)) {
+      refreshState();
+    }
+  });
 
   init();
 })();

@@ -2,6 +2,12 @@
 
 ## Recovery mission, 18 November 2026 (Asia/Kolkata)
 
+### CORE-01: live view synchronization
+
+Parent checkpoint: `418b5aa`. Before production changes, the expanded UI suite reported 26 tests: 14 PASS / 12 FAIL. With the fix, `npm run check` reports **50 PASS / 0 FAIL / 0 SKIPPED** (26 UI tests, including twenty new regressions). Local `test:e2e` on Chromium 158.0.8127.18 passes the ten existing page scenarios plus **five** explicitly counted live-view checkpoints: external pause, resume, trust, trust removal, and reset. Server counts remain ad 5 / benign 10.
+
+Regressions cover both views, unrelated keys/areas, pending writes, rejected writes, reset success/failure, stale read ordering, stale failures, and delayed initialization. The popup HTML is opened as a tab to exercise its script; real toolbar UX is still manual. No permissions, dependencies, services, telemetry, or imported engines were added. PR #20 supplied the first-party refresh approach, adapted and independently regression-tested in current paths.
+
 Baseline `ce77ac5` passed frozen install, lockfile guard, 18 Node tests, matching 11-file build, audit (0 reported vulnerabilities), SBOM, and ten local Chromium scenarios. See [the baseline report](BASELINE_TEST_REPORT.md).
 
 Audit checkpoint `c9e54b2` adds seven inventory and five boundary-check regressions: **30 tests passed**, no failures/skips. [Exact-commit CI 44182569555](https://github.com/rejoansardar23/ad-blocker/actions/runs/44182569555) passed the full pipeline. `npm run audit:repository` accounts for every tracked path and verifies 1,384 imported-file hashes plus both ZIP hashes without executing imports.

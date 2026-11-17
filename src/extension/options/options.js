@@ -9,6 +9,8 @@
   const status = document.getElementById("status");
   let state = null;
   let busy = false;
+  let refreshEpoch = 0;
+  let refreshQueued = false;
 
   async function send(message) {
     const response = await chrome.runtime.sendMessage(message);
@@ -45,8 +47,36 @@
     }
   }
 
+  // First-party PR #20 established the live-view refresh approach. Discard
+  // older reads and defer external refreshes while a user mutation is pending.
+  function refreshState() {
+    if (busy) {
+      refreshQueued = true;
+      return;
+    }
+    const epoch = ++refreshEpoch;
+    send({ type: "GET_STATUS" })
+      .then((saved) => {
+        if (epoch !== refreshEpoch) return;
+        if (busy) {
+          refreshQueued = true;
+          return;
+        }
+        const firstLoad = state === null;
+        state = saved;
+        render();
+        if (firstLoad) show("Settings loaded.");
+      })
+      .catch((error) => {
+        if (epoch === refreshEpoch && !busy) {
+          show("Could not refresh settings: " + error.message, true);
+        }
+      });
+  }
+
   async function change(message, successText = "Saved. Reload affected tabs to apply website exceptions.") {
     if (busy) return;
+    ++refreshEpoch;
     busy = true;
     // Do not redraw the old saved checkbox state inside its change event:
     // restoring it synchronously makes a real user click appear to revert.
@@ -66,6 +96,10 @@
     } finally {
       busy = false;
       render();
+      if (refreshQueued) {
+        refreshQueued = false;
+        refreshState();
+      }
     }
   }
 
@@ -88,7 +122,11 @@
     change({ type: "RESET_SETTINGS" }, "Default settings restored. Reload open tabs to apply them.");
   });
 
-  send({ type: "GET_STATUS" })
-    .then((saved) => { state = saved; render(); show("Settings loaded."); })
-    .catch((error) => show(error.message, true));
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && ("enabled" in changes || "allowlistedSites" in changes)) {
+      refreshState();
+    }
+  });
+
+  refreshState();
 })();

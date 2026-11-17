@@ -47,6 +47,7 @@ const server = createServer((request, response) => {
 });
 let port = 0;
 let context;
+let liveViewCheckpoints = 0;
 
 const launch = () => chromium.launchPersistentContext(profile, {
   channel: "chromium",
@@ -120,6 +121,26 @@ async function setTrusted(options, site, trusted) {
   }
 }
 
+async function openMirrorViews(extensionId) {
+  const mirror = await context.newPage();
+  await mirror.goto("chrome-extension://" + extensionId + "/options/options.html");
+  await mirror.locator("#status").filter({ hasText: "Settings loaded." }).waitFor();
+  const popupView = await context.newPage();
+  await popupView.goto("chrome-extension://" + extensionId + "/popup/popup.html");
+  await popupView.locator("#badge").filter({ hasText: /Protected|Paused/ }).waitFor();
+  return { mirror, popupView };
+}
+
+async function checkLiveViews(views, name, enabled, sites) {
+  await views.mirror.waitForFunction((expected) => document.querySelector("#enabled")?.checked === expected, enabled);
+  await views.popupView.locator("#badge").filter({ hasText: enabled ? "Protected" : "Paused" }).waitFor();
+  await views.mirror.waitForFunction((expected) =>
+    JSON.stringify([...document.querySelectorAll("#sites li span")].map((item) => item.textContent)) === JSON.stringify(expected)
+  , sites);
+  liveViewCheckpoints++;
+  console.log("Live-view checkpoint passed:", name);
+}
+
 try {
   await new Promise((resolve, reject) => {
     server.once("error", reject);
@@ -142,18 +163,26 @@ try {
   await checkPage(website, { adLoaded: false, cosmeticHidden: true });
   assert.equal(counts.ad, 0, "Blocked ad fixture should never hit local server");
 
+  // PR #20's two-view regression goal, adapted to the current package layout.
+  // popup.html in a tab exercises view logic; actual toolbar presentation is manual QA.
+  const views = await openMirrorViews(extensionId);
+
   await setEnabled(options, false);
+  await checkLiveViews(views, "external pause", false, []);
   await website.waitForFunction(() => getComputedStyle(document.querySelector("#ad-box")).display !== "none");
   assert.equal(await website.locator("#ad-blocker-cosmetic").count(), 1, "Pause must not remove page-owned content before navigation");
   await checkPage(website, { adLoaded: true, cosmeticHidden: false });
   assert.ok(counts.ad > 0, "Paused extension should allow the fake ad fixture");
 
   await setEnabled(options, true);
+  await checkLiveViews(views, "external resume", true, []);
   await setTrusted(options, "publisher.test", true);
+  await checkLiveViews(views, "external site trust", true, ["publisher.test"]);
   await checkPage(website, { adLoaded: true, cosmeticHidden: false });
   await checkPage(website, { host: "news.publisher.test", adLoaded: true, cosmeticHidden: false });
   await checkPage(website, { host: "notpublisher.test", adLoaded: false, cosmeticHidden: true });
   await setTrusted(options, "publisher.test", false);
+  await checkLiveViews(views, "external trust removal", true, []);
   await checkPage(website, { adLoaded: false, cosmeticHidden: true });
 
   // Persistence after closing Chromium and launching the same user-data-dir.
@@ -179,6 +208,7 @@ try {
   await pausedOptions.goto("chrome-extension://" + new URL(pausedWorker.url()).host + "/options/options.html");
   await pausedOptions.locator("#status").filter({ hasText: "Settings loaded." }).waitFor();
   assert.equal(await pausedOptions.locator("#enabled").isChecked(), false, "Global pause must survive restart");
+  const recoveryViews = await openMirrorViews(new URL(pausedWorker.url()).host);
   const pausedWebsite = await context.newPage();
   await checkPage(pausedWebsite, { adLoaded: true, cosmeticHidden: false });
   await setTrusted(pausedOptions, "publisher.test", true);
@@ -187,7 +217,10 @@ try {
   await pausedOptions.locator("#status").filter({ hasText: "Default settings restored." }).waitFor();
   assert.equal(await pausedOptions.locator("#enabled").isChecked(), true, "Recovery must re-enable protection");
   assert.equal(await pausedOptions.locator("#sites li").count(), 0, "Recovery must remove trusted sites");
+  await checkLiveViews(recoveryViews, "external reset recovery", true, []);
   await checkPage(pausedWebsite, { adLoaded: false, cosmeticHidden: true });
+  assert.equal(liveViewCheckpoints, 5, "Run every live-view synchronization checkpoint");
+  console.log("Live-view synchronization checkpoints:", liveViewCheckpoints);
   console.log("All Chromium MV3 smoke tests passed; ad/control request counts:", counts);
 } finally {
   if (context) await context.close().catch(() => {});
