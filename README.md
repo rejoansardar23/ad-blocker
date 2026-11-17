@@ -1,5 +1,7 @@
 # Ad Blocker — Chrome MV3 Development Preview
 
+> **Current project handoff:** Read [HANDOFF.md](HANDOFF.md) for the live feature inventory, purpose of every active file/folder, complete dependency-ordered task queue, current PR state, and reviewer monitoring protocol.
+
 > **Lost the old ChatGPT chat? Start with [the permanent master project handoff](docs/history/MASTER_PROJECT_HANDOFF.md), [conversation/research archive](docs/history/RESEARCH_AND_CHAT_HISTORY_ARCHIVE.md), and [copy/paste prompt for a new agent](docs/history/NEXT_CHAT_START.txt).** These GitHub-native documents preserve the recoverable product vision, pinned external sources, architecture diagrams, CI evidence, PR history and next tasks; they are not a verbatim transcript export.
 
 
