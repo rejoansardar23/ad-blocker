@@ -30,6 +30,8 @@ jobs:
         run: npm audit --audit-level=high
       - name: Run static checks and unit tests
         run: npm run check
+      - name: Inventory tracked files and verify preserved snapshot hashes
+        run: npm run audit:repository
       - name: Build unpacked Chrome extension
         run: npm run build
       - name: Install Playwright Chromium for extension tests
@@ -49,4 +51,11 @@ jobs:
         with:
           name: ad-blocker-dependency-sbom
           path: build/dependency-sbom.json
+          if-no-files-found: warn
+      - name: Save static repository inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ad-blocker-repository-audit
+          path: build/audit/
           if-no-files-found: warn

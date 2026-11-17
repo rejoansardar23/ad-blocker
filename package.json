@@ -4,7 +4,8 @@
   "private": true,
   "description": "Development preview of a privacy-first Chrome MV3 ad blocker",
   "scripts": {
-    "verify": "node scripts/verify.mjs",
+    "verify": "node scripts/verify.mjs && node scripts/verify-repository.mjs",
+    "audit:repository": "node scripts/audit-repository.mjs",
     "test:unit": "node --test tests/unit/*.test.mjs",
     "test": "npm run test:unit",
     "check": "npm run verify && npm run test",

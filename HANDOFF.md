@@ -1,5 +1,15 @@
 # Ad Blocker project handoff
 
+## Recovery mission checkpoint — 18 November 2026
+
+The mission baseline `ce77ac5` is preserved on remote `recovery/pre-mission-ce77ac5`. The owner subsequently directed delivery straight to `main`; no mission PR is required by that instruction.
+
+The [integrity investigation](docs/security/REPOSITORY_INTEGRITY_AUDIT.md) confirms disruptive imports/document removal and prior archive-code activation, with no evidence sufficient to attribute unauthorized account access. The [complete static inventory](docs/audit/REPOSITORY_AUDIT.md) accounts for all 1,455 baseline files and 11 duplicate groups. All imported-file/archive hashes match their local records; upstream identity and licensing remain unresolved. Run `npm run audit:repository` for the current inventory; CI saves its JSON/CSV reports as an artifact.
+
+The [pre-change baseline](docs/testing/BASELINE_TEST_REPORT.md) passed locally, including ten real Chromium scenarios on 158.0.8127.18. [Structure decisions](docs/architecture/STRUCTURE_MIGRATION_PLAN.md) retain the active runtime layout. New repository checks prevent literal package-boundary escapes, broken active documentation links, tracked generated/credential-format files, and reactivation of quarantined root commands. Regex checks are guardrails, not a comprehensive security proof.
+
+Next: consolidate verified redundant documentation, then port and regression-test PR #20's useful settings-view synchronization into current paths. Concurrency, DNR/storage failure convergence, manual Stable/accessibility, real-site coverage, and performance remain open.
+
 > **Live operational handoff — 17 November 2026 (Asia/Kolkata).** This update was prepared from validated `main` commit `215bd5c59087393763cef74d42ca5f269e28367a`. Always recheck the current SHA, open pull requests, issues, source, and exact-commit CI before starting work.
 
 This is the primary handoff for a human or coding tool continuing the project. It records the main goal, verified features, limitations, purpose of every active file and folder, complete dependency-aware task queue, and the pull-request evidence that a reviewer must monitor.
