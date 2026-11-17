@@ -1,0 +1,1340 @@
+AD BLOCKER PROJECT IDEA — EVIDENCE-DRIVEN PRIVACY PROTECTION
+======================================================================
+
+Document date: 17 November 2026 (Asia/Kolkata)
+Document type: product and research charter
+Working concept name: Evidence-Driven Privacy Shield
+Brand status: not selected; the working name is not a trademark decision
+
+
+0. DOCUMENT STATUS AND TRUTH RULES
+==================================
+
+This document describes the strongest responsible long-term idea for this
+project. It is a direction, not a claim that every feature already exists and
+not a promise that every research idea will ship.
+
+Current source code, reproducible builds, exact-version browser evidence, and
+reviewed release artifacts always outrank planning text. A feature moves from
+idea to supported product only after its code, tests, browser behavior,
+security and privacy impact, licensing, rollback, and known limitations are
+recorded.
+
+The reorganized baseline described here was pushed to main as commit e5260c9.
+The active first-party project is under src/extension/. ZIP-derived Ghostery
+and uBlock Origin trees under AnalyseFuture/ are preserved research and
+forensic material. They are not trusted dependencies, active engines, or
+approved sources for distribution. Their exact upstream revisions are not
+known. Nothing in this idea authorizes copying, running, or shipping them.
+
+Historical CI results show that earlier versions of the small Chrome preview
+passed controlled tests. Those results remain useful history, but the
+reorganized commit must be revalidated in a later testing task. No application
+tests or builds were run while restructuring the repository or writing this
+document, as requested by the owner.
+
+
+1. THE IDEA IN ONE SENTENCE
+===========================
+
+Build a local-first, privacy-first ad and tracker blocker that begins with a
+dependable Chrome Manifest V3 extension, earns every public claim through
+repeatable evidence, minimizes damage to wanted content, gives users simple
+reversible control, and uses AI only as carefully measured assistance for
+testing, compatibility, and rule maintenance.
+
+
+2. THE USER PROBLEM
+===================
+
+Advertising and tracking can make pages slower, more distracting, less
+private, and sometimes less safe. Existing blockers can be powerful, but the
+environment is difficult:
+
+  - browsers restrict what extensions may observe and change;
+  - websites and advertising delivery change continuously;
+  - aggressive rules can hide legitimate content or break important actions;
+  - filters, software, data, and assets have different licenses;
+  - users need both simple controls and advanced, understandable recovery;
+  - regional sites and languages receive uneven maintenance;
+  - video advertising includes technically different categories that cannot
+    be solved by one universal rule;
+  - unsupported marketing claims make it hard to know what truly works.
+
+The project should solve the practical problem, not merely create a large
+feature list. Success means useful protection with low breakage, clear limits,
+safe updates, and sustainable maintenance.
+
+
+3. WHO THE PRODUCT SERVES
+=========================
+
+Everyday users
+  Want fewer intrusive ads, pages that still work, and one clear protection
+  control without learning filter syntax.
+
+Privacy-conscious users
+  Want tracker protection, minimal permissions, local processing, no hidden
+  telemetry, and an understandable privacy policy.
+
+Power users
+  Want trusted-site exceptions, custom rules, optional lists, diagnostics,
+  import/export, and reversible element selection.
+
+Accessibility and low-resource users
+  Need keyboard and screen-reader support, predictable layouts, low CPU and
+  memory overhead, and protection that does not remove essential controls.
+
+Regional and multilingual users
+  Need locally relevant coverage reviewed by people who understand the sites,
+  languages, and legitimate content being tested.
+
+Maintainers, testers, and security researchers
+  Need reproducible builds, small coherent modules, exact evidence, clear
+  provenance, safe disclosure, and a fast way to reproduce regressions.
+
+
+4. THE PRODUCT PROMISE
+======================
+
+The project will pursue the broadest useful protection it can demonstrate. It
+will preserve wanted content, investigate missed ads, repair reproducible site
+breakage, make controls reversible, and show limitations honestly.
+
+It will compete through:
+
+  1. measured blocking and tracker protection;
+  2. low severity-weighted website breakage;
+  3. privacy by default and no browsing-history business model;
+  4. fast recovery when a rule, update, or setting fails;
+  5. understandable basic controls plus an optional expert mode;
+  6. accessible and efficient operation;
+  7. transparent rule, dependency, and release provenance;
+  8. regional coverage that is earned region by region;
+  9. a compatibility program that continues after launch;
+ 10. evidence instead of “number one” or “100%” marketing.
+
+
+5. NON-NEGOTIABLE PRINCIPLES
+============================
+
+Privacy by default
+  Filtering and ordinary settings stay on the device. The default product
+  does not upload browsing history, full URLs, page text, screenshots, account
+  identifiers, cookies, or private page content.
+
+Deterministic enforcement
+  Browser-native rules and reviewed code decide what is blocked. A remote AI
+  response is never required for normal page loading.
+
+Wanted-content protection
+  A missed ad is a defect to investigate; deleting a checkout button, login,
+  article, player control, accessibility node, or other wanted content can be
+  a more serious defect. Both must be measured.
+
+Reversible control
+  Global pause, per-site trust, rule undo, settings reset, last-known-good
+  rollback, and clear error messages are product features, not afterthoughts.
+
+Proof over claims
+  Documentation separates present source, controlled browser evidence,
+  limited real-site evidence, experimental results, and future ideas.
+
+One coherent filtering pipeline
+  The project will not combine several overlapping engines merely because
+  their source is available. A single active architecture must have a named
+  owner and a recorded decision.
+
+Legal and supply-chain clarity
+  Public availability is not permission to relicense or redistribute code,
+  filter data, model weights, assets, or brands. Exact revisions, licenses,
+  notices, dependencies, and data rights must be reviewed before integration.
+
+Secure updates
+  Filter data and application updates are versioned, validated, integrity
+  checked, staged, observable, and reversible. Remote executable JavaScript is
+  prohibited.
+
+Sustainable scope
+  Worldwide ambition requires continuous maintenance. A feature without an
+  owner, evidence plan, and maintenance capacity is not ready to promise.
+
+
+6. CURRENT STARTING POINT
+=========================
+
+The active repository contains a small original Chrome MV3 preview:
+
+  - a Manifest V3 package under src/extension/;
+  - a small packaged declarativeNetRequest starter ruleset;
+  - a background service worker for settings and browser rule coordination;
+  - local enabled state and trusted-site exceptions;
+  - narrow, reversible cosmetic CSS;
+  - popup and options interfaces;
+  - settings validation, recovery, and reset behavior;
+  - Node unit fixtures and a Playwright Chromium fixture suite;
+  - dependency-light verification and build scripts;
+  - CI, security, contribution, architecture, product, and research records.
+
+It is not yet a mature commercial or worldwide blocker. It does not yet have:
+
+  - an owner-approved project license and distribution model;
+  - a verified production filter-list compiler and legal data catalog;
+  - broad network/cosmetic syntax coverage;
+  - safe production list updates and last-known-good rollback;
+  - a mature custom-rule system or element picker;
+  - representative worldwide compatibility evidence;
+  - complete accessibility, permission, privacy, and security review;
+  - a current release candidate or store approval;
+  - verified competitor superiority;
+  - guaranteed video-ad blocking;
+  - approved desktop, DNS, or mobile products.
+
+
+7. THE DIFFERENTIATED USER EXPERIENCE
+=====================================
+
+Simple mode
+  The popup shows whether protection is active, whether the current site is
+  trusted, what action will happen, and how to recover. Controls use plain
+  language and remain keyboard accessible.
+
+Recovery first
+  When a site breaks, the user can pause protection for that site, reload, see
+  which protection category may be involved, undo recent changes, and return
+  to the last-known-good ruleset. Recovery should not require deleting the
+  extension or losing all settings.
+
+Advanced mode
+  Expert users may inspect enabled lists, unsupported syntax, ruleset version,
+  rule-budget use, custom rules, and diagnostics. Dangerous or experimental
+  capabilities are separate, explained, and reversible.
+
+Honest diagnostics
+  Show only information supported by production browser APIs. If an exact
+  blocked-request count is unavailable, explain the limitation or omit the
+  number. Never display a fabricated counter.
+
+Privacy-respecting reports
+  A future breakage report is previewable and opt-in. It minimizes and redacts
+  data before sending anything. Raw browsing history is never silently
+  attached.
+
+Global but locally reviewed coverage
+  Language and region packs are visible choices with sources, maintainers,
+  versions, and known limits. “Worldwide” is an ambition assembled from
+  measured regional coverage, not one unsupported checkbox.
+
+
+8. FUNCTIONAL ARCHITECTURE
+==========================
+
+The product should develop as six connected layers.
+
+Layer A — Browser enforcement
+  Chrome declarativeNetRequest performs browser-native network blocking.
+  Content scripts perform narrowly scoped cosmetic filtering. Platform limits
+  and permissions remain explicit.
+
+Layer B — Local policy and controls
+  A validated state model owns global protection, per-site exceptions,
+  profiles, custom rules, migrations, recovery, and import/export. All state
+  changes are serialized where concurrency could cause lost updates.
+
+Layer C — Rule production
+  Approved filter sources enter a build-time parser/compiler. It records
+  provenance, supported and unsupported syntax, priority conflicts, duplicate
+  rules, browser quotas, and deterministic output hashes.
+
+Layer D — Safe update delivery
+  Candidate rule bundles are versioned, integrity checked, tested, staged, and
+  promoted only after gates pass. The extension retains a last-known-good
+  version and can recover offline.
+
+Layer E — Compatibility laboratory
+  Synthetic fixtures and consent-respecting representative sites measure
+  blocking, wanted-content preservation, performance, accessibility, browser
+  behavior, regional gaps, updates, restart behavior, and recovery.
+
+Layer F — Optional AI research
+  Models may propose issue labels, candidate rules, tests, or explanations.
+  Deterministic validators, privacy review, human review, isolated experiments,
+  staged rollout, and rollback stand between any model output and users.
+
+Conceptual flow:
+
+  approved filter sources
+    -> provenance and license registry
+    -> parser/compiler
+    -> syntax, conflict, quota, and integrity validation
+    -> versioned candidate ruleset
+    -> compatibility and security gates
+    -> staged release
+    -> browser-native enforcement
+    -> local diagnostics and reversible user controls
+    -> last-known-good rollback when needed
+
+  optional AI experiment
+    -> candidate suggestion only
+    -> deterministic validation
+    -> human review
+    -> isolated test or canary
+    -> accept, revise, or reject
+
+AnalyseFuture/ has no active edge in this flow. Promotion from quarantine is a
+separate, approval-gated provenance, license, security, and architecture task.
+
+
+9. RULE, DATA, AND LICENSE GOVERNANCE
+=====================================
+
+Every integrated source should have a machine-readable record containing:
+
+  - canonical source URL;
+  - immutable commit, release, or content hash;
+  - source, asset, dependency, and filter-data licenses;
+  - required copyright and attribution notices;
+  - intended use and files included in the distributed product;
+  - supported syntax and deliberately omitted behavior;
+  - update frequency and responsible maintainer;
+  - integrity verification and rollback behavior;
+  - security history and dependency risk;
+  - decision record approving, deferring, or rejecting integration.
+
+The first architecture decision must choose one active rule pipeline. Ghostery
+and uBlock-derived snapshots may inform research only after their provenance
+is verified. GPL, MPL, permissive code, and independently licensed list data
+have different obligations. AI summaries are not legal verification.
+
+
+10. COMPATIBILITY AS AN OPERATING SYSTEM
+========================================
+
+Ad blocking is not a one-time integration. The project needs a recurring
+operating process:
+
+  1. detect a missed ad, tracker leak, breakage, performance regression, or
+     browser-policy change;
+  2. reproduce it with a minimized, privacy-safe fixture where possible;
+  3. classify the affected rule, site category, browser, version, region, and
+     user action;
+  4. propose the smallest deterministic fix;
+  5. test both the desired block and legitimate negative controls;
+  6. evaluate performance, accessibility, privacy, and rule-budget impact;
+  7. review provenance and licensing when data or code changes;
+  8. stage the change and retain rollback;
+  9. record evidence and known limits;
+ 10. monitor support cost and reopen when new evidence appears.
+
+Representative coverage should include ordinary publishing, commerce, search,
+social, streaming, games, web applications, authentication, payments,
+accessibility workflows, regional sites, and benign pages with ad-like names.
+Testing must never depend on collecting unsuspecting users' browsing histories.
+
+
+11. WHAT IS REALISTIC TO BUILD NOW
+==================================
+
+With current browser and engineering capabilities, the project can reasonably
+build and verify:
+
+  - a dependable Chrome MV3 package using browser-native DNR;
+  - licensed network and cosmetic filter compilation within browser quotas;
+  - clear unsupported-syntax and quota reports;
+  - deterministic priority, exceptions, deduplication, and conflict rules;
+  - global pause and per-site trust with reliable persistence and recovery;
+  - safe settings migration, reset, backup, and validated import/export;
+  - versioned filter updates, integrity checks, offline fallback, and rollback;
+  - custom blocking and allow rules with preview, validation, and undo;
+  - a reversible, accessibility-aware element picker;
+  - tracker, nuisance, and regional profiles with measured breakage;
+  - transparent diagnostics without fake statistics;
+  - accessible popup/options experiences;
+  - reproducible Chrome builds, staged releases, and vulnerability response;
+  - controlled comparisons against current competitor versions;
+  - optional Edge and Firefox adapters after Chrome operations are stable.
+
+These are feasible capabilities, not automatically completed work. Each still
+requires an accountable owner, implementation, review, evidence, and ongoing
+maintenance.
+
+
+12. WHAT IS NOT POSSIBLE OR MUST NOT BE PROMISED
+=================================================
+
+Permanent 100% blocking everywhere
+  No blocker can responsibly guarantee every ad and tracker on every website,
+  language, browser, device, account state, and future delivery method.
+
+Universal YouTube or video-ad removal
+  Some ads are ordinary network requests, some are overlays, some are client
+  inserted, some are sponsorship segments, and some are inserted into the same
+  authenticated or encrypted media stream as wanted content. When ad and
+  content bytes are technically indistinguishable, an extension cannot promise
+  perfect removal without risking wanted playback.
+
+Zero false positives and zero website breakage
+  Aggressive filtering and site compatibility are competing goals. The project
+  can reduce, measure, and recover from breakage; it cannot guarantee none.
+
+Zero-maintenance worldwide coverage
+  Websites, lists, browsers, policies, and adversaries change. A one-time code
+  merge cannot produce permanent global coverage.
+
+Unrestricted interception under Chrome MV3
+  Chrome controls available APIs, permissions, quotas, and store policy. An
+  extension cannot behave like an unrestricted operating-system proxy.
+
+Device-wide protection from one browser extension
+  DNS, VPN, native desktop, mobile-app, and network-wide filtering require
+  separate products, permissions, threat models, deployments, and tests.
+
+Exact universal block counters
+  Production MV3 APIs may not expose every event needed for a complete exact
+  counter. Development-only information cannot justify a public fake number.
+
+Automatic parity on every browser
+  Chrome, Edge, Firefox, Safari, iOS, Android, and embedded browsers have
+  different APIs, signing, policy, and extension models. Each target needs an
+  independently tested adapter or separate product.
+
+Guaranteed invisibility to anti-blocking systems
+  Detection and evasion are adversarial and change over time. The product will
+  not promise permanent invisibility or use unsafe tricks to chase it.
+
+Autonomous AI publishing
+  AI cannot safely or legally promote filters, selectors, scriptlets,
+  dependencies, model weights, or releases without deterministic checks,
+  provenance, license review, human approval, staged delivery, and rollback.
+
+AI as an authenticity, security, or license oracle
+  Model output may assist research, but it cannot prove a file is authentic,
+  code is safe, a license is compatible, or a vulnerability is absent.
+
+Privacy-perfect cloud page analysis
+  Sending raw URLs, page text, screenshots, account state, or browsing history
+  to a remote model contradicts the default privacy promise and cannot be made
+  harmless merely by calling it AI.
+
+Inappropriate or prohibited goals
+  The project will not bypass paywalls, DRM, account controls, browser security
+  boundaries, consent mechanisms, or store protections. It will not disguise
+  malware, collect user histories for sale, or claim ownership of upstream
+  copyrights.
+
+Unsupported market claims
+  “Best,” “number one,” “production ready,” and competitor-superiority claims
+  are not allowed without dated, reproducible, comparable evidence.
+
+
+13. DELIVERY ROADMAP — BUILD THE DETERMINISTIC CORE FIRST
+=========================================================
+
+Phase 0 — Ownership and trusted foundation
+
+  - owner selects distribution model, project license, contributor terms, and
+    brand process;
+  - preserve the reorganized active baseline and quarantine boundary;
+  - review imported provenance without executing untrusted lifecycle scripts;
+  - compare realistic foundations and choose exactly one active pipeline;
+  - record architecture, licensing, privacy, and permission decisions;
+  - revalidate the active preview in the target browser in a later test task.
+
+Exit gate:
+  One approved architecture, reproducible active build, known legal boundary,
+  current browser evidence, and no critical unexplained source provenance in
+  the active product.
+
+Phase 1 — Reliable Chrome alpha
+
+  - finish settings consistency, concurrency, API failure, and recovery work;
+  - complete real Chrome install, popup, options, reload, restart, accessibility,
+    permission, privacy, and negative-control tests;
+  - establish a legal initial filter-source registry and deterministic compiler;
+  - measure DNR quota use and unsupported filter syntax;
+  - produce a developer alpha with checksums and exact limitations.
+
+Exit gate:
+  The extension installs reproducibly, core controls work in the target Chrome
+  version, known critical fixture breakage is resolved, and claims match data.
+
+Phase 2 — Mature filtering and safe updates
+
+  - add maintained network, tracker, cosmetic, nuisance, and regional profiles;
+  - implement versioned updates, integrity validation, staged promotion,
+    last-known-good rollback, and offline recovery;
+  - add validated custom rules and reversible element selection;
+  - establish a representative compatibility corpus and breakage severity model;
+  - publish unsupported syntax and known limitations.
+
+Exit gate:
+  Dated coverage, false-positive, breakage, performance, and rollback evidence;
+  every shipped data source has provenance and ownership.
+
+Phase 3 — Product quality and controlled release
+
+  - complete accessible onboarding and advanced settings;
+  - add honest diagnostics and privacy-safe support reports;
+  - perform security, supply-chain, permissions, privacy, and legal reviews;
+  - establish release signing, artifact checksums, incident response, support,
+    staged rollout, and rollback drills;
+  - prepare accurate store assets and policies only after owner approval.
+
+Exit gate:
+  A reproducible release candidate passes the complete gate, high-priority
+  findings are resolved, and an accountable operator can support the release.
+
+Phase 4 — Measured competition
+
+  - compare identical workloads against pinned current competitor releases;
+  - measure blocking, wanted-content preservation, page breakage, performance,
+    privacy, accessibility, recovery, and maintenance cost;
+  - fix regressions and publish methodology, uncertainty, and omissions;
+  - prioritize differentiators users actually value.
+
+Exit gate:
+  Reproducible results support narrowly worded public claims. No ranking is
+  inferred from feature count or marketing copy.
+
+Phase 5 — Approved expansion
+
+  - adapt to Edge and Firefox with independent tests;
+  - investigate video categories honestly;
+  - decide whether mobile, desktop, or DNS deserve separate products;
+  - expand regional stewardship only when qualified maintainers exist.
+
+Exit gate:
+  Each platform or research area has its own go/no-go decision, threat model,
+  owner, cost model, and evidence. Expansion is never automatic.
+
+
+14. AI IN THIS PROJECT: ALLOWED AND PROHIBITED ROLES
+===================================================
+
+AI is useful when it reduces review time or discovers reproducible defects. It
+is dangerous when probabilistic output silently becomes enforcement.
+
+Allowed, after evaluation:
+
+  - cluster duplicate, redacted issue reports;
+  - suggest a likely failure category;
+  - generate candidate synthetic fixtures or fuzz cases;
+  - suggest candidate filter rules or safe selectors for human review;
+  - explain diagnostics in plain language;
+  - find documentation inconsistencies;
+  - assist localization under native-language review;
+  - rank compatibility risk for a proposed deterministic change;
+  - explore small on-device classifiers in isolated or opt-in experiments.
+
+Prohibited by default:
+
+  - uploading raw browsing activity or private page content;
+  - blocking a page solely because a remote model says so;
+  - generating and publishing rules without deterministic negative controls;
+  - changing permissions, dependencies, licenses, or update endpoints silently;
+  - executing model-generated code or remote JavaScript in the extension;
+  - treating confidence scores as proof of safety;
+  - hiding model errors or presenting estimates as exact facts;
+  - allowing an AI agent to sign or release without accountable human approval.
+
+
+15. FIRST-YEAR AI-ERA RESEARCH HORIZON
+======================================
+
+“First year” means the first twelve months after a staffed research program
+begins. It is not a guaranteed calendar release. The deterministic filter and
+rollback foundation remains higher priority.
+
+Experiment A — Redacted issue and breakage triage
+
+Accountable owner:
+  Compatibility/QA lead, with privacy reviewer and ML research support.
+
+Hypothesis:
+  A model can group duplicate reports, identify likely rule categories, and
+  reduce maintainer triage time without retaining sensitive browsing data.
+
+Evaluation:
+  A labeled historical/synthetic set; cluster purity; urgent-defect recall;
+  misrouting rate; maintainer minutes saved; private-data leakage review.
+
+Success gate:
+  Material, repeatable time savings with acceptable urgent-case recall and no
+  need for raw browsing histories.
+
+Stop conditions:
+  Private data is required; urgent issues are hidden or misgrouped; maintainers
+  spend as much time correcting the model as they save; clusters drift badly.
+
+Experiment B — Candidate filter and cosmetic-rule suggestions
+
+Accountable owner:
+  Filtering/rules lead; security and compatibility reviewers approve results.
+
+Hypothesis:
+  AI suggestions can shorten diagnosis while deterministic validation and
+  human review protect users.
+
+Evaluation:
+  Held-out missed-ad and broken-site cases; supported syntax; block efficacy;
+  wanted-content false positives; reviewer acceptance; reproducibility; time.
+
+Success gate:
+  Accepted suggestions resolve more verified cases per reviewer hour than the
+  manual baseline without increasing severe regressions.
+
+Stop conditions:
+  Legitimate content is repeatedly hidden; suggestions require unsafe scripts;
+  results are not reproducible; license/provenance is unclear; acceptance is
+  too low to justify review cost.
+
+Experiment C — Regression fixture and fuzz-case generation
+
+Accountable owner:
+  QA/test lead.
+
+Hypothesis:
+  Generated variations can find state, parser, rule-priority, DOM, migration,
+  and recovery defects that hand-written fixtures miss.
+
+Evaluation:
+  Unique reproducible defects found; mutation coverage; negative-control
+  quality; flake rate; duplicate rate; compute and review cost.
+
+Success gate:
+  The experiment finds valuable minimized cases and improves coverage without
+  overwhelming reviewers or weakening assertions.
+
+Stop conditions:
+  Tests are mainly duplicate, trivial, flaky, non-deterministic, or harder to
+  audit than equivalent hand-written fixtures.
+
+Experiment D — On-device ambiguous-container classifier feasibility
+
+Accountable owner:
+  ML/runtime research lead, with performance, privacy, accessibility, and
+  compatibility reviewers.
+
+Hypothesis:
+  A small local model might identify ambiguous visual ad containers that safe
+  deterministic selectors miss.
+
+Evaluation:
+  Diverse held-out pages and languages; precision/recall; legitimate-content
+  loss; task completion; CPU, memory, latency, battery, package size; offline
+  behavior; adversarial examples; accessibility-tree impact.
+
+Success gate:
+  A shadow-mode or opt-in prototype provides measurable incremental benefit
+  while meeting strict false-positive and device budgets.
+
+Stop conditions:
+  It needs page uploads, broad new permissions, or remote inference; wanted
+  content is harmed; overhead is visible; a simpler deterministic rule performs
+  similarly; model maintenance has no sustainable owner.
+
+Experiment E — Documentation, accessibility, and localization assistance
+
+Accountable owner:
+  UX/accessibility lead and native-language reviewers.
+
+Hypothesis:
+  AI can help find unclear controls, missing labels, inconsistent claims, and
+  translation gaps without deciding final policy language.
+
+Evaluation:
+  User-task completion; keyboard and screen-reader review; translation defect
+  rate; misleading-claim rate; reviewer time.
+
+Success gate:
+  Human-reviewed assistance improves clarity or coverage with fewer defects
+  and less effort than the baseline.
+
+Stop conditions:
+  Accessibility regressions appear; native reviewers are unavailable; legal or
+  privacy wording is published without qualified human review.
+
+
+16. SECOND-YEAR AI-ERA RESEARCH HORIZON
+=======================================
+
+These experiments begin only after the deterministic pipeline, compatibility
+corpus, update rollback, privacy rules, and research governance are stable.
+
+Experiment F — Breakage-risk ranking for rule changes
+
+Owner:
+  Compatibility lead plus ML research engineer.
+
+Method and evaluation:
+  Train or score only on approved versioned evidence; compare against simple
+  deterministic heuristics; measure calibration, severe-breakage recall, false
+  alarms, canary outcomes, drift, and maintainer time saved.
+
+Success:
+  High-risk changes are surfaced earlier and severe regressions decline without
+  blocking ordinary safe updates.
+
+Stop:
+  Poor calibration, unexplained drift, too many false alarms, or no gain over
+  transparent rules.
+
+Experiment G — Regional and multilingual gap discovery
+
+Owner:
+  Rule/data steward plus named regional/native-language maintainers.
+
+Method and evaluation:
+  Use licensed or consented regional corpora; measure reproducible coverage
+  gains, false positives, reviewer agreement, accessibility, and maintenance
+  cost by region.
+
+Success:
+  A region gains verified coverage with sustainable local review and clear data
+  rights.
+
+Stop:
+  No qualified reviewers, ambiguous data rights, systematic wanted-content
+  harm, or maintenance cost exceeds available ownership.
+
+Experiment H — Minimal reversible cosmetic-rule generation
+
+Owner:
+  Browser UI/filtering engineer with accessibility and QA review.
+
+Method and evaluation:
+  Generate the smallest candidate selector; test DOM variations, legitimate
+  siblings, navigation, keyboard operation, and undo. Compare with the manual
+  element-picker baseline.
+
+Success:
+  More correct reversible rules with no increase in severe hiding defects.
+
+Stop:
+  Broad/brittle selectors, inaccessible results, non-reproducible behavior, or
+  insufficient advantage over deterministic picker logic.
+
+Experiment I — Dynamic-page compatibility and repair suggestions
+
+Owner:
+  Browser compatibility lead.
+
+Method and evaluation:
+  Diagnose state changes on approved fixtures; suggest a minimal allow rule,
+  exception, or cosmetic change; measure recovery rate, false repair, and page
+  task completion. Suggestions remain human approved.
+
+Success:
+  Faster recovery from reproducible dynamic-page breakage without weakening
+  unrelated protection.
+
+Stop:
+  Suggestions broadly disable protection, require unsafe injection, or cannot
+  preserve authentication, payments, media, and accessibility tasks.
+
+Experiment J — Category-specific video diagnostics
+
+Owner:
+  Video compatibility engineer with policy/legal and privacy reviewers.
+
+Method and evaluation:
+  Treat network ads, overlays, client-inserted segments, sponsorship segments,
+  server-side insertion, and encrypted streams separately. Record exact
+  browser, account type, region, media version, playback integrity, false
+  skips, and privacy impact.
+
+Success:
+  A narrowly defined category becomes more measurable or controllable without
+  harming wanted playback or accounts.
+
+Stop:
+  Ad and content are technically indistinguishable; wanted media is skipped;
+  the method risks accounts, privacy, DRM, paywalls, or platform policy.
+
+Experiment K — Assisted cross-browser adaptation
+
+Owner:
+  Browser-platform lead.
+
+Method and evaluation:
+  AI may propose adapter changes, but each browser must pass its native
+  permissions, packaging, signing, security, and compatibility matrix.
+
+Success:
+  Reduced adaptation effort while platform-specific behavior remains explicit
+  and independently verified.
+
+Stop:
+  Generated abstractions hide important API differences, weaken security, or
+  cost more to maintain than focused adapters.
+
+
+17. THREE-YEAR AND LONGER RESEARCH HORIZON
+==========================================
+
+These are evidence triggers, not scheduled promises. Revisit only when browser
+APIs, model capabilities, authoritative components, or well-designed
+experiments create new evidence.
+
+Multimodal on-device page understanding
+  Owner: ML/privacy lead with accessibility and browser engineers.
+  Goal: distinguish ambiguous ad containers using local visual, DOM, and
+  accessibility signals.
+  Evaluation: unseen pages, devices, languages, adversarial layouts, wanted-
+  content precision, latency, memory, battery, and accessibility task success.
+  Success: meaningful incremental coverage over deterministic rules within
+  strict local-device and false-positive budgets.
+  Stop: page upload, excessive resource use, unexplainable decisions, or
+  legitimate content loss is required.
+
+Reversible layout repair after safe removal
+  Owner: browser UX/accessibility lead.
+  Goal: close empty gaps without moving, hiding, or disabling wanted controls.
+  Evaluation: layout stability, task completion, cumulative layout shift,
+  screen-reader order, focus, interaction, and reliable undo.
+  Success: visible gaps improve while page tasks and accessibility remain at
+  least as reliable as the no-repair baseline.
+  Stop: accessibility, focus, interaction, or layout regressions cannot be
+  bounded and reversed.
+
+Human-approved rule-operations agent
+  Owner: release/rules operator.
+  Goal: prepare an explained candidate update, run deterministic gates, and
+  summarize risks. It never signs or promotes a release by itself.
+  Evaluation: gate completeness, explanation accuracy, missed-risk rate,
+  reviewer time, rejected suggestions, and staged rollback outcomes.
+  Success: reviewers make faster, better-supported decisions without reduced
+  scrutiny or autonomous promotion.
+  Stop: explanations are unreliable, severe risks are missed, or reviewers
+  become rubber stamps.
+
+Privacy-preserving compatibility learning
+  Owner: security/privacy and ML leads, with independent audit.
+  Goal: learn from explicitly opted-in, minimized signals without raw URLs,
+  page text, screenshots, or histories.
+  Evaluation: measurable compatibility benefit, re-identification testing,
+  consent comprehension, collection minimization, retention, and deletion.
+  Success: audited minimized signals improve reproducible compatibility cases
+  without creating a browsing-history dataset.
+  Stop: de-identification is weak, consent is unclear, deletion is unreliable,
+  or central data creates disproportionate risk.
+
+Accessible mobile-browser protection
+  Owner: dedicated mobile platform lead.
+  Goal: determine what platform APIs genuinely permit, with separate privacy,
+  battery, store-policy, and accessibility tests. It is not an automatic port.
+  Evaluation: supported request/cosmetic behavior, wanted-content preservation,
+  device and battery overhead, accessibility tasks, privacy, and store policy.
+  Success: one defined mobile target delivers useful protection within native
+  constraints and has a maintainable signing/release path.
+  Stop: the platform cannot provide meaningful safe coverage, resource or
+  accessibility budgets fail, store policy forbids the design, or no owner can
+  maintain it.
+
+Separate desktop and DNS products
+  Owner: separately funded platform/security leads.
+  Goal: evaluate system-wide or network-wide protection with independent threat
+  models, deployment, updates, observability, support, and legal review. These
+  products should not be hidden inside the browser-extension scope.
+  Evaluation: coverage and false positives by protocol/application, privilege
+  level, attack surface, latency, operational complexity, support, and cost.
+  Success: a separately governed prototype provides clear user value with a
+  defensible security, privacy, update, and funding model.
+  Stop: required privileges or data visibility are disproportionate, encrypted
+  traffic cannot be handled safely, costs are unsustainable, or ownership is
+  missing.
+
+Server-inserted video-ad research
+  Owner: video research lead.
+  Goal: revisit only if a reproducible, policy-compliant signal distinguishes
+  ads from wanted content without DRM/paywall circumvention or harmful skips.
+  Evaluation: exact stream category, playback integrity, wanted-media false
+  skips, account/region effects, latency, privacy, and policy compliance.
+  Success: a narrow repeatable category can be handled without harming wanted
+  media, accounts, privacy, accessibility, or policy compliance.
+  Stop: streams are technically indistinguishable, wanted playback is harmed,
+  or the method requires circumvention. “Future AI will solve it” is not
+  evidence.
+
+Community and regional rule stewardship
+  Owner: community/rules lead plus regional maintainers.
+  Goal: use AI to assist review queues, never replace local expertise.
+  Evaluation: reviewer agreement, reproduced coverage gains, false positives,
+  time-to-repair, participation health, and per-region maintenance cost.
+  Success: qualified local reviewers sustainably improve a versioned regional
+  corpus with lower breakage and clear provenance.
+  Stop: local review is unavailable, abuse dominates, data rights are unclear,
+  or the region cannot be supported without misleading users.
+
+Browser-vendor collaboration
+  Owner: technical/product lead.
+  Goal: advocate for safer, privacy-preserving filtering, diagnostics, and
+  update APIs.
+  Evaluation: concrete proposals, vendor feedback, prototype API value,
+  permission/privacy impact, standards progress, and implementability.
+  Success: a documented vendor or standards change enables safer measurable
+  capability without expanding surveillance or weakening browser security.
+  Stop: proposals require invasive access, conflict with user safety, receive
+  no actionable path after scheduled reviews, or consume effort needed for the
+  supported core. Success depends on vendor decisions, not only project code.
+
+
+18. VIDEO AND YOUTUBE-SPECIFIC POLICY
+=====================================
+
+The project will treat “video ads” as a matrix of technical categories rather
+than a single promise:
+
+  - ordinary third-party network requests;
+  - page overlays and companion banners;
+  - client-side inserted media segments;
+  - creator sponsorship segments;
+  - server-side inserted streams;
+  - authenticated, encrypted, account- or region-dependent delivery;
+  - anti-blocking and playback integrity behavior.
+
+Each category needs its own owner, lawful and policy-compliant method, test
+accounts where permitted, regions, browsers, negative controls, playback
+integrity checks, and stop conditions. Sponsor skipping, if ever considered,
+requires separate API/database licensing, user consent, and product policy.
+
+The release language must always say “best effort on tested categories” unless
+future evidence supports a narrower stronger statement. It must never promise
+all YouTube ads are blocked forever.
+
+
+19. PLATFORM EXPANSION POLICY
+=============================
+
+Chrome first
+  Stabilize one complete build, test, update, release, support, and rollback
+  process before broad expansion.
+
+Edge
+  Likely shares Chromium concepts but still needs packaging, store, permission,
+  update, enterprise-policy, and regression verification.
+
+Firefox
+  May offer different network APIs and capabilities. Use an explicit adapter
+  and independent test matrix; do not pretend Chrome MV3 behavior is identical.
+
+Safari and mobile browsers
+  Require separate feasibility work, signing, platform APIs, performance,
+  battery, privacy, and accessibility review.
+
+Desktop and DNS
+  Are distinct products, not extension features. Each needs separate staffing,
+  threat modeling, updates, support, and user-consent design.
+
+
+20. ACCOUNTABILITY MODEL — WHO WILL DO THE WORK
+================================================
+
+Product owner / founder
+  Owns audience, scope, brand, budget, distribution model, project license,
+  public claims, and final go/no-go decisions.
+
+Technical/architecture lead
+  Owns one coherent runtime, module boundaries, architecture decisions, and
+  the rule against uncontrolled engine overlap.
+
+Browser-extension engineer
+  Owns manifest, service worker, content scripts, controls, settings, browser
+  adapters, and API correctness.
+
+Filtering and rule-data steward
+  Owns source provenance, parser/compiler behavior, syntax, priority, quotas,
+  data updates, regional packs, and rollback inputs.
+
+Compatibility and QA lead
+  Owns synthetic fixtures, representative-site corpus, breakage severity,
+  browser matrix, regressions, benchmark reproducibility, and triage.
+
+Security and privacy lead
+  Owns permissions, data flow, threat model, supply chain, content-script
+  boundaries, vulnerability response, and privacy review.
+
+License/provenance reviewer or qualified counsel
+  Owns code, data, asset, model, dependency, notice, contribution, and
+  distribution-right review. An AI agent cannot fill this legal role.
+
+UX and accessibility lead
+  Owns understandable controls, onboarding, recovery, keyboard behavior,
+  screen-reader behavior, color/contrast, and honest diagnostics.
+
+Release and operations owner
+  Owns CI, reproducible artifacts, checksums, signing, staged rollout, update
+  monitoring, incident response, rollback drills, and store operations.
+
+AI/ML research lead
+  Owns bounded experiments, data minimization, baseline comparisons, model
+  versioning, resource budgets, drift review, and stop decisions. This role may
+  not promote experiments unilaterally.
+
+Regional/native-language maintainers
+  Own local corpus validity, regional rules, translations, wanted-content
+  review, and sustainable follow-up for their regions.
+
+Support/triage owner
+  Owns user-facing issue intake, redaction, reproduction, severity, response,
+  and escalation without creating a browsing-history database.
+
+A small early team may combine several roles, but every active task and every
+research record must name one accountable person. “The community” or “AI” is
+not an accountable owner.
+
+
+21. EVALUATION SCORECARD
+========================
+
+Blocking efficacy
+  Eligible controlled ad/tracker requests blocked; missed cases categorized by
+  syntax, quota, timing, permissions, and delivery type.
+
+Wanted-content precision
+  Legitimate controls, requests, media, text, authentication, checkout, and
+  accessibility behavior preserved.
+
+Website breakage
+  Severity-weighted failures per tested site/task, not just a raw site count.
+
+Recovery
+  Time and steps to pause, trust a site, undo a rule, restore settings, roll
+  back a bundle, and return to safe operation.
+
+Performance
+  Incremental CPU, memory, page-load time, long-task time, rule footprint,
+  package size, and, where relevant, battery use versus no-extension baseline.
+
+Privacy
+  Manifest permissions, host access, stored data, retention, expected outbound
+  traffic, unexpected outbound traffic, report minimization, and consent.
+
+Security and supply chain
+  Dependency inventory, advisories, reproducibility, artifact hashes, remote
+  code checks, update integrity, secret handling, and unresolved findings.
+
+Rule/update reliability
+  Compilation determinism, unsupported syntax, quota utilization, update
+  success, corrupted-update rejection, offline behavior, and rollback success.
+
+Accessibility and usability
+  Keyboard and screen-reader task completion, focus, contrast, error recovery,
+  permission comprehension, and success on common basic/advanced tasks.
+
+Regional coverage
+  Results by region and language with qualified review, not a global average
+  that hides unsupported areas.
+
+Support and maintenance
+  Time-to-reproduce, time-to-repair, open severe regressions, update workload,
+  reviewer effort, regional ownership, and recurring operational cost.
+
+AI experiment value
+  Improvement over a deterministic/manual baseline, false positives, reviewer
+  acceptance, time saved, privacy impact, resource cost, drift, and rollback.
+
+Every result should identify date, source commit/version, browser/version,
+operating system/hardware class, rules and settings, corpus version, repetitions,
+failures, uncertainty, and omitted cases. Numerical targets should be set only
+after honest baselines exist.
+
+
+22. FEATURE AND EVIDENCE LIFECYCLE
+==================================
+
+Idea
+  A user problem and possible approach are written down. No shipping claim.
+
+Research
+  An owner tests a falsifiable hypothesis and records evidence, risks, and stop
+  conditions.
+
+Prototype
+  Isolated code demonstrates a narrow behavior. It is disabled or separate
+  from normal users and has an explicit removal path.
+
+Controlled verification
+  Deterministic fixtures, negative controls, representative cases, performance,
+  privacy, accessibility, security, and license gates are run.
+
+Release candidate
+  Reproducible artifact, migration, rollback, support, known limits, and owner
+  approval are complete.
+
+Supported
+  Staged release is monitored, documentation matches behavior, a maintainer is
+  accountable, and incidents can be rolled back.
+
+Deprecated or rejected
+  The reason, migration/removal, preserved findings, failed approaches, and
+  next evidence trigger are recorded. Rejection is a valid research result.
+
+
+23. RELEASE GATES AND ROLLBACK
+==============================
+
+No release should advance merely because a build file exists. Required gates:
+
+  - reproducible source and dependency installation;
+  - active tests appropriate to changed behavior;
+  - exact target-browser verification;
+  - benign negative controls and breakage review;
+  - performance and rule-budget review;
+  - permissions, privacy, and unexpected-network review;
+  - security, dependency, and update-path review;
+  - source/data/model license and notice review;
+  - accessibility and recovery checks;
+  - settings migration and rollback verification;
+  - artifact checksum and staged rollout plan;
+  - known-limitations and support documentation;
+  - accountable release owner approval.
+
+Rollback must cover application releases, settings migrations where feasible,
+filter bundles, model experiments, and remote data. A rollout without a tested
+last-known-good path is not release ready.
+
+
+24. RESEARCH RECORD TEMPLATE
+============================
+
+Research ID and title:
+Question or falsifiable hypothesis:
+User problem and decision affected:
+Why investigate now:
+Accountable owner:
+Required reviewers:
+Current evidence and uncertainty:
+Exact prototype scope:
+Deterministic/manual baseline:
+Data source, rights, and privacy boundary:
+Browser/platform/model versions:
+Evaluation corpus and negative controls:
+Metrics:
+Success threshold:
+Performance/resource budget:
+Security, accessibility, and license review:
+Human approval point:
+Rollback or removal plan:
+Stop conditions:
+Findings:
+Failed approaches and lessons:
+Decision — accept, revise, defer, or reject:
+Next evidence trigger:
+Next review date, if maintainers have capacity:
+
+Revisit a record when a browser API, upstream component, model capability, or
+well-designed experiment supplies new evidence. A quarterly review may be
+useful when maintainers have capacity. Never relabel a speculative research
+idea as a scheduled release commitment.
+
+
+25. COSTS AND PRACTICAL RESOURCES
+=================================
+
+The largest recurring cost is compatibility maintenance. Websites, advertising
+delivery, browsers, policies, rules, and attacks change continuously.
+
+Plan for:
+
+  - extension and rules engineering;
+  - code, security, privacy, and license review;
+  - browser/device and accessibility testing;
+  - CI, artifact storage, release signing, and update delivery;
+  - representative and regional test maintenance;
+  - user support, issue triage, and incident response;
+  - vulnerability and dependency maintenance;
+  - store accounts, policy work, and release operations;
+  - optional model training/evaluation and supported test hardware;
+  - qualified legal review when distribution obligations are uncertain.
+
+No paid service is enabled by this idea. Spending, dates, staffing, and public
+launch must be decided by the owner. AI experiments must demonstrate benefit
+over simpler approaches after compute, device, privacy, and reviewer costs are
+included.
+
+Possible future sustainability models include donations, sponsorship that does
+not control filtering decisions, paid support, managed organizational policy,
+or optional premium convenience features. No model is approved. Selling
+browsing data, paid allowlisting hidden from users, or weakening protection for
+advertisers would violate the trust position.
+
+
+26. MAJOR RISKS AND RESPONSES
+=============================
+
+License or provenance failure
+  Response: quarantine by default; immutable source records; qualified review;
+  no active integration until approved.
+
+Site breakage from aggressive filtering
+  Response: negative controls, representative task testing, severity scoring,
+  staged rules, site trust, undo, and last-known-good rollback.
+
+Browser policy/API change
+  Response: official-source monitoring, target-version CI, adapter boundaries,
+  honest capability changes, and no unsupported bypasses.
+
+Compromised update or dependency
+  Response: pinned dependencies, SBOM, integrity checks, reproducible builds,
+  least privilege, staged release, protected signing, and rollback.
+
+Privacy erosion through support or AI
+  Response: local defaults, minimization, previewable opt-in reports, retention
+  limits, access controls, privacy review, and no raw history collection.
+
+AI false confidence
+  Response: deterministic baselines, held-out evaluation, human approval,
+  limited experiments, clear uncertainty, and preset stop conditions.
+
+Maintenance overload
+  Response: one pipeline, narrow supported scope, named owners, severity-based
+  triage, regional expansion only with maintainers, and rejection of features
+  whose recurring cost is not sustainable.
+
+Misleading marketing
+  Response: evidence-linked claims, version/date labels, limitations, and
+  explicit separation of source present, tested, experimental, and planned.
+
+
+27. THE NEXT CONCRETE WORK BATCHES
+==================================
+
+P0 — Protect the recovered foundation
+
+  - keep active source and AnalyseFuture quarantine boundaries intact;
+  - resolve project license, distribution, contribution, and brand decisions;
+  - perform provenance/security/license review before any quarantine execution;
+  - assign accountable owners for architecture, filtering, QA, security, and
+    release work;
+  - revalidate the reorganized active project in a separately authorized test
+    task and record exact evidence.
+
+P1 — Make the filtering decision reviewable
+
+  - compare the original Chrome DNR baseline with narrowly defined alternatives;
+  - decide whether any external parser adds enough value to justify obligations;
+  - select legal initial filter sources;
+  - record one approved pipeline and explicitly reject/defer overlaps.
+
+P2 — Complete the first browser experience
+
+  - verify blocking, cosmetics, settings consistency, exceptions, concurrency,
+    API failure recovery, reset, migration, restart, popup/options, permissions,
+    accessibility, and privacy in the target Chrome version;
+  - fix only reproducible defects and preserve benign negative controls.
+
+P3 — Establish the first coverage and update program
+
+  - build deterministic compilation, unsupported-syntax and quota reports;
+  - add provenance, versioning, integrity, staged updates, offline fallback, and
+    last-known-good rollback;
+  - select representative sites/languages and a category-specific video matrix;
+  - record supported, missed, and broken cases without exaggeration.
+
+P4 — Add advanced user value safely
+
+  - custom rules with validation/undo;
+  - reversible element picker;
+  - regional and protection profiles;
+  - validated settings backup/restore;
+  - honest diagnostics and privacy-safe breakage reporting.
+
+P5 — Prepare controlled distribution
+
+  - complete security, privacy, permission, accessibility, performance, legal,
+    supply-chain, support, and release reviews;
+  - produce reproducible artifacts and checksums;
+  - run staged rollout and rollback drills;
+  - publish only after every release gate and owner decision passes.
+
+Do not skip the trusted-foundation work by calling archive extraction an
+integration. Do not rewrite working behavior merely to create activity. Do not
+start a dependent batch before the prior gate has a recorded result.
+
+
+28. CURRENT SOURCE AND EVIDENCE MAP
+===================================
+
+Active source and configuration:
+
+  src/extension/manifest.json
+    Chrome MV3 permissions and entry points.
+
+  src/extension/rules/starter.json
+    Small proof-of-concept packaged network rules.
+
+  src/extension/background/service-worker.js
+    Settings validation, recovery, and browser rule coordination.
+
+  src/extension/shared/domain.js
+    Host validation and trusted-site matching.
+
+  src/extension/content/cosmetic.js
+    Narrow reversible cosmetic filtering.
+
+  src/extension/popup/ and src/extension/options/
+    Current preview controls.
+
+  scripts/verify.mjs and scripts/build.mjs
+    Active first-party structural verification and packaging.
+
+  tests/unit/ and tests/browser/
+    Active unit and Chromium fixture locations.
+
+  docs/
+    Categorized architecture, product, development, research, governance,
+    security, testing, and historical records.
+
+  PROJECT_STRUCTURE.md
+    Authoritative repository organization and old-to-new path map.
+
+Preserved, inactive research material:
+
+  AnalyseFuture/README.txt
+    Provenance, safety boundary, archive fingerprints, and future review gate.
+
+  AnalyseFuture/OriginalUploads/
+    Exact supplied ZIP inputs.
+
+  AnalyseFuture/ImportedUpstream/
+    Preserved extracted trees and disrupted-state integration files. Commands
+    and nested workflows here are not active and must not be run before review.
+
+Current root package commands describe only the active first-party project:
+
+  npm run verify
+  npm run test
+  npm run check
+  npm run build
+  npm run test:e2e
+
+These commands are listed for future evidence work. They were not executed for
+this restructuring or vision task. Pre-restructure commands such as
+verify:archives, build:ublock, and test:ublock are quarantined historical work,
+not current root commands.
+
+
+29. THE LONG-TERM PRODUCT COMMITMENT
+====================================
+
+We will build protection that is useful, explainable, reversible, and worthy
+of user trust. We will treat missed ads and broken wanted content as measurable
+engineering problems. We will keep ordinary operation local, make data and
+permissions visible, preserve safe recovery, and publish only what evidence
+supports.
+
+We will treat video advertising, regional coverage, cross-browser behavior,
+and future AI as collections of specific research questions, not magical
+promises. We will preserve failed experiments because they prevent repeated
+mistakes. We will stop work that cannot meet privacy, safety, legal, performance,
+or maintenance gates even when the idea sounds impressive.
+
+The ambition may be worldwide. Every supported release must earn its claims
+through reproducible source, exact-version browser behavior, representative
+evidence, wanted-content protection, accessibility, secure updates, privacy
+safeguards, license clarity, accountable maintenance, and tested rollback.
+
+That combination—effective protection, low breakage, privacy, honesty, and a
+disciplined AI-assisted maintenance system—is the project’s best opportunity
+to become genuinely valuable in the AI era.
