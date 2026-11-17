@@ -11,13 +11,13 @@
 | Narrow cosmetic hiding | P0 | Chromium fixture verified | Reversible CSS and page-owned node collision tests; broad site compatibility remains open |
 | Popup and options controls | P0 | Partly verified | Browser options controls and Node pending/error tests; actual toolbar popup and accessibility review remain open |
 | Local preferences, no explicit telemetry | P0 | Source present | privacy review and outbound-traffic check |
-| Node unit, structural checks and build | P0 | CI verified | 30 Node/tooling tests at audit checkpoint, plus literal boundary/link guards |
+| Node unit, structural checks and build | P0 | Locally verified; prior checkpoints CI verified | 60 tests currently pass; guards reject untracked inputs before changing output; final CI must match final commit |
 | Settings reset and malformed-state repair | P0 | Chromium + Node verified | Confirmed recovery, cancel, invalid state normalization, unrelated-rule preservation |
 | Complete static inventory and quarantine hashes | P0 | Verified | All tracked files accounted for; 1,384 snapshot file hashes + 2 ZIP hashes match; upstream authenticity remains unknown |
 | Live popup/options synchronization | P0 | Node + Chromium verified | External local changes refresh open views; pending edits, stale reads/failures, initial races and reset status have regressions; five browser checkpoints |
 | Concurrent settings operations | P0 | Node + Chromium verified | Full worker-operation queue; simultaneous additions, removal/reset/pause ordering, repair races and rejected-write recovery; one browser concurrency checkpoint |
 | CI build artifact | P0 | CI verified | GitHub Actions artifact; automated Chromium loading verified; manual alpha installation pending |
-| Real Chromium integration tests | P0 | CI verified | 10 synthetic cases using locked Playwright 1.65.0 |
+| Real Chromium integration tests | P0 | Local + CI verified | 10 page scenarios, 5 live-view and 1 concurrency checkpoints using Playwright 1.65.0 / Chromium 158.0.8127.18 |
 | Complete site compatibility and accessibility review | P0 | Planned | multiple pages, screen reader |
 | Imported license-reviewed filter sources | P1 | Planned | provenance and attribution |
 | Full filter-list compilation and quota management | P1 | Planned | benchmark vs existing parsers |

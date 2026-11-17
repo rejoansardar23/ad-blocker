@@ -2,6 +2,8 @@
 
 Updated 18 November 2026 (Asia/Kolkata). Inspected baseline: `ce77ac5`. Recovery/audit checkpoint: `c9e54b2`, [CI passed](https://github.com/rejoansardar23/ad-blocker/actions/runs/44182569555). Read live Git state and the [feature ledger](docs/product/FEATURE_MATRIX.md) before assuming this snapshot is current.
 
+Mission results: 1,454 tracked files (11 runtime; 1,395 preserved quarantine), nine redundant documents consolidated/removed, **60 passing tests**, ten original Chromium scenarios plus five live-view and one concurrency checkpoint. Direct builds reject untracked source before replacing output, and CI rebuilds after Chromium generates its local rules cache. See the [full engineering outcome](docs/audit/REPOSITORY_AUDIT.md) and [latest evidence](docs/testing/TEST_EVIDENCE.md). Next: CORE-03 failure convergence, followed by CORE-04 migration/lifecycle; manual and release gates remain open.
+
 ## Purpose and prior work
 
 Build privacy-first ad/tracker protection with measurable coverage, low breakage, local controls, accessibility, safe updates, and recovery. The existing Chrome MV3 application is the starting product. Preserve its working DNR rules, pause/resume, trusted sites, reversible cosmetics, popup/options, settings repair/reset, tests, build, and Git history. Do not start over.
@@ -39,7 +41,7 @@ Remaining structure concerns: preserve one current status owner per document; ke
 
 ## Current code and validation
 
-CORE-01 is implemented: open popup/options views subscribe to relevant local changes, read canonical worker state, defer refresh while saving, and discard older responses or failures. Twenty new Node regressions pass; total suite count is now 50. Real Chromium passes ten original scenarios plus five live-view checkpoints. The popup page is loaded in a tab for logic testing; toolbar presentation/accessibility remains manual. The next implementation is CORE-02's reproduced concurrent-site-write race.
+CORE-01 is implemented: open popup/options views subscribe to relevant local changes, read canonical worker state, defer refresh while saving, and discard older responses or failures. Twenty new Node regressions passed at its 50-test checkpoint. Real Chromium passes ten original scenarios plus five live-view checkpoints. The popup page is loaded in a tab for logic testing; toolbar presentation/accessibility remains manual.
 
 CORE-02 is also implemented: one queue serializes complete messages, repair-capable reads, and install/start/storage reconciliation. Eight new worker regressions bring the current suite to **58 passing tests**. Chromium adds a concurrent-mutation checkpoint proving both site exceptions survive in storage and DNR. The next reliability task is CORE-03: DNR/storage failure convergence; queue serialization alone does not provide rollback on API failure.
 
@@ -75,10 +77,10 @@ Keep mock/unit, bundled-Chromium, manual Chrome Stable, representative-site, acc
 | ID | Priority / dependency | Missing tests and completion evidence |
 |---|---|---|
 | `TEST-01` | P0, current core | Define and test IDN/punycode, public-suffix, hostname/label limits, trailing dots, ports, localhost/IP/internal URLs, malformed/unknown messages, and 0/1/99/100/101-site boundaries. Done when explicit policy and positive/negative unit fixtures agree. |
-| `TEST-02` | P0, `CORE-02` | Force interleaved add/add, add/remove, reset/site, and toggle/site mutations plus queue rejection/recovery. Done when deterministic scheduling proves no lost update or poisoned queue. |
+| `TEST-02` | COMPLETED, `CORE-02` | Eight regressions force interleaved add/add, add/remove, reset/site, toggle/site, repair and rejection recovery; a Chromium checkpoint verifies concurrent storage/DNR state. |
 | `TEST-03` | P0, `CORE-03` | Inject storage failures and failures from `getEnabledRulesets`, `updateEnabledRulesets`, `getDynamicRules`, and `updateDynamicRules`. Done when UI/state are honest, retry/restart converges, and unrelated rules survive. |
 | `TEST-04` | P0, `CORE-04` | Exercise corrupt, partial, old, and unknown-future settings; install/startup/storage events; migration rollback; worker suspension/restart. Done with a versioned matrix and no silent data loss. |
-| `TEST-05` | P0, `CORE-01` | Test cross-view `storage.onChanged`, pending edit versus external change, stale async responses, site toggle/reload/settings navigation, add/remove validation, reset failure, unavailable/internal tabs, and API errors in Node plus two-view Chromium. |
+| `TEST-05` | PARTLY COMPLETED, `CORE-01` | Cross-view changes, pending edits, stale responses/failures, initialization and reset races now pass Node and multi-view Chromium tests. Full toolbar/site navigation, unavailable/internal-tab UX and broader API failures still need coverage. |
 | `TEST-06` | P0, stable core | Test cosmetic startup on trusted sites, storage failure, missing/replaced document roots, irrelevant changes, duplicate prevention, hostile DOM, CSP, frames, shadow DOM, and SPA navigation. Done when behavior stays bounded/reversible and never deletes page-owned content. |
 | `TEST-07` | P0, `CORE-01–04` | Manually load the exact build in Chrome Stable; test the real toolbar popup, options, worker console, disable/enable, extension reload/update, browser restart/suspension, uninstall, and clean/existing profiles. Record exact OS, Chrome, SHA, and errors. |
 | `TEST-08` | P0/P1, core reliability | Expand synthetic browser fixtures to HTTPS, redirects, frames, multiple tabs/windows, rapid toggles, 100 exceptions, worker wake/suspension, two extension views, and failure recovery. Every block assertion needs a benign server-count control. |
@@ -115,7 +117,7 @@ Status meanings: **Ready** can start from current `main`; **Blocked** needs a de
 |---|---|---|
 | `CORE-01` | **COMPLETED** | Current-path UI synchronization, pending-edit protection, stale response/failure epochs, twenty new Node regressions, and five Chromium checkpoints. PR #20's unrelated old docs were excluded. |
 | `CORE-02` | **COMPLETED** | Full operation serialization, deterministic interleaving/repair/reset tests, recovery after rejected writes, idempotent storage-event reconciliation, and a real Chromium concurrency checkpoint. |
-| `CORE-03` | **Blocked by CORE-02** | Make storage/DNR failure behavior consistent. Inject failures from enabled-ruleset and dynamic-rule APIs; UI reports the failure honestly; status does not claim unapplied protection; retry/restart converges; unrelated browser rules remain intact. |
+| `CORE-03` | **NOT STARTED; ready after completed CORE-02** | Make storage/DNR failure behavior consistent. Inject failures from enabled-ruleset and dynamic-rule APIs; UI reports the failure honestly; status does not claim unapplied protection; retry/restart converges; unrelated browser rules remain intact. |
 | `CORE-04` | **Blocked by CORE-02/03** | Add a versioned settings schema and migrations. Preserve current data, safely repair corrupt/partial state, define future-version behavior, and test install/startup/storage changes after worker suspension. |
 | `QA-01` | **Blocked by CORE-01–04** | Manual Chrome Stable, permission, privacy, and accessibility gate: exact OS/browser/version, actual toolbar popup and options, keyboard/focus/labels/contrast/screen reader, pause/trust/reload/restart, permission disclosure, service-worker console, and outbound-traffic capture. File every failure as a scoped issue. |
 | `ALPHA-01` | **Blocked by QA-01** | Create a deterministic developer alpha ZIP containing only the verified extension; compare two clean builds, publish SHA-256, test install/update/uninstall/rollback, and document limitations. Public distribution remains owner-gated. |

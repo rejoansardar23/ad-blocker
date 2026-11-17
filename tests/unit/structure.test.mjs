@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, symlinkSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, symlinkSync, rmSync, cpSync, readFileSync, existsSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import { checkedPath, verifyDocumentationLinks, verifyRepository } from "../../scripts/verify-repository.mjs";
@@ -53,6 +54,44 @@ test("repository guard rejects missing resources and remote executable HTML reso
     app.write("src/extension/popup.html", '<link href="missing.css" rel="stylesheet">');
     assert.throws(() => verifyRepository(app.root, app.files), /ENOENT/);
   } finally { app.close(); }
+});
+
+test("repository guard rejects untracked extension source without removing it", () => {
+  const app = fixture();
+  try {
+    app.write("src/extension/background/surprise.js", "const unreviewed = true;");
+    assert.throws(() => verifyRepository(app.root, app.files), /Untracked extension resource/);
+    assert.equal(readFileSync(path.join(app.root, "src/extension/background/surprise.js"), "utf8"), "const unreviewed = true;");
+  } finally { app.close(); }
+});
+
+test("direct build rejects untracked source before replacing the existing output", () => {
+  const root = mkdtempSync(path.join(tmpdir(), "adblock-build-boundary-"));
+  try {
+    mkdirSync(path.join(root, "scripts"));
+    cpSync(new URL("../../src/extension/", import.meta.url), path.join(root, "src/extension"), { recursive: true });
+    for (const file of ["build.mjs", "verify.mjs", "verify-repository.mjs"]) {
+      cpSync(new URL("../../scripts/" + file, import.meta.url), path.join(root, "scripts", file));
+    }
+    writeFileSync(path.join(root, "package.json"), "{}");
+    execFileSync("git", ["init", "--quiet"], { cwd: root });
+    execFileSync("git", ["add", "src", "scripts", "package.json"], { cwd: root });
+    mkdirSync(path.join(root, "dist/chrome"), { recursive: true });
+    const sentinel = path.join(root, "dist/chrome/existing-build.txt");
+    writeFileSync(sentinel, "previous verified output");
+    const unexpected = path.join(root, "src/extension/background/surprise.js");
+    writeFileSync(unexpected, "const unreviewed = true;");
+    const blocked = spawnSync(process.execPath, [path.join(root, "scripts/build.mjs")], { cwd: root, encoding: "utf8" });
+    assert.notEqual(blocked.status, 0);
+    assert.match(blocked.stderr, /Untracked extension resource/);
+    assert.equal(readFileSync(sentinel, "utf8"), "previous verified output");
+    assert.equal(existsSync(unexpected), true);
+    rmSync(unexpected);
+    const allowed = spawnSync(process.execPath, [path.join(root, "scripts/build.mjs")], { cwd: root, encoding: "utf8" });
+    assert.equal(allowed.status, 0, allowed.stderr);
+    assert.equal(existsSync(sentinel), false);
+    assert.equal(readFileSync(path.join(root, "dist/chrome/manifest.json"), "utf8"), readFileSync(path.join(root, "src/extension/manifest.json"), "utf8"));
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
 test("repository guard blocks source symlinks and documentation traversal", () => {

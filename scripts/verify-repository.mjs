@@ -25,7 +25,9 @@ export function checkedPath(root, relative) {
   return absolute;
 }
 
-export function verifyPackageBoundary(root) {
+export function verifyPackageBoundary(root, trackedFiles) {
+  if (!trackedFiles) trackedFiles = new Set(execFileSync("git", ["ls-files", "-z"], { cwd: root, encoding: "utf8" }).split("\0").filter(Boolean));
+  else if (!(trackedFiles instanceof Set)) trackedFiles = new Set(trackedFiles);
   const extension = path.join(root, "src", "extension");
   const sources = [];
   const visit = (directory) => {
@@ -33,7 +35,11 @@ export function verifyPackageBoundary(root) {
       const absolute = path.join(directory, entry.name);
       if (entry.isSymbolicLink()) fail("Extension source symlink refused: " + path.relative(root, absolute));
       if (entry.isDirectory()) visit(absolute);
-      else if (entry.isFile()) sources.push(path.relative(extension, absolute).split(path.sep).join("/"));
+      else if (entry.isFile()) {
+        const relative = path.relative(extension, absolute).split(path.sep).join("/");
+        if (!trackedFiles.has("src/extension/" + relative)) fail("Untracked extension resource refused: " + relative);
+        sources.push(relative);
+      }
       else fail("Non-regular extension resource refused");
     }
   };
@@ -123,7 +129,7 @@ export function verifyRepository(root, files) {
   for (const file of files.filter((name) => /^\.github\/workflows\/[^/]+\.ya?ml$/.test(name))) {
     if (/AnalyseFuture|verify:archives|build:ublock|test:ublock/.test(readFileSync(checkedPath(root, file), "utf8"))) fail("Root workflow references quarantined tooling: " + file);
   }
-  const sourceFiles = verifyPackageBoundary(root);
+  const sourceFiles = verifyPackageBoundary(root, new Set(files));
   const documentationLinks = verifyDocumentationLinks(root, files);
   return { sourceFiles, documentationLinks };
 }

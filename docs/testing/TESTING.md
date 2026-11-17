@@ -34,6 +34,8 @@ Node.js 22+ required. `npm ci --no-audit --no-fund` installs lockfile-pinned Pla
 
 `npm run test:browser` is the low-level browser-only group used by CI after its explicit build step. For normal local use, prefer `npm run test:e2e` so the browser cannot receive a missing or stale package. Nothing under `AnalyseFuture/` belongs to the active test pipeline.
 
+Chromium can write `dist/chrome/_metadata/generated_indexed_rulesets/` while loading DNR rules. Run `npm run build` again before source/output comparisons or distribution; CI recreates the clean artifact after browser execution. Direct builds now run repository guards before replacing `dist/`, including refusal of untracked extension inputs.
+
 ## What the existing tests measure
 
 - Hostname normalization and safe exact/subdomain exception matching.
@@ -41,6 +43,8 @@ Node.js 22+ required. `npm ci --no-audit --no-fund` installs lockfile-pinned Pla
 - Invalid command/input handling and preservation of unrelated browser rules.
 - Cosmetic filtering ownership and reversibility without removing page-owned content.
 - Popup/options pending-save behavior, rejected-save recovery and confirmed settings reset.
+- Live cross-view updates with stale-read/failure protection and delayed initialization; five Chromium synchronization checkpoints.
+- Complete worker-operation serialization for concurrent site/reset/toggle/repair requests, queue recovery after rejection, and one concurrent Chromium checkpoint.
 - Packaging consistency of manifest, JavaScript files and DNR JSON.
 
 Mock-based unit tests **do not** prove Chrome rules work in a browser or that real websites are safe.

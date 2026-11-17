@@ -2,6 +2,12 @@
 
 ## Recovery mission, 18 November 2026 (Asia/Kolkata)
 
+### Final build/evidence gate
+
+The closing tree extends `c2c65f4`, whose [CI passed](https://github.com/rejoansardar23/ad-blocker/actions/runs/44184644937). **60 tests pass**, including two new build-input regressions. Those regressions failed before the fix: an untracked source file was accepted and a direct build replaced existing output. Builds now run repository guards first and refuse untracked source without deleting it or replacing the previous build.
+
+Final local Chromium on 158.0.8127.18 passed ten page cases, five synchronization checkpoints, and one concurrent-mutation checkpoint. Chrome then left `_metadata/generated_indexed_rulesets/_ruleset1`; a clean rebuild removed that generated cache. CI now performs the same post-browser rebuild. Two clean builds matched SHA-256 for all eleven files, and source/output comparison passed. Frozen install, unchanged lockfile, npm audit (0 reported vulnerabilities), SBOM and patch hygiene passed. The complete [mission outcome](../audit/REPOSITORY_AUDIT.md) records before/after metrics, cleanup, commands, delivered commits, and remaining work.
+
 ### CORE-02: complete worker operation serialization
 
 Parent checkpoint: `f1b071e`, whose [CI passed](https://github.com/rejoansardar23/ad-blocker/actions/runs/44184083819). The expanded worker suite first ran against the old worker: **17 tests / 13 PASS / 4 FAIL**. Failures reproduced lost additions/removals, reset ordering, and stale repair overwriting a pause. With one operation queue, all **58** current Node/tooling tests pass (17 worker tests), zero failures/skips.
@@ -67,7 +73,7 @@ The successful pipeline is a strong development baseline, not proof of universal
 - Licensed production filter-list compilation, regional/language coverage, list updates, integrity failure and last-known-good rollback.
 - Performance, memory, CPU, battery, page-load and DNR quota benchmarks against a no-extension baseline.
 - Privacy verification of outbound traffic and a formal review of permissions, release packaging and store disclosures.
-- Concurrent settings/exception writes, DNR API failures after storage writes, service-worker suspension and schema migration.
+- Beyond the covered concurrency regressions, DNR API failures after storage writes, service-worker suspension and schema migration remain open.
 - Exact production blocking statistics and guaranteed server-inserted video-ad removal; browser/API limits make universal claims invalid.
 
 Future evidence should keep these groups separate, record failures as failures, and always attach results to the tested commit and browser version.

@@ -11,6 +11,10 @@ execFileSync(process.execPath, [path.join(root, "scripts", "verify.mjs")], {
   cwd: root,
   stdio: "inherit"
 });
+execFileSync(process.execPath, [path.join(root, "scripts", "verify-repository.mjs")], {
+  cwd: root,
+  stdio: "inherit"
+});
 rmSync(path.join(root, "dist"), { recursive: true, force: true });
 mkdirSync(dest, { recursive: true });
 copyFileSync(path.join(source, "manifest.json"), path.join(dest, "manifest.json"));
