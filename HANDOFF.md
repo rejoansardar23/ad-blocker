@@ -2,7 +2,19 @@
 
 Updated 18 November 2026 (Asia/Kolkata). Inspected baseline: `ce77ac5`. Recovery/audit checkpoint: `c9e54b2`, [CI passed](https://github.com/rejoansardar23/ad-blocker/actions/runs/44182569555). Read live Git state and the [feature ledger](docs/product/FEATURE_MATRIX.md) before assuming this snapshot is current.
 
-Mission results: 1,454 tracked files (11 runtime; 1,395 preserved quarantine), nine redundant documents consolidated/removed, **60 passing tests**, ten original Chromium scenarios plus five live-view and one concurrency checkpoint. Direct builds reject untracked source before replacing output, and CI rebuilds after Chromium generates its local rules cache. See the [full engineering outcome](docs/audit/REPOSITORY_AUDIT.md) and [latest evidence](docs/testing/TEST_EVIDENCE.md). Next: CORE-03 failure convergence, followed by CORE-04 migration/lifecycle; manual and release gates remain open.
+Mission results: 1,454 tracked files (11 runtime; 1,395 preserved quarantine), nine redundant documents consolidated/removed, **60 passing tests**, ten original Chromium scenarios plus five live-view and one concurrency checkpoint. Direct builds reject untracked source before replacing output, and CI rebuilds after Chromium generates its local rules cache. See the [full engineering outcome](docs/audit/REPOSITORY_AUDIT.md) and [latest evidence](docs/testing/TEST_EVIDENCE.md). Next: complete remaining CORE-03 failure/restart cases, then CORE-04 migration/lifecycle; manual and release gates remain open.
+
+## Recovery and reliability follow-up — 18 November 2026
+
+Three focused changes have now been merged without deleting or replacing preserved implementation files:
+
+- [PR #23](https://github.com/rejoansardar23/ad-blocker/pull/23), merge `946f46b`: `scripts/recover-history.mjs` can compare historical Git trees and stage exact original source/binary bytes beneath ignored `build/recovery/`. It refuses overwrites, unsafe paths and historical symlinks.
+- [PR #24](https://github.com/rejoansardar23/ad-blocker/pull/24), merge `ac3d7fd`: the comparison also suggests *possible* moved-and-modified counterparts, rather than assuming a historical path with different bytes represents lost functionality. This suggestion does not establish ownership or code equivalence.
+- [PR #25](https://github.com/rejoansardar23/ad-blocker/pull/25), merge `3e43a83`: the worker restores affected prior preferences and reconciles existing rules after a one-time DNR API failure. [Exact PR CI](https://github.com/rejoansardar23/ad-blocker/actions/runs/44201035109) passed **68 Node tests**, including four new DNR failure-injection scenarios, and the existing Chromium smoke suite.
+
+Historical comparison of commit `6191c3c` found the earlier first-party manifest, worker, popup, options, cosmetic script, shared domain logic and browser/unit suites have corresponding current locations. Some source is byte-identical; other source has been moved and modified. Old paths alone are not evidence of missing product features. **No content under `AnalyseFuture/` was deleted, executed or activated.**
+
+Remaining reliability work: CORE-03 is **partially implemented**, not fully complete. Test sustained/failed rollback, read API failures, external writes and restart convergence before claiming transactional guarantees. Then proceed to CORE-04 migrations and lifecycle tests. The project's broader filtering, licensing and release tasks remain governed by the existing task matrix.
 
 ## Purpose and prior work
 
@@ -43,7 +55,7 @@ Remaining structure concerns: preserve one current status owner per document; ke
 
 CORE-01 is implemented: open popup/options views subscribe to relevant local changes, read canonical worker state, defer refresh while saving, and discard older responses or failures. Twenty new Node regressions passed at its 50-test checkpoint. Real Chromium passes ten original scenarios plus five live-view checkpoints. The popup page is loaded in a tab for logic testing; toolbar presentation/accessibility remains manual.
 
-CORE-02 is also implemented: one queue serializes complete messages, repair-capable reads, and install/start/storage reconciliation. Eight new worker regressions bring the current suite to **58 passing tests**. Chromium adds a concurrent-mutation checkpoint proving both site exceptions survive in storage and DNR. The next reliability task is CORE-03: DNR/storage failure convergence; queue serialization alone does not provide rollback on API failure.
+CORE-02 is also implemented: one queue serializes complete messages, repair-capable reads, and install/start/storage reconciliation. Eight new worker regressions bring the current suite to **58 passing tests**. Chromium adds a concurrent-mutation checkpoint proving both site exceptions survive in storage and DNR. CORE-03 now has a tested rollback path for one-time static/dynamic DNR failures (PR #25); sustained failures, other API errors and restart convergence still need tests.
 
 `src/extension/manifest.json` declares one MV3 service worker, popup, options, shared/content scripts, and starter DNR rules. The worker validates local state and reconciles Chrome rules; UI sends messages to it; page-side cosmetics use an owned reversible stylesheet. The runtime ships no Node package dependencies. `scripts/build.mjs` copies only this source tree to `dist/chrome`.
 
@@ -117,7 +129,7 @@ Status meanings: **Ready** can start from current `main`; **Blocked** needs a de
 |---|---|---|
 | `CORE-01` | **COMPLETED** | Current-path UI synchronization, pending-edit protection, stale response/failure epochs, twenty new Node regressions, and five Chromium checkpoints. PR #20's unrelated old docs were excluded. |
 | `CORE-02` | **COMPLETED** | Full operation serialization, deterministic interleaving/repair/reset tests, recovery after rejected writes, idempotent storage-event reconciliation, and a real Chromium concurrency checkpoint. |
-| `CORE-03` | **NOT STARTED; ready after completed CORE-02** | Make storage/DNR failure behavior consistent. Inject failures from enabled-ruleset and dynamic-rule APIs; UI reports the failure honestly; status does not claim unapplied protection; retry/restart converges; unrelated browser rules remain intact. |
+| `CORE-03` | **IN PROGRESS; one-time DNR failure rollback verified in PR #25** | Make storage/DNR failure behavior consistent. Inject failures from enabled-ruleset and dynamic-rule APIs; UI reports the failure honestly; status does not claim unapplied protection; retry/restart converges; unrelated browser rules remain intact. |
 | `CORE-04` | **Blocked by CORE-02/03** | Add a versioned settings schema and migrations. Preserve current data, safely repair corrupt/partial state, define future-version behavior, and test install/startup/storage changes after worker suspension. |
 | `QA-01` | **Blocked by CORE-01–04** | Manual Chrome Stable, permission, privacy, and accessibility gate: exact OS/browser/version, actual toolbar popup and options, keyboard/focus/labels/contrast/screen reader, pause/trust/reload/restart, permission disclosure, service-worker console, and outbound-traffic capture. File every failure as a scoped issue. |
 | `ALPHA-01` | **Blocked by QA-01** | Create a deterministic developer alpha ZIP containing only the verified extension; compare two clean builds, publish SHA-256, test install/update/uninstall/rollback, and document limitations. Public distribution remains owner-gated. |
@@ -216,7 +228,7 @@ Every task record must name an accountable role, issue/PR, state, dependencies, 
 
 ### Recommended work for the next coding tool
 
-Start with `CORE-03` unless the maintainer assigns a different unblocked task. CORE-01 and CORE-02 are implemented. The useful synchronization approach from PR #20 has attribution and current regressions; do not merge that old mixed-scope PR wholesale or execute anything in `AnalyseFuture/`.
+Finish remaining CORE-03 failure/restart cases unless the maintainer assigns a different unblocked task. CORE-01 and CORE-02 are implemented. The useful synchronization approach from PR #20 has attribution and current regressions; do not merge that old mixed-scope PR wholesale or execute anything in `AnalyseFuture/`.
 
 After `CORE-01`, the safe reliability order is:
 
