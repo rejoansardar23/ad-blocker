@@ -19,11 +19,14 @@ test('historical comparison distinguishes deleted, changed and renamed implement
   add('src/engine.js', 'engine version one');
   add('src/removed.js', 'lost implementation');
   add('src/unchanged.js', 'unchanged');
+  add('background/service-worker.js', 'older code');
   add('src/renamed.js', 'renamable');
   const baseline = commit('before disruption');
   add('src/engine.js', 'engine version two');
   rmSync(path.join(root, 'src/removed.js'));
   renameSync(path.join(root, 'src/renamed.js'), path.join(root, 'src/relocated.js'));
+  add('src/extension/background/service-worker.js', 'newer code');
+  rmSync(path.join(root, 'background/service-worker.js'));
   commit('after disruption');
   assert.equal(commitSha(root, baseline), baseline);
   const result = compareHistoricalTrees(trackedTree(root, baseline), trackedTree(root, 'HEAD'));
@@ -31,6 +34,7 @@ test('historical comparison distinguishes deleted, changed and renamed implement
   assert.equal(result.differences.find((f) => f.path === 'src/removed.js').status, 'MISSING');
   assert.equal(result.differences.find((f) => f.path === 'src/engine.js').status, 'CHANGED');
   assert.deepEqual(result.differences.find((f) => f.path === 'src/renamed.js').identical_current_paths, ['src/relocated.js']);
+  assert.deepEqual(result.differences.find((f) => f.path === 'background/service-worker.js').possible_current_paths, ['src/extension/background/service-worker.js']);
   assert.equal(result.differences.find((f) => f.path === 'src/renamed.js').status, 'MOVED_OR_COPIED');
 }));
 

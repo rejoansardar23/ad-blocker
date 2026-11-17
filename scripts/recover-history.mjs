@@ -51,6 +51,13 @@ export function compareHistoricalTrees(before, after) {
     if (!nowBySha.has(item.sha)) nowBySha.set(item.sha, []);
     nowBySha.get(item.sha).push(item.path);
   }
+  const currentByBasename = new Map();
+  for (const item of after.files.values()) {
+    if (!GIT_MODES.has(item.mode) || item.type !== 'blob') continue;
+    const name = path.posix.basename(item.path);
+    if (!currentByBasename.has(name)) currentByBasename.set(name, []);
+    currentByBasename.get(name).push(item.path);
+  }
   const differences = [];
   let unchanged = 0;
   for (const old of before.files.values()) {
@@ -58,12 +65,26 @@ export function compareHistoricalTrees(before, after) {
     const current = after.files.get(old.path);
     if (current?.sha === old.sha && current?.mode === old.mode) { unchanged++; continue; }
     const identicalElsewhere = (nowBySha.get(old.sha) || []).filter((p) => p !== old.path);
+    // Modified files cannot match historical hashes. Suggest, never assert, possible relocations.
+    const possibleCurrentPaths = (currentByBasename.get(path.posix.basename(old.path)) || [])
+      .filter((p) => p !== old.path && !identicalElsewhere.includes(p))
+      .sort((left, right) => {
+        const overlap = (candidate) => {
+          const a = old.path.split('/').reverse();
+          const b = candidate.split('/').reverse();
+          let i = 0;
+          while (i < Math.min(a.length, b.length) && a[i] === b[i]) i++;
+          return i;
+        };
+        return overlap(right) - overlap(left) || left.localeCompare(right);
+      }).slice(0, 5);
     differences.push({
       path: old.path,
       status: current ? 'CHANGED' : (identicalElsewhere.length ? 'MOVED_OR_COPIED' : 'MISSING'),
       from_blob: old.sha,
       current_blob: current?.sha || null,
-      identical_current_paths: identicalElsewhere
+      identical_current_paths: identicalElsewhere,
+      possible_current_paths: possibleCurrentPaths
     });
   }
   return { source_commit: before.commit, current_commit: after.commit, unchanged, differences };
