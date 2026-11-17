@@ -1,6 +1,6 @@
 # Ad Blocker project handoff
 
-> **Live operational handoff — 17 November 2026 (Asia/Kolkata).** This document was prepared from `main` at `652fe406b14c189b2f877a5e1528c4197e63ff35`. Always recheck the current SHA, open pull requests, issues, source, and exact-commit CI before starting work.
+> **Live operational handoff — 17 November 2026 (Asia/Kolkata).** This update was prepared from validated `main` commit `215bd5c59087393763cef74d42ca5f269e28367a`. Always recheck the current SHA, open pull requests, issues, source, and exact-commit CI before starting work.
 
 This is the primary handoff for a human or coding tool continuing the project. It records the main goal, verified features, limitations, purpose of every active file and folder, complete dependency-aware task queue, and the pull-request evidence that a reviewer must monitor.
 
@@ -38,18 +38,169 @@ Use `npm run test:e2e` only where Playwright Chromium can be downloaded and unpa
 - Do not claim universal blocking, zero breakage, exact production block counts, guaranteed YouTube/video-ad removal, or market leadership without reproducible evidence.
 - One implementation task belongs in one focused pull request. A passing run for an older SHA is not evidence for a newer one.
 
-## Main goal
+## 0. Prior work already available — preserve and build on it
 
-Build an independently branded, privacy-first ad-blocking platform, beginning with a reliable Chrome Manifest V3 extension. The product should earn trust through measured blocking quality, low website breakage, minimal permissions, local-first settings, accessible controls, deterministic builds, safe filter updates, transparent limitations, and reproducible browser evidence.
+Do not restart this project as an empty repository. A substantial foundation has already been implemented, recovered, organized, tested, documented, and pushed to `main`:
 
-Chrome is the current product boundary. Edge and Firefox require separately tested adapters. Mobile, desktop, and DNS protection would be separate products with their own architecture, consent model, security review, operating cost, and owner approval.
+- one active original-code Chrome MV3 extension under `src/extension/`;
+- browser-native starter DNR blocking, global pause, trusted-site exceptions, narrow cosmetics, popup, options, local repair, and reset;
+- deterministic verification and packaging that copy only the active extension into `dist/chrome`;
+- 18 Node regression tests and ten real Playwright Chromium page scenarios;
+- frozen dependency installation, lockfile validation, audit, SBOM, CI artifacts, and exact-commit browser evidence;
+- a professional functionality-based source, test, automation, and documentation layout;
+- preservation of disrupted/imported work under `AnalyseFuture/` without activating or deleting it;
+- a detailed product charter, architecture, 60-task program, research catalog, security rules, test evidence, and contribution workflow;
+- direct `main` history for recovery, restructuring, project vision, grouped tests, and this handoff.
+
+### Durable milestones already completed
+
+| Milestone | Preserved result |
+|---|---|
+| `5ec7cd4` | Original Chrome MV3 preview, starter rules, UI, worker, tests, and 60-step roadmap |
+| [PR #3](https://github.com/rejoansardar23/ad-blocker/pull/3) | Real Playwright Chromium blocking/allowlist baseline and locked browser dependency |
+| [PR #4](https://github.com/rejoansardar23/ad-blocker/pull/4) | Idempotent DNR reconciliation and safe owned cosmetic styles |
+| `10c8770` and related merge history | Reconciled upstream/fork regression, audit, SBOM, and documentation work |
+| `c68d861` | Malformed-state repair and confirmed settings reset/recovery |
+| `e5260c9` | Complete functionality-based active/quarantine repository organization without deleting preserved work |
+| `560a485` | Detailed evidence-driven product and multi-year research charter |
+| `ee0519f` | Grouped active commands and build-first E2E protection against stale packages |
+| `652fe40` | Exact grouped test evidence and environment boundaries |
+| `215bd5c` | Complete live handoff, 60-file inventory, task queue, and PR monitoring contract; [CI run 39](https://github.com/rejoansardar23/ad-blocker/actions/runs/44045637804) passed |
+
+The next tool must first understand and protect this baseline. It should improve one proven boundary at a time, retain useful attribution, and avoid replacing working code merely to create activity. The implemented-feature table, complete file inventory, task queue, structure audit, and testing backlog below define what can be reused and what still needs work.
+
+## 1. Complete project idea and ultimate ambition
+
+### The idea in one sentence
+
+Build a local-first, privacy-first protection platform that begins as a dependable Chrome Manifest V3 extension, blocks as much advertising and tracking as each target platform lawfully and safely permits, minimizes damage to wanted content, gives users reversible controls and recovery, and earns every claim through exact-version evidence.
+
+### How to interpret “block ads everywhere”
+
+The owner's ultimate ambition includes ordinary websites, dynamic web applications, YouTube and other video platforms, regional sites, browser-based apps, native applications, and network traffic. This is the direction for a family of products and research programs. It is not a technically valid promise that one browser extension can block every ad.
+
+| Target | Correct product form | Realistic objective | Important boundary |
+|---|---|---|---|
+| Chrome websites and web apps | Current MV3 extension | Browser-native DNR blocking, safe cosmetics, local controls, licensed lists, custom rules, safe updates, and recovery | MV3 APIs, rule quotas, permissions, encrypted traffic, and store policy limit what the extension can observe or change |
+| YouTube and other video sites | Category-specific browser research | Best-effort blocking of tested, distinguishable network ads, overlays, companion banners, and client-side categories without harming playback | Ads inserted into the same authenticated or encrypted stream as wanted video may be technically indistinguishable |
+| Edge | Separately packaged Chromium adapter | Reuse proven modules where compatible, with its own store, permission, enterprise-policy, and regression evidence | Chromium similarity does not prove identical packaging or behavior |
+| Firefox | Firefox-specific adapter | Use Firefox-supported filtering APIs with a separate manifest, implementation boundary, and test matrix | Chrome MV3 behavior cannot be assumed to match Firefox |
+| Safari and mobile browsers | Separate platform feasibility projects | Use only approved content-blocking/extension capabilities within privacy, battery, signing, and policy budgets | APIs, background execution, distribution, and review rules differ materially by platform |
+| Native mobile and desktop apps | Separate local product using OS-approved filtering APIs where feasible | Protect opted-in application/device traffic with clear consent, local control, updates, and recovery | A Chrome extension cannot filter arbitrary native-app traffic; encrypted app content often cannot be classified safely |
+| DNS or network-wide protection | Separate DNS/network product | Domain-level protection for opted-in devices and networks | DNS cannot provide page cosmetics, distinguish paths on shared domains, or guarantee app compatibility; it needs privacy-safe operations and support |
+| Creator sponsorship segments | Optional separately approved feature | User-controlled skipping only if API/database rights, consent, accuracy, and policy are clear | Sponsorship skipping is not ordinary request blocking and must not be silently bundled |
+| Smart TVs, routers, and embedded devices | Future network/platform research | Apply only supported DNS, router, or platform mechanisms with device-specific testing | Hardware, certificates, updates, consent, recovery, and vendor restrictions require separate engineering |
+
+The shared platform should provide governance, provenance, deterministic rule production, evidence standards, privacy principles, user expectations, and safe-update methods. It must not pretend that one codebase, permission set, or filtering technique works everywhere.
+
+### Technical ad-category model
+
+“Ads” are not one technical class. Each category needs a lawful mechanism, versioned corpus, wanted-content controls, owner, metrics, and stop conditions.
+
+| Category | Candidate mechanism | Core limitation |
+|---|---|---|
+| Third-party network ads/trackers | Browser DNR, approved DNS/network rules | Coverage depends on accurate maintained domains/rules; shared infrastructure can create false positives |
+| First-party or same-host requests | Carefully scoped URL/rule patterns and site-specific evidence | Blocking a host/path shared with wanted content can break the site |
+| DOM banners, overlays, placeholders | Reviewed cosmetic selectors and reversible page-side behavior | Visual structure changes often; selectors can hide legitimate controls/content |
+| Dynamically inserted SPA content | Bounded dynamic cosmetic handling and navigation-aware tests | Continuous DOM observation can cost CPU and cause race/breakage issues |
+| Video companion ads/overlays | Network plus cosmetic rules for explicitly tested versions | Account, region, experiment, and player changes can invalidate rules |
+| Client-inserted ad media | Category-specific request/manifest logic where browser APIs expose a safe distinction | Media manifests and playback integrity vary and can be authenticated |
+| Server-side inserted video | Research only when a reproducible signal distinguishes ad from wanted media | Identical encrypted/authenticated stream bytes may make reliable separation impossible |
+| Creator sponsorships | Optional user-controlled segment data after separate API/database review | Not ordinary ad blocking; accuracy, licensing, consent, and community moderation matter |
+| Native in-app advertising | Separate OS-approved app/network product | Browser extensions have no authority over other apps; encrypted/same-host traffic remains hard |
+| Tracking, cookie banners, and nuisances | Separate transparent profiles with source attribution and breakage tests | Users have different expectations; aggressive rules can remove consent or required UI |
+
+### Product pillars
+
+1. **Effective measured protection:** maximize reproducible ad and tracker coverage within the real capabilities of each platform.
+2. **Wanted-content safety:** treat broken checkout, login, article, player, accessibility, download, payment, or security controls as serious defects.
+3. **Privacy by default:** ordinary filtering and settings stay local; there is no browsing-history business model or silent upload of page data.
+4. **Reversible control:** global pause, per-site trust, preview, undo, reset, last-known-good rollback, clear errors, and recovery are first-class features.
+5. **One coherent pipeline:** approve one filtering architecture instead of combining overlapping engines without measured benefit.
+6. **Legal provenance:** record immutable source identity, code/data/asset licenses, notices, dependencies, and redistribution approval.
+7. **Secure delivery:** version, validate, integrity-check, stage, observe, and roll back every filter or application update.
+8. **Accessibility and efficiency:** support keyboard/screen-reader use and enforce CPU, memory, page-load, battery, and package/rule-size budgets.
+9. **Global coverage earned region by region:** every language/region needs approved sources, a representative corpus, qualified review, an owner, and sustainable maintenance.
+10. **Evidence over marketing:** distinguish source presence, unit evidence, bundled-browser evidence, manual Stable-browser evidence, public-site evidence, experiments, and future ideas.
+
+### Target platform architecture
+
+```text
+approved code and filter sources
+  -> provenance and license registry
+  -> deterministic parser/compiler
+  -> syntax, conflict, quota, security, and integrity validation
+  -> versioned candidate rule/data bundle
+  -> compatibility, accessibility, privacy, and performance gates
+  -> staged release
+  -> platform-specific enforcement adapter
+       -> Chrome / Edge / Firefox / Safari browser products
+       -> separately approved mobile / desktop / DNS products
+  -> local diagnostics and reversible controls
+  -> last-known-good rollback and incident response
+```
+
+The architecture should develop as six connected layers:
+
+- **Enforcement:** browser-native DNR and narrow cosmetics now; independently approved browser, OS, or DNS adapters later.
+- **Local policy:** one validated, versioned state model for protection, site trust, profiles, custom rules, migrations, import/export, and recovery.
+- **Rule production:** licensed inputs become deterministic bundles with stable hashes, unsupported-syntax reports, priority rules, deduplication, and quota reports.
+- **Safe delivery:** candidate bundles receive integrity checks, staged promotion, offline fallback, observation, and tested rollback.
+- **Compatibility laboratory:** synthetic and consent-respecting representative tests measure blocking, wanted-content preservation, accessibility, regions, privacy, performance, and recovery.
+- **Optional AI assistance:** AI may suggest issue groups, tests, rules, or explanations, but deterministic validation, privacy/license review, human approval, canaries, and rollback remain mandatory.
+
+### Delivery horizons
+
+| Horizon | Focus | Required exit evidence |
+|---|---|---|
+| Current–12 months | Stabilize Chrome settings/DNR behavior, manual Chrome/accessibility/privacy review, owner licensing decisions, approved filter registry/compiler, and developer alpha | Reproducible Chrome build, exact-version browser evidence, no critical fixture failures, known legal boundary, tested recovery |
+| 12–24 months | Mature filtering, safe updates/rollback, custom rules, dynamic cosmetics, regional packs, compatibility/performance corpus, and controlled Chrome release | Proven provenance, rollback drills, dated coverage/breakage/performance results, accessible UX, supported release operations |
+| 24–36+ months | Edge/Firefox adapters, category-specific video research, privacy-safe AI assistance, and separate Safari/mobile/desktop/DNS feasibility | Independent go/no-go ADR, threat model, accountable owner, cost model, platform tests, stop conditions, and maintenance plan for every target |
+
+### AI-era role
+
+AI can assist with redacted issue grouping, deterministic fixture generation, candidate rule suggestions, unsupported-syntax explanations, documentation, localization drafts, accessibility review prompts, and regional coverage-gap research. Every output remains a proposal until reviewed against versioned data and deterministic tests.
+
+AI must not autonomously publish rules or releases, approve licenses, promote quarantined code, expand permissions, spend money, or send URLs, browsing history, page text, screenshots, cookies, credentials, or account state to a remote model by default. Experiments need an owner, hypothesis, baseline, privacy/security/license review, success threshold, stop conditions, cost budget, human approval, and rollback.
+
+### Product success metrics
+
+| Area | Measure |
+|---|---|
+| Protection | Blocking recall by named category, site corpus, list version, browser, region, and account state |
+| Wanted-content safety | Precision plus severity-weighted breakage of navigation, login, payment, media, accessibility, and other legitimate workflows |
+| Recovery | Time and user steps to pause, trust a site, undo a rule, reset settings, restore last-known-good data, and recover from a failed update |
+| Performance | Startup, page load, CPU, memory, long-lived DOM, battery proxy, package/list size, and rule-compilation/update cost |
+| Browser capacity | Static/dynamic/session DNR quota use, rejected rules, unsupported syntax, and graceful overflow behavior |
+| Reliability | Update success, rollback success, offline startup, crash/divergence rate, and soak-test results |
+| Privacy/security | Unexpected outbound requests, stored-data inventory, permission scope, high-risk findings, dependency provenance, and incident response |
+| Accessibility | Keyboard and screen-reader task completion, focus/announcement quality, contrast, zoom/reflow, and error recovery |
+| Global coverage | Measured language/region coverage, qualified reviewer agreement, false positives, and sustainable maintenance ownership |
+| Operations | Time to reproduce/repair, release rollback time, support load, infrastructure cost, and owner capacity |
+
+Numerical release targets should be set only after a reproducible baseline exists; invented targets or counts are not evidence.
+
+### What the project can promise
+
+The responsible promise is: pursue the broadest useful protection that can be measured on each supported platform, preserve wanted content, investigate reproducible misses and breakage, keep normal operation private and reversible, recover safely, and state limitations honestly.
+
+### What the project cannot promise
+
+- Permanent 100% blocking on every website, application, language, browser, device, account state, region, or future delivery method.
+- Universal YouTube/video-ad removal when advertising and wanted media are technically indistinguishable.
+- Zero false positives, zero website/app breakage, zero maintenance, or permanent invisibility to anti-block systems.
+- Device-wide native-app filtering from a browser extension.
+- Automatic parity across Chrome, Edge, Firefox, Safari, Android, iOS, desktop, DNS, routers, and smart TVs.
+- Exact universal blocked-ad counters when production APIs do not expose every required event.
+- Autonomous AI-generated rules, source imports, model changes, or releases without deterministic checks and accountable human approval.
+- Paywall, DRM, browser-security, account-control, consent, certificate-security, or store-policy circumvention.
 
 ## Current project status
 
 **Status:** development preview, not a production release.
 
-- Baseline inspected: `652fe40` on `main`.
-- Exact-main workflow: [GitHub Actions run 38](https://github.com/rejoansardar23/ad-blocker/actions/runs/44034393848), successful in 42 seconds.
+- Baseline used for this update: `215bd5c` on `main`.
+- Exact-baseline workflow: [GitHub Actions run 39](https://github.com/rejoansardar23/ad-blocker/actions/runs/44045637804), successful in 37 seconds.
 - Automated inventory: 18 Node tests and ten page-level Playwright Chromium scenarios.
 - Runtime dependencies shipped in the extension: none.
 - Development dependency: Playwright 1.65.0, locked for browser testing.
@@ -250,6 +401,33 @@ The following table covers every tracked file outside `AnalyseFuture/`, includin
 
 Do not enumerate or treat every quarantined upstream internal file as a project feature. `PROJECT_STRUCTURE.md`, `AnalyseFuture/README.txt`, and the recorded snapshot hashes are the safe inventory. Promotion requires an immutable upstream identity, content comparison, file/data/dependency license audit, security review, demonstrated need, scoped integration/rollback design, tests, and explicit maintainer approval.
 
+## Repository structure and cleanup audit
+
+**Verdict:** the active repository is now functionally organized. No further mass restructure is justified. The remaining problems are documentation authority/status drift, workflow/governance debt, missing future test/data collections, and the intentionally isolated quarantine—not broken active imports or misplaced runtime files.
+
+This ledger records issues to review; it is not permission to delete, move, or rewrite files silently.
+
+| ID | Finding | Classification | Required action |
+|---|---|---|---|
+| `STRUCT-00` | `src/extension/` is one package boundary; root scripts, unit/browser tests, topical docs, CI, and ignored output are coherently separated | Healthy | Preserve this layout; avoid speculative moves |
+| `STRUCT-01` | `HANDOFF.md` is the live operational source, while `AGENTS.md` still tells agents to start with a dated master handoff and `START_HERE.md` omits this file | Documentation-authority ambiguity | In `DOCS-01`, define ownership: handoff = live operations/tasks, feature matrix = evidence ledger, checklist = program, history = dated snapshots |
+| `STRUCT-02` | `PROJECT_STRUCTURE.md` calls itself authoritative but its root map predates `HANDOFF.md` and `PROJECT_IDEA.txt`; its “tests not run” note applies only to the restructuring commit | Stale map, not a broken tree | Update the map and clarify the dated validation note in a reviewed docs PR |
+| `STRUCT-03` | README, feature matrix, checklist, onboarding, agent guide, PR queue, research/security docs, and history repeat current-state facts | Duplication/status drift | Give each document one owner/purpose and add update-on-merge rules; never rewrite dated history as though it were current |
+| `STRUCT-04` | Several active documents contain obsolete browser/test/code statements | Documentation debt | Complete `DOCS-01`; known examples are listed near the end of this handoff |
+| `STRUCT-05` | Draft PR #20 is based on the pre-restructure tree and combines UI synchronization with a large research bundle | High workflow debt | Rebase and split it or create a fresh focused `CORE-01` PR with attribution and new exact-head CI |
+| `STRUCT-06` | Issue #1 still requests a Chromium baseline that now exists | Stale tracker state | Reconcile every acceptance item against current evidence before updating or closing it |
+| `STRUCT-07` | No project-wide `LICENSE` or approved contributor/distribution policy exists | Intentional governance blocker | Owner/legal decision through `GOV-01`; no tool may infer or add a license |
+| `STRUCT-08` | `AnalyseFuture/` holds 1,395 files, ZIPs, nested workflows, lifecycle/network/release scripts, unknown upstream revisions, and mixed licenses | Intentional quarantine/security risk | Keep it excluded and intact; apply the full promotion gate before touching any item |
+| `STRUCT-09` | The quarantine increases clone/search cost | Preservation tradeoff | Use scoped searches and `git ls-files`; do not delete or flatten preserved upstream topology |
+| `STRUCT-10` | The browser suite is one monolithic script with an inline fixture server and ten scenarios | Test-organization debt | Split helpers/cases only when new coverage needs independent reporting; do not refactor solely for activity |
+| `STRUCT-11` | There is no automated documentation link/status/file-inventory consistency command | Tooling gap | Add a root docs-quality check under `DOCS-01`/`TEST-16` and run it in CI |
+| `STRUCT-12` | Compatibility, accessibility, privacy-network, performance, migration, failure, filter, regional, and release corpora do not yet have dedicated active folders | Planned evidence gap | Create each collection only with its matching approved task, owner, fixtures, and maintenance rule |
+| `STRUCT-13` | There is no release ZIP/checksum/signing/changelog pipeline | Planned release gap | Implement only after `QA-01` through `ALPHA-01`/`BUILD-01` and owner approval |
+| `STRUCT-14` | No Edge/Firefox/Safari/mobile/desktop/DNS application folders exist | Correct current scope | Add platform source trees only after an approved ADR; an empty speculative hierarchy would be misleading |
+| `STRUCT-15` | `node_modules/`, `dist/`, `build/`, reports, and caches may exist locally | Generated output, not structure defects | Keep them ignored; use tracked-file inventories when describing repository source |
+
+No broken active imports, missing active path references, or misplaced first-party runtime files were found in this audit. Nested workflows below quarantine are inert because only root `.github/workflows/` is active. Symlinks observed under generated `node_modules/.bin` are dependency output, not tracked project structure.
+
 ## Test groups and current evidence
 
 | Group | Command | Current evidence |
@@ -263,6 +441,43 @@ Do not enumerate or treat every quarantined upstream internal file as a project 
 | Supply chain | GitHub Actions | Frozen install, lockfile guard, high-severity audit, CycloneDX SBOM, and artifacts |
 
 See [grouped evidence](docs/testing/TEST_EVIDENCE.md). The successful suite is a strong development baseline, not proof of broad real-world compatibility or production readiness.
+
+## Complete testing backlog
+
+Keep mock/unit, bundled-Chromium, manual Chrome Stable, representative-site, accessibility, privacy, performance, security, release, and future-platform results as separate evidence groups. Passing one group never silently completes another.
+
+| ID | Priority / dependency | Missing tests and completion evidence |
+|---|---|---|
+| `TEST-01` | P0, current core | Define and test IDN/punycode, public-suffix, hostname/label limits, trailing dots, ports, localhost/IP/internal URLs, malformed/unknown messages, and 0/1/99/100/101-site boundaries. Done when explicit policy and positive/negative unit fixtures agree. |
+| `TEST-02` | P0, `CORE-02` | Force interleaved add/add, add/remove, reset/site, and toggle/site mutations plus queue rejection/recovery. Done when deterministic scheduling proves no lost update or poisoned queue. |
+| `TEST-03` | P0, `CORE-03` | Inject storage failures and failures from `getEnabledRulesets`, `updateEnabledRulesets`, `getDynamicRules`, and `updateDynamicRules`. Done when UI/state are honest, retry/restart converges, and unrelated rules survive. |
+| `TEST-04` | P0, `CORE-04` | Exercise corrupt, partial, old, and unknown-future settings; install/startup/storage events; migration rollback; worker suspension/restart. Done with a versioned matrix and no silent data loss. |
+| `TEST-05` | P0, `CORE-01` | Test cross-view `storage.onChanged`, pending edit versus external change, stale async responses, site toggle/reload/settings navigation, add/remove validation, reset failure, unavailable/internal tabs, and API errors in Node plus two-view Chromium. |
+| `TEST-06` | P0, stable core | Test cosmetic startup on trusted sites, storage failure, missing/replaced document roots, irrelevant changes, duplicate prevention, hostile DOM, CSP, frames, shadow DOM, and SPA navigation. Done when behavior stays bounded/reversible and never deletes page-owned content. |
+| `TEST-07` | P0, `CORE-01–04` | Manually load the exact build in Chrome Stable; test the real toolbar popup, options, worker console, disable/enable, extension reload/update, browser restart/suspension, uninstall, and clean/existing profiles. Record exact OS, Chrome, SHA, and errors. |
+| `TEST-08` | P0/P1, core reliability | Expand synthetic browser fixtures to HTTPS, redirects, frames, multiple tabs/windows, rapid toggles, 100 exceptions, worker wake/suspension, two extension views, and failure recovery. Every block assertion needs a benign server-count control. |
+| `TEST-09` | P0, stable core | Review manifest permissions, broad HTTP(S) content-script scope, `activeTab`, install warnings, CSP, remote-code prohibition, and permission diffs. Done with approved least-privilege rationale and real Chrome prompt evidence. |
+| `TEST-10` | P0, core reliability | Send unexpected-context, malformed, oversized, replayed, overlapping, and prototype-shaped messages; disconnect the worker. Done when requests reject without mutation, privilege escalation, crash, or data leakage. |
+| `TEST-11` | P0/P1, stable core; repeat after network features | Capture outbound traffic during install, toggle, trust, reset, restart, and updates; inspect storage/logs for URLs, history, content, credentials, and account data. Done with a recorded inventory showing no unexplained traffic/data. |
+| `TEST-12` | P0, after core changes | Test real popup/options keyboard order, visible focus, names/roles/states, live announcements, confirmations/errors, zoom/reflow, contrast/high-contrast mode, reduced motion, and screen readers. Record exact browser, OS, and assistive technology. |
+| `TEST-13` | P1, stable UI | Stress popup size, narrow/zoomed options, long domains/errors, light/dark/high-contrast, localization expansion, and right-to-left text. Done when controls remain visible, understandable, and reachable. |
+| `TEST-14` | P1, stable filtering pipeline | Build a consent-safe HTTPS compatibility corpus for news, shopping, media, SPAs, controlled authenticated flows, frames, widgets, forms, downloads, payments, CSP/shadow DOM, accessibility-heavy pages, and anti-adblock behavior. Measure coverage and severity-weighted breakage. |
+| `TEST-15` | P1, `DATA-01`/`COMP-01` | Version a golden compiler corpus for supported grammar, explicit unsupported reports, exception/priority behavior, stable IDs/hashes, deduplication, regex validity, malformed/adversarial input, fuzz/property tests, and deterministic output. |
+| `TEST-16` | P0 docs quality, `DOCS-01` | Check all tracked active links, file inventory, task/checklist mapping, duplicated live-status claims, outdated SHAs/runs, and quarantine exclusion. Add a reproducible root command and CI step without rewriting dated history. |
+| `TEST-17` | P1, `COMP-01` | Test browser-version-specific static/dynamic/session quotas, safe/unsafe categories, 100 site exceptions, maximum approved lists, and partial API failure. Produce a threshold report and reject overflow without silent rule loss. |
+| `TEST-18` | P1, `DATA-01`/`COMP-01`/`UPDATE-01` | Test valid/invalid integrity data, wrong source/version, truncation, corruption, replay/downgrade, timeout, network loss, interrupted promotion, offline startup, and last-known-good restore. Complete a staged rollback drill. |
+| `TEST-19` | P1, licensed lists and regional owners | Measure per-language/site coverage, wanted-content controls, reviewer agreement, source drift, update cadence, and attribution. Every regional pack needs a qualified named reviewer and sustainable owner. |
+| `TEST-20` | P1, `COSMETIC-01`/`PICKER-01` | Test dynamic DOM, selector cost, frames/shadow limits, preview/cancel/undo, keyboard operation, and legitimate controls. Require browser, accessibility, and performance evidence within budgets. |
+| `TEST-21` | P1, representative corpus | Measure cold/warm load, startup/worker wake, CPU, memory, long-lived DOM, large lists, 100 exceptions, repeated sync, package/rule size, and battery proxy against a no-extension baseline. Record repetitions, distributions, hardware, and regression budgets. |
+| `TEST-22` | P1, stable core/update system | Soak repeated toggles, updates, restarts, many tabs, long-running profiles, rapid SPA navigation, worker suspension, network loss, and update failure. Done when defined duration/repetitions show no divergence, leak, crash, or unrecovered failure. |
+| `TEST-23` | P0/P1, every build/dependency change | Audit dependency provenance/lifecycle hooks, secrets/keys, artifact allowlist, notices/licenses, action versions, tamper detection, and quarantine exclusion. Preserve SBOM/audit plus exact artifact inventory/hash. |
+| `TEST-24` | P1, `QA-01`/`BUILD-01` | Compare two clean builds, ZIP bytes/contents, checksums, clean-profile install, update/downgrade/uninstall, artifact rollback, notices, SBOM, and changelog. Produce an immutable exact-commit artifact and rollback rehearsal. |
+| `TEST-25` | Release gate | Review Chrome Web Store remote-code, permission, data-use, screenshots/copy, privacy policy, and support requirements. Human owner/legal approval is mandatory before submission. |
+| `TEST-26` | P1, stable candidate | Benchmark isolated profiles on the same hardware/browser/list versions and workloads. Report blocking recall, wanted-content precision, breakage, CPU, memory, load, and reliability distributions with uncertainty—never an unsupported ranking. |
+| `TEST-27` | Research, stable core plus legal/policy review | Separate video network ads, overlays, companion ads, client insertion, sponsorship, and server-side insertion by account/region/version. Protect playback and define stop conditions; indistinguishable wanted media is not guaranteed blockable. |
+| `TEST-28` | Future, separately approved products | Create independent Edge, Firefox, Safari/iOS, Android, desktop, DNS, router, smart-TV, and native-app matrices covering APIs, permissions, signing, power/network transitions, consent, privacy, updates, rollback, compatibility, and OS/device versions. Chrome success is not evidence. |
+
+Every evidence record must include: task/owner, exact commit SHA, date/time and timezone, commands and exit results, fixtures and data/list versions, OS/hardware, browser/tool versions, repetitions where relevant, logs/artifacts, pass/fail/blocked status, known gaps, rollback result, and next action. A policy-blocked local browser attempt is neither an application pass nor an application failure. Never execute quarantine merely to increase test coverage.
 
 ## Live GitHub state at this handoff
 
@@ -286,7 +501,9 @@ Status meanings: **Ready** can start from current `main`; **Blocked** needs a de
 | `CORE-04` | **Blocked by CORE-02/03** | Add a versioned settings schema and migrations. Preserve current data, safely repair corrupt/partial state, define future-version behavior, and test install/startup/storage changes after worker suspension. |
 | `QA-01` | **Blocked by CORE-01–04** | Manual Chrome Stable, permission, privacy, and accessibility gate: exact OS/browser/version, actual toolbar popup and options, keyboard/focus/labels/contrast/screen reader, pause/trust/reload/restart, permission disclosure, service-worker console, and outbound-traffic capture. File every failure as a scoped issue. |
 | `ALPHA-01` | **Blocked by QA-01** | Create a deterministic developer alpha ZIP containing only the verified extension; compare two clean builds, publish SHA-256, test install/update/uninstall/rollback, and document limitations. Public distribution remains owner-gated. |
-| `DOCS-01` | **Ready, separate docs PR** | Reconcile stale current docs with live code/evidence without rewriting history: feature matrix, checklist, security/privacy, contributor guide, agent guide, research backlog, issue #1 status, and exact CI/test counts. Keep dated history explicitly dated. |
+| `STRUCTURE-01` | **Ready, separate docs/tooling PR** | Reconcile documentation ownership and `PROJECT_STRUCTURE.md`, add the active file/link/status consistency command from `TEST-16`, and prove no active imports/paths are broken. Do not perform another mass move or alter quarantine. |
+| `DOCS-01` | **Ready after/with STRUCTURE-01, separate docs PR** | Reconcile stale current docs with live code/evidence without rewriting history: feature matrix, checklist, security/privacy, contributor guide, agent guide, research backlog, issue #1 status, and exact CI/test counts. Keep dated history explicitly dated. |
+| `TEST-MATRIX-01` | **Program task; implemented incrementally** | Track `TEST-01`–`TEST-28`, owners, fixtures, results, and gaps. Each product PR implements only its relevant tests; never create one unreviewable “test everything” change. |
 
 ### Governance, data, and filtering foundation
 
@@ -308,6 +525,7 @@ Status meanings: **Ready** can start from current `main`; **Blocked** needs a de
 | ID | Status / dependency | Deliverable and acceptance evidence |
 |---|---|---|
 | `REPORT-01` | **Blocked by stable rules** | Privacy-safe breakage reporting with local preview/redaction, explicit opt-in, cancellation/deletion, and no raw history, cookies, credentials, or page contents by default. Any server/retention policy requires owner approval. |
+| `COVERAGE-01` | **Blocked by stable filtering pipeline** | Build the representative HTTPS compatibility corpus from `TEST-14`, including category, region, legitimate controls, consent/account rules, breakage severity, privacy handling, owner, and reproducible versioning. |
 | `PROFILE-01` | **Blocked by FILTER-01/REGION-01** | Clearly separated tracker/nuisance profiles with visible source/version, opt-in controls, false-positive corpus, and per-profile rollback. |
 | `PRIVACY-01` | **Blocked by stable core** | Audit every permission/content script and actual outbound traffic; inventory stored data; minimize access; update threat model; remediate high-risk findings. |
 | `UX-01` | **Blocked by stable settings/filter core** | Accessible simple/expert dashboard with keyboard/screen-reader task completion, visible errors, recovery, and browser regressions. |
@@ -326,9 +544,55 @@ Status meanings: **Ready** can start from current `main`; **Blocked** needs a de
 
 | ID | Status / dependency | Deliverable and acceptance evidence |
 |---|---|---|
-| `PLATFORM-01` | **Future after stable Chrome release** | Separate Edge and Firefox adapters, manifests, permissions, packaging/signing, and browser matrices; independent go/no-go ADR for each. |
+| `EDGE-01` | **Future after stable Chrome release** | Edge-specific manifest/package/store/enterprise-policy review and full regression matrix; do not infer support merely because Edge is Chromium-based. |
+| `FIREFOX-01` | **Future after stable Chrome release** | Firefox API/manifest adapter, permission model, signing/distribution path, filtering semantics, and independent unit/browser/manual matrix. |
+| `SAFARI-01` | **Owner / future feasibility** | Safari content-blocker/extension architecture, signing, App Store policy, privacy, performance, supported syntax, updates, and macOS/iOS matrices with go/no-go ADR. |
+| `ANDROID-01` | **Owner / future separate product** | Compare Android browser extension, Private DNS, local VPN, and approved OS mechanisms; document consent, battery, encrypted/same-host limits, app compatibility, store policy, updates, rollback, and device/OS matrix. |
+| `IOS-01` | **Owner / future separate product** | Evaluate Safari content blocking and permitted DNS/VPN mechanisms under iOS signing, background, battery, privacy, store, update, and device-version constraints. |
+| `DESKTOP-01` | **Owner / future separate product** | Evaluate native desktop DNS/proxy/VPN/content-filter mechanisms for Windows, macOS, and Linux with certificate policy, least privilege, app compatibility, security, updates, rollback, and support cost. |
+| `DNS-01` | **Owner / future separate product** | Design an opt-in DNS service/local resolver with domain-level block policy, privacy/retention model, shared-domain false-positive controls, encrypted DNS, availability, updates, rollback, and operations ownership. |
+| `NETWORK-01` | **Owner / future feasibility** | Research router, smart-TV, and embedded-device support with hardware/vendor matrices, safe configuration, consent, recovery, updates, DNS limitations, and sustainable support. |
 | `VIDEO-01` | **Future after stable core and legal/API review** | Separate network ads, overlays, sponsorship, and server-inserted streams in a version/account/region corpus; protect playback; publish stop conditions; never promise universal removal. |
-| `FUTURE-01` | **Owner / future** | Independent mobile, desktop, and DNS feasibility ADRs covering architecture, threat model, consent, operations, cost, staffing, and maintenance. The extension cannot provide device-wide filtering by itself. |
+| `SPONSOR-01` | **Owner / future optional feature** | Review sponsor-segment API/database rights, user consent, accuracy, privacy, controls, attribution, moderation, and policy before any user-controlled integration. |
+| `AI-01` | **Research after deterministic baselines** | Evaluate redacted issue triage, fixture generation, rule suggestions, regional-gap discovery, and optional on-device classifiers against human/deterministic baselines. No raw browsing data by default and no autonomous promotion. |
+| `BUSINESS-01` | **Owner / future** | For every proposed platform, record audience, value, staffing, infrastructure, legal/security burden, support/incident cost, maintenance ownership, funding model, and explicit go/no-go decision. |
+
+### Mapping to the original 60-step checklist
+
+This queue covers every still-open checklist range; the mapping prevents a future tool from overlooking work or declaring a broad stage complete from one PR.
+
+| Checklist item(s) | Handoff task(s) |
+|---|---|
+| 004–006 | `GOV-01` |
+| 007–010 | `GOV-02` |
+| 024 | `QA-01`, `TEST-07`, `TEST-09`, `TEST-11`, `TEST-12` |
+| 025 | `ALPHA-01`, `TEST-24` |
+| 026 | `DATA-01` |
+| 027–028 | `COMP-01`, `TEST-15`, `TEST-17` |
+| 029 | `FILTER-01` |
+| 030 | `COSMETIC-01`, `TEST-20` |
+| 031 | `REGION-01`, `TEST-19` |
+| 032 | `RULES-01` |
+| 033 | `PICKER-01` |
+| 034 | `UPDATE-01`, `TEST-18` |
+| 035 | `REPORT-01` |
+| 036 | `PROFILE-01` |
+| 037 | `PRIVACY-01`, `TEST-09`–`TEST-11` |
+| 038 | `UX-01`, `TEST-12`, `TEST-13` |
+| 039 | `SETTINGS-01`, `CORE-04` |
+| 040 | `DIAG-01` |
+| 041 | `PERF-01`, `TEST-21`, `TEST-22` |
+| 042 | `BUILD-01`, `TEST-23`, `TEST-24` |
+| 043 | `POLICY-01` |
+| 044 | `SEC-01` |
+| 045 | `RELEASE-01`, `TEST-25` |
+| 046–051 | `BENCH-01`, `BENCH-02`, `COVERAGE-01`, `TEST-14`, `TEST-26` |
+| 050 and 052 | `OPS-01` |
+| 053–054 | `EDGE-01`, `FIREFOX-01`, `SAFARI-01`, `TEST-28` |
+| 055–056 | `VIDEO-01`, `SPONSOR-01`, `TEST-27` |
+| 057–060 | `ANDROID-01`, `IOS-01`, `DESKTOP-01`, `DNS-01`, `NETWORK-01`, `BUSINESS-01`, `TEST-28` |
+
+Every task record must name an accountable role, issue/PR, state, dependencies, baseline SHA, files in scope, acceptance criteria, test groups, privacy/security/license effects, rollback/recovery, exact-head CI, known gaps, and next eligible task. “AI” or “the community” is not an accountable owner.
 
 ### Recommended work for the next coding tool
 
