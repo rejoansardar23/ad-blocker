@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
-const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const extensionPath = path.join(repo, "dist", "chrome");
 const profile = mkdtempSync(path.join(tmpdir(), "ad-blocker-e2e-"));
 const counts = { ad: 0, benign: 0 };

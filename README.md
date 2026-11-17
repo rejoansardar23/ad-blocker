@@ -1,86 +1,88 @@
-# Ad Blocker — ZIP-based foundations
+# Ad Blocker — Chrome MV3 Development Preview
 
-This repository organizes the two supplied ZIP projects as separate codebases. **Integration is deferred.** Existing extension code is preserved; the previous planning and AI handoff documents have been removed. The worldwide ad-blocking direction is described in the [product plan](docs/ADBLOCK_PRODUCT_PLAN.md).
+> **Lost the old ChatGPT chat? Start with [the permanent master project handoff](docs/history/MASTER_PROJECT_HANDOFF.md), [conversation/research archive](docs/history/RESEARCH_AND_CHAT_HISTORY_ARCHIVE.md), and [copy/paste prompt for a new agent](docs/history/NEXT_CHAT_START.txt).** These GitHub-native documents preserve the recoverable product vision, pinned external sources, architecture diagrams, CI evidence, PR history and next tasks; they are not a verbatim transcript export.
 
-**Current capability:** extracted ad-blocking source code, a tested ZIP-derived Node filtering engine, and a small Chrome MV3 preview. Broad worldwide blocking coverage remains a development goal.
 
-## Project structure
+> **Version 0.1.0 · Development preview · 15 November 2026**
+> A small, original-code browser extension foundation now exists. **The synthetic Playwright Chromium MV3 test suite has passed, but broad real-world browser compatibility and production readiness are NOT verified.** Full AdGuard/uBlock/Ghostery feature parity is a long-term goal, not a current claim.
 
-```text
-projects/
-  ghostery-adblocker/       # extracted adblocker-master.zip; MPL-2.0
-  ublock-origin/            # extracted uBlock-master.zip; GPL-3.0-or-later
-  snapshots.json           # input ZIP hashes and SHA-256 of every source file
-background/                # preserved original preview service worker
-content/                   # preserved original preview cosmetic filtering
-shared/                    # preserved original preview domain utilities
-popup/                     # preserved original preview toolbar interface
-options/                   # preserved original preview settings interface
-rules/                     # preserved original preview starter DNR rules
-manifest.json              # original preview Chrome MV3 manifest
-scripts/
-  verify.mjs               # original preview validation
-  build.mjs                # original preview packaging
-  verify-snapshots.mjs      # verifies both extractions against the ZIP inventory
-  build-ublock-node.mjs     # builds the ZIP's Node engine, fixes a missing copy
-tests/
-  *.test.mjs               # original preview unit tests
-  chromium-smoke.mjs       # original preview Chromium integration suite
-  upstream/ublock.test.mjs # ZIP-derived engine functional test
-docs/ADBLOCK_PRODUCT_PLAN.md # current product direction and delivery gates
-.github/workflows/          # existing preview CI
-package.json               # development commands; no merged filtering engines
-package-lock.json          # preserved pinned preview test dependencies
-build/ublock-node/          # generated ZIP-derived engine (ignored)
-dist/chrome/               # generated original preview extension (ignored)
-```
+## Vision
 
-The Ghostery project contains **321 files**, and uBlock contains **1,063 files**. Every extracted file was checked byte-for-byte using SHA-256. The two redundant ZIP copies were removed after extraction. Git history retains the original archives. Snapshot hashes identify the supplied files; their precise upstream Git commits are unknown.
+Build a market-competitive, independently branded, privacy-first ad-blocking software platform, starting with Chrome Manifest V3. Compete on **measured blocking quality, low website breakage, efficient resource use, privacy and user experience**. Use AI coding agents such as Codex Cloud and compatible open-source components only when they reduce total effort without compromising legality, security or maintainability.
 
-Upstream source layouts, licenses, notices, tests, and build configuration are preserved. Files with identical contents at different required paths—including license notices—remain in place so imports and packaging do not break. They are not separate engines to run together. Nested upstream workflows are retained as source material; GitHub only discovers this repository's root `.github/workflows`.
+**New developer?** Start with [START HERE](docs/development/START_HERE.md) and the **[60-step implementation checklist](docs/product/IMPLEMENTATION_CHECKLIST.md)**. You do **not** need the original planning chat.
 
-## Verify and develop
+## Current code: what is actually here
 
-Requires Node.js 22+; the uBlock Node build also requires Bash. Validated here with Node.js 24.22.1.
+| Capability | Code state | Required proof |
+|---|---|---|
+| Chrome Manifest V3 package | Chromium CI verified | Test real users' Chrome environments separately |
+| Bundled sample blocking rules (few ad networks) | Synthetic Chromium fixture verified | Extend filter coverage only after license review |
+| Global protection toggle | Synthetic Chromium CI verified | More browser/profile compatibility tests later |
+| Per-site trusted website list | Chromium CI verified on fixture | Subdomain/real-site variations need more tests |
+| Basic cosmetic CSS | Fixture CI verified | Broad false-positive testing still required |
+| Popup, options and local settings | Options + Node UI regression tests | Manual toolbar popup and accessibility checks pending |
+| Node unit tests and structural checks | CI verified | [Passing GitHub Actions run](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) |
+| Runtime dependency-free extension packaging | CI verified | Synthetic Chromium load verified; manual installation remains |
+| Comprehensive filter-list support, tracker modes, custom rules, element picker | Not yet built | Milestones P1 |
+| Chrome Store release, Chrome/Firefox/desktop/DNS products | Not yet built | Separate approval/testing |
+
+This is a **starter ruleset**, not a market-leading blocker yet. No telemetry or remote code is implemented. Do not make unsupported claims of 100% blocking, exact ad counts or YouTube ad removal.
+
+## Verified CI build
+
+The [successful validation/build run](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) ran structural checks, Node unit tests and the package build and uploaded the `ad-blocker-chrome-unpacked` artifact. It has **not** proved live Chrome filtering, reload behavior or website compatibility.
+
+## Quick start
+
+Requires **Node.js 22+** and Chrome/Chromium 121+ for testing.
 
 ```bash
-cd /workspace/ad-blocker  # or your local checkout
-npm run verify:archives
-npm run test:ublock
+git clone https://github.com/rejoansardar23/ad-blocker.git
+cd ad-blocker
 npm run check
 npm run build
 ```
 
-The first two commands need no npm installation. `test:ublock` builds the archive's Node engine and checks blocking, an explicit allow exception, and a benign control using synthetic filters and a synthetic public-suffix list. It does not validate a browser or full production filter coverage. The build adapter copies `src/js/publicsuffix.js` from the same ZIP into the generated package because the archived build script omits it. It also declares the generated package as an ES module; upstream sources remain unchanged.
+Open `chrome://extensions` → enable **Developer mode** → **Load unpacked** → select `dist/chrome`.
 
-`check` runs the original preview's 14 unit tests and structural checks. `build` packages that original preview into `dist/chrome`. The extracted upstream projects have separate build systems; neither engine has been merged into the preview. To load the preview, select `dist/chrome` using Chrome's **Load unpacked** control in developer mode.
+**The extension runtime has no third-party packages.** Run `npm ci --no-audit --no-fund` and `npx playwright install chromium` to execute the real Chromium suite with `npm run test:e2e`. See [developer setup](docs/development/DEVELOPER_SETUP.md).
 
-For the original preview's browser tests:
+## Documentation map
 
-```bash
-npm ci --cache /workspace/.cache/npm --no-audit --no-fund
-PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright npx --no-install playwright install chromium
-PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright npm run test:e2e
-```
+- **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** — authoritative directory map, dependency flow, preservation rules and old-to-new path mapping.
+- **[AnalyseFuture/README.txt](AnalyseFuture/README.txt)** — quarantine status, provenance and safety rules for preserved imported material.
+- **[START_HERE.md](docs/development/START_HERE.md)** — orientation for humans and AI developers.
+- **[IMPLEMENTATION_CHECKLIST.md](docs/product/IMPLEMENTATION_CHECKLIST.md)** — 60 sequential tasks with status.
+- [VISION.md](docs/product/VISION.md) — competitive goals and principles.
+- [PRODUCT_SPEC.md](docs/product/PRODUCT_SPEC.md) / [FEATURE_MATRIX.md](docs/product/FEATURE_MATRIX.md) — product requirements and verified/planned states.
+- [ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) — existing request/permission design and future modules.
+- [ROADMAP.md](docs/product/ROADMAP.md) — phase delivery and exit gates.
+- [REUSE_AND_LICENSES.md](docs/governance/REUSE_AND_LICENSES.md) / [REUSE_AUDIT_TEMPLATE.md](docs/governance/REUSE_AUDIT_TEMPLATE.md) — public repository evaluation before integration.
+- **[FOUNDATION_AUDIT.md](docs/research/FOUNDATION_AUDIT.md)** — preliminary pinned audit of existing engine and selected candidates.
+- **[OPEN_SOURCE_REFERENCE_REPOS.txt](docs/research/OPEN_SOURCE_REFERENCE_REPOS.txt)** — complete list of previously suggested public repositories to study.
+- [TESTING.md](docs/testing/TESTING.md) / [COMPETITIVE_BENCHMARK.md](docs/research/COMPETITIVE_BENCHMARK.md) — quality proof and competitor benchmarking.
+- [SECURITY_PRIVACY.md](docs/security/SECURITY_PRIVACY.md) / [SECURITY.md](SECURITY.md) — security, privacy and vulnerability disclosures.
+- [CODEX_WORKFLOW.md](docs/development/CODEX_WORKFLOW.md) / [AGENTS.md](AGENTS.md) — Codex Cloud instructions and credit-saving workflow.
+- [DEVELOPER_SETUP.md](docs/development/DEVELOPER_SETUP.md) / [RELEASE_GUIDE.md](docs/development/RELEASE_GUIDE.md) — local workflow and future releases.
+- [DECISIONS.md](docs/governance/DECISIONS.md) / [RESEARCH_BACKLOG.md](docs/research/RESEARCH_BACKLOG.md) — open decisions and research.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — how to propose scoped, testable changes.
 
-The workspace-specific cache locations above avoid an unavailable home cache. Local development can use normal npm and Playwright defaults instead, provided installation and testing use the same browser cache.
+## Reuse strategy and competitor references
 
-## ZIP project build status
+We propose **one main modular product repo**, not a blind merge of several GPL codebases. The active minimal implementation is original code; no imported upstream engine is integrated into its runtime, build, or dependency graph. Unverified ZIP-derived source snapshots are preserved for review under [`AnalyseFuture/`](AnalyseFuture/README.txt), outside the active product. Before larger features, audit possible foundations [Very Good AdBlock](https://github.com/chrisbbreuer/very-good-adblock), [Unblock](https://github.com/adyoi/unblock), [Ghostery's adblocker SDK](https://github.com/ghostery/adblocker), [WXT](https://github.com/wxt-dev/wxt) and filtering datasets. Use [AdGuard](https://github.com/AdguardTeam/AdguardBrowserExtension) and [uBlock Origin](https://github.com/gorhill/uBlock) as competitor references, not license-free source.
 
-| Component | Local result | Remaining work |
-|---|---|---|
-| Both ZIP extractions | 1,384 file hashes verified | Integration deliberately deferred |
-| uBlock Node engine | Built; block/exception/control test passed | Production datasets and browser behavior not tested |
-| Original preview | 14 unit tests and packaging passed | Browser download blocked by network policy |
-| uBlock Lite Chrome MV3 | Build attempted; failed | ZIP omits CodeMirror and serializer submodule contents; the normal build also downloads external filter lists |
-| Ghostery workspace | Yarn 4.18.0 obtained; initial dependency fetch failed; proxy-adjusted retry interrupted when scope changed | Complete dependency installation before claiming its build or tests work |
+**Ownership/license warning:** the repo is public, but a project-wide source license is not yet selected. The founder must decide licensing/distribution and external contribution terms before a public release or major third-party code import. Original code ownership does not imply ownership of upstream components.
 
-uBlock's upstream MV3 instructions are in [its README](projects/ublock-origin/platform/mv3/README.md). Running `make mv3-chromium` from its project directory currently fails at the missing CodeMirror submodule. The ZIP's `.gitmodules` records dependency URLs but does not provide their pinned Git commits; do not silently replace these with arbitrary current versions.
+## Fork integration and independent research
 
-Ghostery retains its Yarn workspace and lockfile. Its documented workflow is `yarn install --immutable`, `yarn build`, and `yarn test` from `projects/ghostery-adblocker`, using the `packageManager` version in its manifest. Verify the selected adapter's browser API requirements before integration into a Chrome MV3 extension.
+The fork [renoukhan39-bit/ad-blocker](https://github.com/renoukhan39-bit/ad-blocker) contributed stronger synthetic browser regressions, additional settings UI tests, a more complete DNR comparison, and CI dependency SBOM/auditing. Both commit histories are preserved through the integration; no third-party filter engine or dataset is integrated into the active runtime. Separate unverified snapshots remain quarantined in `AnalyseFuture/`. The 18-repository research list remains in [OPEN_SOURCE_REFERENCE_REPOS.txt](docs/research/OPEN_SOURCE_REFERENCE_REPOS.txt). Original product licensing remains undecided.
 
-## Licenses and next direction
+## Next milestone (Codex Cloud)
 
-Retain [Ghostery's MPL-2.0 license](projects/ghostery-adblocker/LICENSE) and [uBlock's GPL license](projects/ublock-origin/LICENSE.txt), along with their file-level and bundled dependency notices. Extraction does not change these terms or grant ownership of upstream work. The original preview has no project-wide license selected.
+1. Run `npm ci --no-audit --no-fund`, `npm run check`, `npm run build` and `npm run test:e2e`; verify the exact integration PR CI.
+2. Complete the owner-controlled project licensing decision and pinned dependency/filter data research.
+3. Perform security, permissions, accessibility and manual Chrome installation reviews; record results in the checklist.
+4. Expand filter compilation and coverage only after legal reuse evaluation and actual browser tests.
 
-The [ad-blocking product plan](docs/ADBLOCK_PRODUCT_PLAN.md) is the single new planning document. It describes the roles of the supplied projects, worldwide coverage, testing, updates, and delivery gates. No other filtering engine has been added, and neither extracted engine has been merged into the preview.
+**The goal is real working software, not a feature checklist without evidence.**

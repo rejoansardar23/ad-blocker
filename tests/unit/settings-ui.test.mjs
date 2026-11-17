@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
-const read = (name) => readFileSync(new URL("../" + name, import.meta.url), "utf8");
+const read = (name) => readFileSync(new URL("../../src/extension/" + name, import.meta.url), "utf8");
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
 function element() {

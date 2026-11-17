@@ -5,9 +5,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const worker = readFileSync(path.join(root, "background/service-worker.js"), "utf8");
-const shared = readFileSync(path.join(root, "shared/domain.js"), "utf8");
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const extension = path.join(root, "src", "extension");
+const worker = readFileSync(path.join(extension, "background/service-worker.js"), "utf8");
+const shared = readFileSync(path.join(extension, "shared/domain.js"), "utf8");
 
 function setup(initial = {}) {
   const stored = { enabled: true, allowlistedSites: [], ...initial };

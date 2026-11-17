@@ -1,0 +1,56 @@
+name: Build and validate Chrome extension
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 25
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install pinned test dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Verify dependency installation preserves the lockfile
+        run: git diff --exit-code -- package-lock.json
+      - name: Generate dependency SBOM using npm
+        run: |
+          mkdir -p build
+          npm sbom --sbom-format cyclonedx > build/dependency-sbom.json
+      - name: Audit installed dependencies
+        run: npm audit --audit-level=high
+      - name: Run static checks and unit tests
+        run: npm run check
+      - name: Verify extracted ZIP source integrity
+        run: npm run verify:archives
+      - name: Build and test ZIP-derived uBlock Node engine
+        run: npm run test:ublock
+      - name: Build unpacked Chrome extension
+        run: npm run build
+      - name: Install Playwright Chromium for extension tests
+        run: npx playwright install --with-deps chromium
+      - name: Run real Chromium extension smoke tests
+        run: npm run test:e2e
+      - name: Save installable unpacked build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ad-blocker-chrome-unpacked
+          path: dist/chrome/
+          if-no-files-found: error
+      - name: Save dependency SBOM
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ad-blocker-dependency-sbom
+          path: build/dependency-sbom.json
+          if-no-files-found: warn

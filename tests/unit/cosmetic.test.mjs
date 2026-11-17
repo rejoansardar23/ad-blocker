@@ -5,9 +5,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const shared = readFileSync(path.join(root, "shared/domain.js"), "utf8");
-const cosmetic = readFileSync(path.join(root, "content/cosmetic.js"), "utf8");
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const extension = path.join(root, "src", "extension");
+const shared = readFileSync(path.join(extension, "shared/domain.js"), "utf8");
+const cosmetic = readFileSync(path.join(extension, "content/cosmetic.js"), "utf8");
 
 function setup() {
   let saved = { enabled: true, allowlistedSites: [] };

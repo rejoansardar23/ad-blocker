@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-await import("../shared/domain.js");
+await import("../../src/extension/shared/domain.js");
 const { normalizeSite, isAllowlisted } = globalThis.AdBlockerDomain;
 
 test("normalizes website hostnames and URLs", () => {

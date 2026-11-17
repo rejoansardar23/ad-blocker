@@ -1,0 +1,97 @@
+AD BLOCKER PROJECT - PUBLIC REPOSITORY RESEARCH CATALOG
+Repository: https://github.com/rejoansardar23/ad-blocker
+Catalog date: 2026-11-15
+Purpose: Collect all public GitHub repositories previously suggested in project planning so a new developer or Codex can research existing implementations before writing duplicate code.
+
+CRITICAL RULES
+- These repositories are STUDY/REUSE CANDIDATES, not software already integrated into our product.
+- Study and benchmark complete competitor projects; do not blindly combine source trees.
+- Before importing any source, package, asset or filter list: pin commit/version, verify file-level and dependency licenses, check security and maintenance, run builds and capture benchmark evidence.
+- Our founder has NOT approved a project-wide license change, GPL code incorporation into proprietary modules, or commercial publication.
+- Prefer the smallest compatible component that solves the problem; avoid overlapping filtering engines.
+- The Chrome extension must obey Manifest V3 security rules and browser API limits.
+- Real browser tests, not GitHub README claims, decide whether a feature works.
+- This catalog records prior recommendations, not a fresh legal or security certification.
+
+=== FOUNDATION / FULL EXTENSION CANDIDATES ===
+01. Very Good AdBlock
+    Repository: https://github.com/chrisbbreuer/very-good-adblock
+    Purpose: Potential permissive-license foundation; must validate code, dependencies and list licensing.
+02. Unblock
+    Repository: https://github.com/adyoi/unblock
+    Purpose: Smaller Chrome MV3 foundation candidate; compare real build and maintenance.
+03. Chroma Ad-Blocker
+    Repository: https://github.com/Dabrogost/Chroma-Ad-Blocker
+    Purpose: Experimental alternative and feature reference; review safety and licensing.
+
+=== COMPETITOR EXTENSIONS (REFERENCE / BENCHMARK, NOT AUTOMATICALLY REUSABLE CODE) ===
+04. AdGuard Browser Extension
+    Repository: https://github.com/AdguardTeam/AdguardBrowserExtension
+    Purpose: Comprehensive features, list management, cosmetic filtering, settings and UX. GPL obligations apply to reuse.
+05. uBlock Origin
+    Repository: https://github.com/gorhill/uBlock
+    Purpose: Advanced filtering, user controls and benchmark reference; not a drop-in Chrome MV3 foundation. GPL obligations apply.
+06. uBlock Origin Lite
+    Repository: https://github.com/uBlockOrigin/uBOL-home
+    Purpose: Chrome Manifest V3 native-rule strategy, lightweight architecture and benchmark reference; check current license.
+07. Ghostery Browser Extension
+    Repository: https://github.com/ghostery/ghostery-extension
+    Purpose: Privacy, tracker protection, UX and browser support benchmark; audit extension license before reuse.
+
+=== REUSABLE BLOCKING ENGINES (EVALUATE ONE PURPOSE AT A TIME) ===
+08. Ghostery Adblocker SDK
+    Repository: https://github.com/ghostery/adblocker
+    Purpose: Candidate filter parsing/matching and cosmetic filtering; MPL covered files and integration limits require audit.
+09. Brave adblock-rust
+    Repository: https://github.com/brave/adblock-rust
+    Purpose: Rust engine reference for future high-performance, desktop/WASM architectures; not automatically needed for Chrome.
+
+=== DEVELOPMENT FRAMEWORK AND QUALITY TOOLS ===
+10. WXT
+    Repository: https://github.com/wxt-dev/wxt
+    Purpose: Cross-browser extension build/dev tooling; consider only if migration has measured value.
+11. AGLint
+    Repository: https://github.com/AdguardTeam/AGLint
+    Purpose: Validate filter rule syntax; evaluate instead of writing a custom linter.
+12. AdGuard DiffBuilder
+    Repository: https://github.com/AdguardTeam/DiffBuilder
+    Purpose: Filter list delta/update tool; candidate for later efficient data updates.
+13. shadcn/ui
+    Repository: https://github.com/shadcn-ui/ui
+    Purpose: UI primitives for a future dashboard; avoid unnecessary framework migrations.
+14. Playwright
+    Repository: https://github.com/microsoft/playwright
+    Purpose: Automated Chromium extension testing; already used as a pinned development dependency in this project.
+
+=== FILTER LISTS AND DATA (CHECK DATA LICENSES SEPARATELY) ===
+15. EasyList and EasyPrivacy
+    Repository: https://github.com/easylist/easylist
+    Purpose: Rule subscriptions for ads/trackers; verify per-list terms, format support and redistribution.
+16. StevenBlack Hosts
+    Repository: https://github.com/StevenBlack/hosts
+    Purpose: Curated hosts/domain lists for evaluation; requires provenance/false-positive testing.
+17. HaGeZi DNS Blocklists
+    Repository: https://github.com/hagezi/dns-blocklists
+    Purpose: Potential future DNS filtering data; domain blocklists alone cannot cosmetically hide ads.
+
+=== OPTIONAL FUTURE VIDEO FEATURE ===
+18. SponsorBlock
+    Repository: https://github.com/ajayyy/SponsorBlock
+    Purpose: Community sponsor segment skipping concept; code/API/database licenses and commercial use must be independently reviewed.
+
+OTHER NON-REPOSITORY REFERENCES FROM OUR PLANNING
+- AdBlock product: https://getadblock.com/ (competitor UX, not imported code)
+- Adblock Plus product: https://adblockplus.org/ (competitor UX, not imported code)
+- Playwright extension testing guide: https://playwright.dev/docs/chrome-extensions
+- Chrome DNR API: https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest
+- Chrome Web Store policies: https://developer.chrome.com/docs/webstore/program-policies/
+
+RECOMMENDED REVIEW ORDER
+A. Evaluate current in-repository extension and tests first (do NOT rebuild working functionality).
+B. Audit Very Good AdBlock and Unblock as possible foundation alternatives.
+C. Benchmark AdGuard, uBlock Origin Lite, uBlock Origin and Ghostery for features and false positives.
+D. Consider Ghostery SDK or Brave's engine only if the current implementation lacks a tested capability and license is compatible.
+E. Select licensed filter datasets, linter/update tools, and optionally WXT/UI components as needed.
+F. Keep SponsorBlock, DNS and desktop integration as later feasibility research.
+
+STATUS: Reference list only. No additional third-party code was imported or licensed by adding this file.

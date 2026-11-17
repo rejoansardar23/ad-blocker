@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const extension = path.join(root, "src", "extension");
 const required = [
   "manifest.json",
   "rules/starter.json",
@@ -18,10 +19,10 @@ const required = [
   "options/options.css",
   "options/options.js"
 ];
-const read = (file) => readFileSync(path.join(root, file), "utf8");
+const read = (file) => readFileSync(path.join(extension, file), "utf8");
 
 for (const file of required) {
-  assert.ok(existsSync(path.join(root, file)), "Missing extension file: " + file);
+  assert.ok(existsSync(path.join(extension, file)), "Missing extension file: " + file);
 }
 const manifest = JSON.parse(read("manifest.json"));
 assert.equal(manifest.manifest_version, 3);
@@ -46,10 +47,10 @@ for (const rule of rules) {
   assert.ok(Array.isArray(rule.condition.resourceTypes));
 }
 for (const script of manifest.content_scripts) {
-  for (const source of script.js) assert.ok(existsSync(path.join(root, source)));
+  for (const source of script.js) assert.ok(existsSync(path.join(extension, source)));
 }
 for (const page of [manifest.action.default_popup, manifest.options_page]) {
-  assert.ok(existsSync(path.join(root, page)));
+  assert.ok(existsSync(path.join(extension, page)));
 }
 
 for (const source of [
@@ -59,7 +60,7 @@ for (const source of [
   "popup/popup.js",
   "options/options.js"
 ]) {
-  execFileSync(process.execPath, ["--check", path.join(root, source)], { stdio: "pipe" });
+  execFileSync(process.execPath, ["--check", path.join(extension, source)], { stdio: "pipe" });
 }
 for (const html of ["popup/popup.html", "options/options.html"]) {
   const text = read(html);
