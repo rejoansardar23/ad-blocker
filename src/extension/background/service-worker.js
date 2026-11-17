@@ -110,6 +110,26 @@ function queueSync() {
   return queueOperation(syncFromStorage);
 }
 
+// Browser rule APIs and local storage are separate systems. If rule application
+// fails after a settings write, restore the affected previous preferences and
+// reconcile the installed rules before reporting a failed user action.
+async function saveAndReconcile(nextSettings, previousSettings) {
+  await chrome.storage.local.set(nextSettings);
+  try {
+    return await syncFromStorage();
+  } catch (applyError) {
+    try {
+      await chrome.storage.local.set(previousSettings);
+      await syncFromStorage();
+    } catch (recoveryError) {
+      throw new Error("Protection update failed and automatic settings recovery failed: " +
+        (recoveryError.message || String(recoveryError)));
+    }
+    throw new Error("Protection update failed; previous settings restored: " +
+      (applyError.message || String(applyError)));
+  }
+}
+
 async function handleMessage(message) {
   if (!message || typeof message.type !== "string") {
     throw new Error("Unsupported message.");
@@ -121,8 +141,8 @@ async function handleMessage(message) {
   }
   if (message.type === "SET_ENABLED") {
     if (typeof message.enabled !== "boolean") throw new Error("Expected boolean enabled.");
-    await chrome.storage.local.set({ enabled: message.enabled });
-    return syncFromStorage();
+    const before = await getState();
+    return saveAndReconcile({ enabled: message.enabled }, { enabled: before.enabled });
   }
   if (message.type === "SET_SITE_ALLOWED") {
     const site = normalizeSite(message.site);
@@ -134,12 +154,17 @@ async function handleMessage(message) {
     if (message.allowed) next.add(site);
     else next.delete(site);
     if (next.size > MAX_SITES) throw new Error("Maximum 100 website exceptions.");
-    await chrome.storage.local.set({ allowlistedSites: [...next].sort() });
-    return syncFromStorage();
+    return saveAndReconcile(
+      { allowlistedSites: [...next].sort() },
+      { allowlistedSites: state.allowlistedSites }
+    );
   }
   if (message.type === "RESET_SETTINGS") {
-    await chrome.storage.local.set({ enabled: true, allowlistedSites: [] });
-    return syncFromStorage();
+    const before = await getState();
+    return saveAndReconcile(
+      { enabled: true, allowlistedSites: [] },
+      { enabled: before.enabled, allowlistedSites: before.allowlistedSites }
+    );
   }
   throw new Error("Unknown operation: " + message.type);
 }
