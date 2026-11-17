@@ -2,6 +2,8 @@
 
 **State:** Node-native structural checks, unit tests and a build script are present; GitHub Actions is configured. **Synthetic Chromium integration tests now run in CI; broad real-site compatibility remains unverified.** Current implementation is a development preview.
 
+See [the latest grouped test evidence](TEST_EVIDENCE.md) for exact commands, results, environment limitations and remaining gaps tied to a specific commit.
+
 ## Commands
 
 ```bash
