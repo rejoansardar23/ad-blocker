@@ -2,6 +2,12 @@
 
 ## Recovery mission, 18 November 2026 (Asia/Kolkata)
 
+### CORE-02: complete worker operation serialization
+
+Parent checkpoint: `f1b071e`, whose [CI passed](https://github.com/rejoansardar23/ad-blocker/actions/runs/44184083819). The expanded worker suite first ran against the old worker: **17 tests / 13 PASS / 4 FAIL**. Failures reproduced lost additions/removals, reset ordering, and stale repair overwriting a pause. With one operation queue, all **58** current Node/tooling tests pass (17 worker tests), zero failures/skips.
+
+Local Chromium 158.0.8127.18 passes ten page cases, five view-synchronization checkpoints, and **one concurrent-mutation checkpoint**. Two requests both succeed with ordered response sizes [1,2], both sites appear in local storage and managed DNR, and reset restores the clean fixture. Rejection recovery and synchronous storage events complete without deadlock or rule churn. DNR API rollback and settings migrations are still NOT IMPLEMENTED; this change does not claim those gates.
+
 ### CORE-01: live view synchronization
 
 Parent checkpoint: `418b5aa`. Before production changes, the expanded UI suite reported 26 tests: 14 PASS / 12 FAIL. With the fix, `npm run check` reports **50 PASS / 0 FAIL / 0 SKIPPED** (26 UI tests, including twenty new regressions). Local `test:e2e` on Chromium 158.0.8127.18 passes the ten existing page scenarios plus **five** explicitly counted live-view checkpoints: external pause, resume, trust, trust removal, and reset. Server counts remain ad 5 / benign 10.

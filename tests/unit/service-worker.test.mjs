@@ -10,7 +10,13 @@ const extension = path.join(root, "src", "extension");
 const worker = readFileSync(path.join(extension, "background/service-worker.js"), "utf8");
 const shared = readFileSync(path.join(extension, "shared/domain.js"), "utf8");
 
-function setup(initial = {}) {
+function deferred() {
+  let resolve;
+  const promise = new Promise((done) => { resolve = done; });
+  return { promise, resolve };
+}
+
+function setup(initial = {}, { emitStorageEvents = false } = {}) {
   const stored = { enabled: true, allowlistedSites: [], ...initial };
   let dynamic = [];
   let lastRuleset = null;
@@ -20,13 +26,41 @@ function setup(initial = {}) {
   let storageWriteCount = 0;
   let onMessage = null;
   let onInstalled = null;
+  let onStartup = null;
+  let onStorageChanged = null;
+  let nextReadPause = null;
+  let failNextWrite = false;
   const chrome = {
     storage: {
       local: {
-        async get(defaults) { return { ...defaults, ...stored }; },
-        async set(changes) { storageWriteCount++; Object.assign(stored, changes); }
+        async get(defaults) {
+          // Chrome returns a snapshot, not a live reference to mutable storage.
+          const snapshot = JSON.parse(JSON.stringify({ ...defaults, ...stored }));
+          const pause = nextReadPause;
+          nextReadPause = null;
+          if (pause) {
+            pause.started.resolve();
+            await pause.release.promise;
+          }
+          return snapshot;
+        },
+        async set(changes) {
+          storageWriteCount++;
+          if (failNextWrite) {
+            failNextWrite = false;
+            throw new Error("Injected storage write failure");
+          }
+          const events = {};
+          for (const [key, value] of Object.entries(changes)) {
+            if (JSON.stringify(stored[key]) !== JSON.stringify(value)) {
+              events[key] = { oldValue: stored[key], newValue: value };
+            }
+          }
+          Object.assign(stored, JSON.parse(JSON.stringify(changes)));
+          if (emitStorageEvents && Object.keys(events).length) onStorageChanged?.(events, "local");
+        }
       },
-      onChanged: { addListener() {} }
+      onChanged: { addListener(callback) { onStorageChanged = callback; } }
     },
     declarativeNetRequest: {
       async getEnabledRulesets() { return [...enabledRulesets]; },
@@ -43,7 +77,7 @@ function setup(initial = {}) {
     },
     runtime: {
       onInstalled: { addListener(callback) { onInstalled = callback; } },
-      onStartup: { addListener() {} },
+      onStartup: { addListener(callback) { onStartup = callback; } },
       onMessage: { addListener(callback) { onMessage = callback; } }
     }
   };
@@ -59,6 +93,13 @@ function setup(initial = {}) {
       });
     },
     async install() { onInstalled(); await this.send({ type: "GET_STATUS" }); },
+    async startup() { onStartup(); await this.send({ type: "GET_STATUS" }); },
+    pauseNextRead() {
+      nextReadPause = { started: deferred(), release: deferred() };
+      const pause = nextReadPause;
+      return { started: pause.started.promise, release: () => pause.release.resolve() };
+    },
+    rejectNextWrite() { failNextWrite = true; },
     seedDynamic(rules) { dynamic = JSON.parse(JSON.stringify(rules)); },
     snapshot() {
       return { stored: JSON.parse(JSON.stringify(stored)), dynamic: JSON.parse(JSON.stringify(dynamic)), lastRuleset: JSON.parse(JSON.stringify(lastRuleset)), enabledRulesets: JSON.parse(JSON.stringify(enabledRulesets)), storageWriteCount, staticUpdateCount, dynamicUpdateCount };
@@ -74,6 +115,99 @@ test("status reads do not rewrite installed rules", async () => {
   assert.equal(app.snapshot().storageWriteCount, 0);
   assert.equal(app.snapshot().staticUpdateCount, 0);
   assert.equal(app.snapshot().dynamicUpdateCount, 0);
+});
+
+test("concurrent site additions retain both exceptions and return ordered state", { timeout: 2000 }, async () => {
+  const app = setup();
+  const pause = app.pauseNextRead();
+  const first = app.send({ type: "SET_SITE_ALLOWED", site: "one.example", allowed: true });
+  await pause.started;
+  const second = app.send({ type: "SET_SITE_ALLOWED", site: "two.example", allowed: true });
+  pause.release();
+  const [one, two] = await Promise.all([first, second]);
+  assert.equal(one.ok, true);
+  assert.equal(two.ok, true);
+  assert.deepEqual(JSON.parse(JSON.stringify(one.state.allowlistedSites)), ["one.example"]);
+  assert.deepEqual(JSON.parse(JSON.stringify(two.state.allowlistedSites)), ["one.example", "two.example"]);
+  assert.deepEqual(app.snapshot().stored.allowlistedSites, ["one.example", "two.example"]);
+  assert.deepEqual(app.snapshot().dynamic.map((rule) => rule.condition.requestDomains[0]), ["one.example", "two.example"]);
+});
+
+test("overlapping site addition and removal do not lose either change", { timeout: 2000 }, async () => {
+  const app = setup({ allowlistedSites: ["old.example"] });
+  const pause = app.pauseNextRead();
+  const add = app.send({ type: "SET_SITE_ALLOWED", site: "new.example", allowed: true });
+  await pause.started;
+  const remove = app.send({ type: "SET_SITE_ALLOWED", site: "old.example", allowed: false });
+  pause.release();
+  assert.ok((await Promise.all([add, remove])).every((result) => result.ok));
+  assert.deepEqual(app.snapshot().stored.allowlistedSites, ["new.example"]);
+  assert.deepEqual(app.snapshot().dynamic.map((rule) => rule.condition.requestDomains[0]), ["new.example"]);
+});
+
+for (const resetFirst of [true, false]) {
+  test("reset and site mutation follow dispatch order: " + (resetFirst ? "reset then add" : "add then reset"), { timeout: 2000 }, async () => {
+    const app = setup({ allowlistedSites: ["old.example"] });
+    const reset = { type: "RESET_SETTINGS" };
+    const add = { type: "SET_SITE_ALLOWED", site: "new.example", allowed: true };
+    const results = await Promise.all((resetFirst ? [reset, add] : [add, reset]).map((message) => app.send(message)));
+    assert.ok(results.every((result) => result.ok));
+    const expected = resetFirst ? ["new.example"] : [];
+    assert.deepEqual(app.snapshot().stored, { enabled: true, allowlistedSites: expected });
+    assert.deepEqual(app.snapshot().dynamic.map((rule) => rule.condition.requestDomains[0]), expected);
+  });
+}
+
+test("overlapping global pause and site addition preserve both preferences", { timeout: 2000 }, async () => {
+  const app = setup();
+  const pause = app.pauseNextRead();
+  const site = app.send({ type: "SET_SITE_ALLOWED", site: "one.example", allowed: true });
+  await pause.started;
+  const toggle = app.send({ type: "SET_ENABLED", enabled: false });
+  pause.release();
+  assert.ok((await Promise.all([site, toggle])).every((result) => result.ok));
+  assert.deepEqual(app.snapshot().stored, { enabled: false, allowlistedSites: ["one.example"] });
+  assert.deepEqual(app.snapshot().enabledRulesets, []);
+  assert.deepEqual(app.snapshot().dynamic, []);
+});
+
+test("a rejected storage mutation does not poison later queued operations", { timeout: 2000 }, async () => {
+  const app = setup();
+  app.rejectNextWrite();
+  const [failed, next] = await Promise.all([
+    app.send({ type: "SET_SITE_ALLOWED", site: "failed.example", allowed: true }),
+    app.send({ type: "SET_SITE_ALLOWED", site: "next.example", allowed: true })
+  ]);
+  assert.equal(failed.ok, false);
+  assert.match(failed.error, /Injected storage write failure/);
+  assert.equal(next.ok, true);
+  assert.deepEqual(app.snapshot().stored.allowlistedSites, ["next.example"]);
+  assert.deepEqual(app.snapshot().dynamic.map((rule) => rule.condition.requestDomains[0]), ["next.example"]);
+});
+
+test("status repair cannot overwrite a concurrently requested state mutation", { timeout: 2000 }, async () => {
+  const app = setup({ enabled: "invalid", allowlistedSites: ["Example.COM", "bad domain"] });
+  const pause = app.pauseNextRead();
+  const status = app.send({ type: "GET_STATUS" });
+  await pause.started;
+  const change = app.send({ type: "SET_ENABLED", enabled: false });
+  pause.release();
+  const results = await Promise.all([status, change]);
+  assert.ok(results.every((result) => result.ok));
+  assert.deepEqual(app.snapshot().stored, { enabled: false, allowlistedSites: ["example.com"] });
+  assert.deepEqual(app.snapshot().enabledRulesets, []);
+});
+
+test("storage events and install/startup reconciliation complete without deadlock or rule churn", { timeout: 2000 }, async () => {
+  const app = setup({}, { emitStorageEvents: true });
+  await app.install();
+  assert.equal((await app.send({ type: "SET_SITE_ALLOWED", site: "one.example", allowed: true })).ok, true);
+  // A status request acts as a barrier behind synchronous storage-event work.
+  await app.send({ type: "GET_STATUS" });
+  await app.startup();
+  assert.equal(app.snapshot().dynamicUpdateCount, 1);
+  assert.equal(app.snapshot().staticUpdateCount, 0);
+  assert.deepEqual(app.snapshot().dynamic.map((rule) => rule.condition.requestDomains[0]), ["one.example"]);
 });
 
 test("status reads repair malformed stored settings", async () => {

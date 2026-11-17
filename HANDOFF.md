@@ -41,6 +41,8 @@ Remaining structure concerns: preserve one current status owner per document; ke
 
 CORE-01 is implemented: open popup/options views subscribe to relevant local changes, read canonical worker state, defer refresh while saving, and discard older responses or failures. Twenty new Node regressions pass; total suite count is now 50. Real Chromium passes ten original scenarios plus five live-view checkpoints. The popup page is loaded in a tab for logic testing; toolbar presentation/accessibility remains manual. The next implementation is CORE-02's reproduced concurrent-site-write race.
 
+CORE-02 is also implemented: one queue serializes complete messages, repair-capable reads, and install/start/storage reconciliation. Eight new worker regressions bring the current suite to **58 passing tests**. Chromium adds a concurrent-mutation checkpoint proving both site exceptions survive in storage and DNR. The next reliability task is CORE-03: DNR/storage failure convergence; queue serialization alone does not provide rollback on API failure.
+
 `src/extension/manifest.json` declares one MV3 service worker, popup, options, shared/content scripts, and starter DNR rules. The worker validates local state and reconciles Chrome rules; UI sends messages to it; page-side cosmetics use an owned reversible stylesheet. The runtime ships no Node package dependencies. `scripts/build.mjs` copies only this source tree to `dist/chrome`.
 
 Baseline tests passed locally: 18 Node tests and ten Chromium page scenarios on Node 24.22.1 / Chromium 158.0.8127.18. The audit checkpoint adds twelve tooling regressions: 30 total tests pass, plus CI browser validation. [Baseline report](docs/testing/BASELINE_TEST_REPORT.md) and [current evidence](docs/testing/TEST_EVIDENCE.md) preserve exact scopes. Formal Stable-toolbar, accessibility, outbound-traffic, performance, real-site, and platform evidence remain separate open gates.
@@ -112,7 +114,7 @@ Status meanings: **Ready** can start from current `main`; **Blocked** needs a de
 | ID | Status / dependency | Deliverable and acceptance evidence |
 |---|---|---|
 | `CORE-01` | **COMPLETED** | Current-path UI synchronization, pending-edit protection, stale response/failure epochs, twenty new Node regressions, and five Chromium checkpoints. PR #20's unrelated old docs were excluded. |
-| `CORE-02` | **Ready after or alongside CORE-01** | Serialize complete settings mutations, not only DNR reconciliation. Interleaved add/add, add/remove, toggle/site, and reset/site operations produce deterministic results; a rejected operation does not poison the queue; regression tests reproduce and fix the lost-update race. |
+| `CORE-02` | **COMPLETED** | Full operation serialization, deterministic interleaving/repair/reset tests, recovery after rejected writes, idempotent storage-event reconciliation, and a real Chromium concurrency checkpoint. |
 | `CORE-03` | **Blocked by CORE-02** | Make storage/DNR failure behavior consistent. Inject failures from enabled-ruleset and dynamic-rule APIs; UI reports the failure honestly; status does not claim unapplied protection; retry/restart converges; unrelated browser rules remain intact. |
 | `CORE-04` | **Blocked by CORE-02/03** | Add a versioned settings schema and migrations. Preserve current data, safely repair corrupt/partial state, define future-version behavior, and test install/startup/storage changes after worker suspension. |
 | `QA-01` | **Blocked by CORE-01–04** | Manual Chrome Stable, permission, privacy, and accessibility gate: exact OS/browser/version, actual toolbar popup and options, keyboard/focus/labels/contrast/screen reader, pause/trust/reload/restart, permission disclosure, service-worker console, and outbound-traffic capture. File every failure as a scoped issue. |
@@ -212,7 +214,7 @@ Every task record must name an accountable role, issue/PR, state, dependencies, 
 
 ### Recommended work for the next coding tool
 
-Start with `CORE-02` unless the maintainer assigns a different unblocked task. `CORE-01` now carries the useful synchronization approach from PR #20 with attribution and current regressions. Do not merge that old mixed-scope PR wholesale or execute anything in `AnalyseFuture/`.
+Start with `CORE-03` unless the maintainer assigns a different unblocked task. CORE-01 and CORE-02 are implemented. The useful synchronization approach from PR #20 has attribution and current regressions; do not merge that old mixed-scope PR wholesale or execute anything in `AnalyseFuture/`.
 
 After `CORE-01`, the safe reliability order is:
 

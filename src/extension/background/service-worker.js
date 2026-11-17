@@ -8,7 +8,7 @@ const DEFAULTS = Object.freeze({ enabled: true, allowlistedSites: Object.freeze(
 const RULESET_ID = "starter_rules";
 const FIRST_SITE_RULE_ID = 100000;
 const MAX_SITES = 100;
-let syncQueue = Promise.resolve();
+let operationQueue = Promise.resolve();
 
 function sameSites(left, right) {
   return Array.isArray(left) && left.length === right.length &&
@@ -98,11 +98,16 @@ async function syncFromStorage() {
   return { enabled, allowlistedSites };
 }
 
+function queueOperation(operation) {
+  // Serialize reads/repairs, complete mutations, and DNR reconciliation together.
+  // Keep each caller's rejection, while allowing subsequent work to recover.
+  const result = operationQueue.then(operation);
+  operationQueue = result.catch(() => {});
+  return result;
+}
+
 function queueSync() {
-  syncQueue = syncQueue.catch((error) => {
-    console.error("Previous DNR sync failed:", error);
-  }).then(syncFromStorage);
-  return syncQueue;
+  return queueOperation(syncFromStorage);
 }
 
 async function handleMessage(message) {
@@ -117,7 +122,7 @@ async function handleMessage(message) {
   if (message.type === "SET_ENABLED") {
     if (typeof message.enabled !== "boolean") throw new Error("Expected boolean enabled.");
     await chrome.storage.local.set({ enabled: message.enabled });
-    return queueSync();
+    return syncFromStorage();
   }
   if (message.type === "SET_SITE_ALLOWED") {
     const site = normalizeSite(message.site);
@@ -130,11 +135,11 @@ async function handleMessage(message) {
     else next.delete(site);
     if (next.size > MAX_SITES) throw new Error("Maximum 100 website exceptions.");
     await chrome.storage.local.set({ allowlistedSites: [...next].sort() });
-    return queueSync();
+    return syncFromStorage();
   }
   if (message.type === "RESET_SETTINGS") {
     await chrome.storage.local.set({ enabled: true, allowlistedSites: [] });
-    return queueSync();
+    return syncFromStorage();
   }
   throw new Error("Unknown operation: " + message.type);
 }
@@ -152,7 +157,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  handleMessage(message)
+  // GET_STATUS also belongs in the queue because malformed-state repair writes.
+  // A queued mutation calls syncFromStorage directly: awaiting queueSync from
+  // inside itself would deadlock. Storage events enqueue a later idempotent sync.
+  queueOperation(() => handleMessage(message))
     .then((state) => sendResponse({ ok: true, state }))
     .catch((error) => {
       console.error("Ad Blocker operation failed:", error);

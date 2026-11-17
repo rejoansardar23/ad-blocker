@@ -50,7 +50,7 @@ The current `normalizeSite` routine supports ordinary DNS hostnames from HTTP(S)
 - A status read does not rewrite Chrome DNR rules. Reapplying unchanged dynamic rules would create unnecessary work and a temporary trusted-site remove/re-add window.
 - Reconciliation compares the complete managed rule with deterministic object keys. It normalizes the order of the set-valued `requestDomains` and `resourceTypes` arrays so browser property/list ordering does not cause churn. Additional stale conditions are detected and repaired; unrelated dynamic-rule IDs are preserved.
 - Cosmetic filtering retains the exact style-node reference it created. Pausing or trusting a site removes only that owned node, never a page element merely because its ID resembles an extension ID. Unit and browser fixtures cover a colliding page-owned element.
-- Settings repair normalizes and deduplicates stored sites and defaults invalid values. Confirmed reset restores protection and clears managed exceptions. Full state-mutation concurrency and DNR/storage failure recovery require their own regressions; serializing reconciliation alone does not prove atomic writes.
+- Settings repair normalizes and deduplicates stored sites and defaults invalid values. Confirmed reset restores protection and clears managed exceptions. A single operation queue serializes full messages (including repair-capable reads) and install/start/storage reconciliation; a queued mutation reconciles directly to avoid awaiting itself. Rejected calls return errors while the queue tail recovers. DNR/storage failure convergence and schema migration remain separate work.
 
 These invariants consolidate the former `IDEMPOTENT_RULES.md` note. Its original text remains recoverable from commit `ce77ac5`.
 

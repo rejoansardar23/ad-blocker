@@ -48,6 +48,7 @@ const server = createServer((request, response) => {
 let port = 0;
 let context;
 let liveViewCheckpoints = 0;
+let concurrentMutationCheckpoints = 0;
 
 const launch = () => chromium.launchPersistentContext(profile, {
   channel: "chromium",
@@ -159,6 +160,27 @@ try {
   await options.locator("#status").filter({ hasText: "Settings loaded." }).waitFor();
   assert.equal(await options.locator("#enabled").isChecked(), true, "New installs must start enabled");
 
+  const concurrent = await options.evaluate(async () => {
+    const responses = await Promise.all([
+      chrome.runtime.sendMessage({ type: "SET_SITE_ALLOWED", site: "one.example", allowed: true }),
+      chrome.runtime.sendMessage({ type: "SET_SITE_ALLOWED", site: "two.example", allowed: true })
+    ]);
+    const stored = await chrome.storage.local.get({ enabled: true, allowlistedSites: [] });
+    const rules = await chrome.declarativeNetRequest.getDynamicRules();
+    return { responses, stored, domains: rules
+      .filter((rule) => rule.id >= 100000 && rule.id < 100100)
+      .flatMap((rule) => rule.condition.requestDomains).sort() };
+  });
+  assert.ok(concurrent.responses.every((response) => response.ok), "Concurrent settings commands must both succeed");
+  assert.deepEqual(concurrent.stored.allowlistedSites, ["one.example", "two.example"], "Concurrent additions must retain both saved exceptions");
+  assert.deepEqual(concurrent.domains, ["one.example", "two.example"], "DNR must retain both concurrent exceptions");
+  assert.deepEqual(concurrent.responses.map((response) => response.state.allowlistedSites.length).sort(), [1, 2], "Each response must describe its completed operation in worker order");
+  concurrentMutationCheckpoints++;
+  console.log("Concurrent-mutation checkpoint passed: both additions persist in storage and DNR");
+  const resetAfterConcurrency = await options.evaluate(() => chrome.runtime.sendMessage({ type: "RESET_SETTINGS" }));
+  assert.equal(resetAfterConcurrency.ok, true);
+  await options.waitForFunction(() => document.querySelectorAll("#sites li").length === 0);
+
   const website = await context.newPage();
   await checkPage(website, { adLoaded: false, cosmeticHidden: true });
   assert.equal(counts.ad, 0, "Blocked ad fixture should never hit local server");
@@ -220,7 +242,9 @@ try {
   await checkLiveViews(recoveryViews, "external reset recovery", true, []);
   await checkPage(pausedWebsite, { adLoaded: false, cosmeticHidden: true });
   assert.equal(liveViewCheckpoints, 5, "Run every live-view synchronization checkpoint");
+  assert.equal(concurrentMutationCheckpoints, 1, "Run the concurrent-mutation browser checkpoint");
   console.log("Live-view synchronization checkpoints:", liveViewCheckpoints);
+  console.log("Concurrent-mutation checkpoints:", concurrentMutationCheckpoints);
   console.log("All Chromium MV3 smoke tests passed; ad/control request counts:", counts);
 } finally {
   if (context) await context.close().catch(() => {});
