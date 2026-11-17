@@ -30,6 +30,8 @@ function setup(initial = {}, { emitStorageEvents = false } = {}) {
   let onStorageChanged = null;
   let nextReadPause = null;
   let failNextWrite = false;
+  let failNextStaticUpdate = false;
+  let failNextDynamicUpdate = false;
   const chrome = {
     storage: {
       local: {
@@ -66,12 +68,20 @@ function setup(initial = {}, { emitStorageEvents = false } = {}) {
       async getEnabledRulesets() { return [...enabledRulesets]; },
       async updateEnabledRulesets(value) {
         staticUpdateCount++;
+        if (failNextStaticUpdate) {
+          failNextStaticUpdate = false;
+          throw new Error("Injected ruleset update failure");
+        }
         lastRuleset = value;
         enabledRulesets = [...new Set(enabledRulesets.filter((x) => !value.disableRulesetIds.includes(x)).concat(value.enableRulesetIds))];
       },
       async getDynamicRules() { return dynamic; },
       async updateDynamicRules({ removeRuleIds, addRules }) {
         dynamicUpdateCount++;
+        if (failNextDynamicUpdate) {
+          failNextDynamicUpdate = false;
+          throw new Error("Injected dynamic rule update failure");
+        }
         dynamic = dynamic.filter((rule) => !removeRuleIds.includes(rule.id)).concat(addRules);
       }
     },
@@ -100,6 +110,11 @@ function setup(initial = {}, { emitStorageEvents = false } = {}) {
       return { started: pause.started.promise, release: () => pause.release.resolve() };
     },
     rejectNextWrite() { failNextWrite = true; },
+    rejectNextDnrUpdate(kind) {
+      if (kind === "static") failNextStaticUpdate = true;
+      else if (kind === "dynamic") failNextDynamicUpdate = true;
+      else throw new Error("Unknown injection kind");
+    },
     seedDynamic(rules) { dynamic = JSON.parse(JSON.stringify(rules)); },
     snapshot() {
       return { stored: JSON.parse(JSON.stringify(stored)), dynamic: JSON.parse(JSON.stringify(dynamic)), lastRuleset: JSON.parse(JSON.stringify(lastRuleset)), enabledRulesets: JSON.parse(JSON.stringify(enabledRulesets)), storageWriteCount, staticUpdateCount, dynamicUpdateCount };
@@ -313,4 +328,55 @@ test("semantically identical managed rules do not churn when Chrome reorders pro
 
   await app.send({ type: "SET_ENABLED", enabled: true });
   assert.equal(app.snapshot().dynamicUpdateCount, 1, "Equivalent rules should not be rewritten");
+});
+
+
+test("failed dynamic-rule addition rolls preferences back and allows a later retry", async () => {
+  const app = setup();
+  app.rejectNextDnrUpdate("dynamic");
+  const failed = await app.send({ type: "SET_SITE_ALLOWED", site: "recover.example", allowed: true });
+  assert.equal(failed.ok, false);
+  assert.match(failed.error, /previous settings restored/);
+  assert.deepEqual(app.snapshot().stored, { enabled: true, allowlistedSites: [] });
+  assert.deepEqual(app.snapshot().dynamic, []);
+
+  const retried = await app.send({ type: "SET_SITE_ALLOWED", site: "recover.example", allowed: true });
+  assert.equal(retried.ok, true);
+  assert.deepEqual(app.snapshot().stored.allowlistedSites, ["recover.example"]);
+  assert.deepEqual(app.snapshot().dynamic.map((rule) => rule.condition.requestDomains[0]), ["recover.example"]);
+});
+
+test("failed static ruleset toggle restores enabled setting without disabling protection", async () => {
+  const app = setup();
+  app.rejectNextDnrUpdate("static");
+  const failed = await app.send({ type: "SET_ENABLED", enabled: false });
+  assert.equal(failed.ok, false);
+  assert.match(failed.error, /previous settings restored/);
+  assert.deepEqual(app.snapshot().stored, { enabled: true, allowlistedSites: [] });
+  assert.deepEqual(app.snapshot().enabledRulesets, ["starter_rules"]);
+  assert.equal((await app.send({ type: "SET_ENABLED", enabled: false })).ok, true);
+  assert.deepEqual(app.snapshot().enabledRulesets, []);
+});
+
+test("failed dynamic update after static pause restores both browser rule states", async () => {
+  const app = setup();
+  assert.equal((await app.send({ type: "SET_SITE_ALLOWED", site: "trusted.example", allowed: true })).ok, true);
+  app.rejectNextDnrUpdate("dynamic");
+  const failed = await app.send({ type: "SET_ENABLED", enabled: false });
+  assert.equal(failed.ok, false);
+  assert.match(failed.error, /previous settings restored/);
+  assert.equal(app.snapshot().stored.enabled, true);
+  assert.deepEqual(app.snapshot().enabledRulesets, ["starter_rules"]);
+  assert.deepEqual(app.snapshot().dynamic.map((rule) => rule.condition.requestDomains[0]), ["trusted.example"]);
+});
+
+test("failed reset restores the previous allowlist and preserves installed exceptions", async () => {
+  const app = setup();
+  assert.equal((await app.send({ type: "SET_SITE_ALLOWED", site: "trusted.example", allowed: true })).ok, true);
+  app.rejectNextDnrUpdate("dynamic");
+  const failed = await app.send({ type: "RESET_SETTINGS" });
+  assert.equal(failed.ok, false);
+  assert.match(failed.error, /previous settings restored/);
+  assert.deepEqual(app.snapshot().stored, { enabled: true, allowlistedSites: ["trusted.example"] });
+  assert.deepEqual(app.snapshot().dynamic.map((rule) => rule.condition.requestDomains[0]), ["trusted.example"]);
 });
