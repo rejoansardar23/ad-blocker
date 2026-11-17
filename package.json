@@ -5,10 +5,13 @@
   "description": "Development preview of a privacy-first Chrome MV3 ad blocker",
   "scripts": {
     "verify": "node scripts/verify.mjs",
-    "test": "node --test tests/unit/*.test.mjs",
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "test": "npm run test:unit",
     "check": "npm run verify && npm run test",
     "build": "node scripts/build.mjs",
-    "test:e2e": "node tests/browser/chromium-smoke.mjs"
+    "test:browser": "node tests/browser/chromium-smoke.mjs",
+    "test:e2e": "npm run build && npm run test:browser",
+    "test:all": "npm run check && npm run test:e2e"
   },
   "devDependencies": {
     "playwright": "1.65.0"

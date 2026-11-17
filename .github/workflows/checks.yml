@@ -35,7 +35,7 @@ jobs:
       - name: Install Playwright Chromium for extension tests
         run: npx playwright install --with-deps chromium
       - name: Run real Chromium extension smoke tests
-        run: npm run test:e2e
+        run: npm run test:browser
       - name: Save installable unpacked build
         if: always()
         uses: actions/upload-artifact@v4

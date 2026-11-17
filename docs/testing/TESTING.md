@@ -5,21 +5,39 @@
 ## Commands
 
 ```bash
-npm run verify   # JSON/manifest/files and JS syntax checks
-npm run test     # Node unit tests for domain logic and mock service worker
-npm run check    # both of the above
-npm run build    # validate then copy unpacked extension to dist/chrome
-npm run test:e2e # real Chromium synthetic request/cosmetic/restart fixtures
+npm run verify       # JSON/manifest/files and JavaScript syntax checks
+npm run test:unit    # all Node unit behavior tests
+npm test             # conventional alias for test:unit
+npm run check        # structural verification plus unit tests
+npm run build        # verify, then copy src/extension to dist/chrome
+npm run test:browser # browser fixtures against an already-built dist/chrome
+npm run test:e2e     # build current source, then run the browser fixtures
+npm run test:all     # check, build and run every active automated test group
 ```
 
 Node.js 22+ required. `npm ci --no-audit --no-fund` installs lockfile-pinned Playwright for the browser tests. Run `npx playwright install chromium`, then `npm run test:e2e`.
 
+## Active test groups
+
+| Group | Primary command | Purpose |
+|---|---|---|
+| Structure and syntax | `npm run verify` | Required runtime files, manifest/rules JSON, references, JavaScript syntax and remote-script guard |
+| Unit behavior | `npm run test:unit` | Domain matching, service-worker/DNR state, cosmetic ownership and popup/options recovery behavior |
+| Package integrity | `npm run build` | Recreate `dist/chrome` from only the active `src/extension` tree |
+| Browser integration | `npm run test:e2e` | Rebuild, side-load in Playwright Chromium and exercise DNR, controls, cosmetics, exceptions and persistence |
+| Complete active pipeline | `npm run test:all` | Run every group above in dependency order |
+| Supply chain | CI workflow | Frozen install, lockfile check, high-severity audit and CycloneDX SBOM |
+
+`npm run test:browser` is the low-level browser-only group used by CI after its explicit build step. For normal local use, prefer `npm run test:e2e` so the browser cannot receive a missing or stale package. Nothing under `AnalyseFuture/` belongs to the active test pipeline.
+
 ## What the existing tests measure
 
 - Hostname normalization and safe exact/subdomain exception matching.
-- Mocked service-worker global toggles, DNR ruleset selection and dynamic allowAllRequests generation.
-- Invalid command/input handling.
-- Packaging consistency of manifest, JS files and DNR JSON.
+- Mocked service-worker global toggles, settings repair/reset, DNR ruleset selection, idempotence and managed dynamic allowAllRequests generation.
+- Invalid command/input handling and preservation of unrelated browser rules.
+- Cosmetic filtering ownership and reversibility without removing page-owned content.
+- Popup/options pending-save behavior, rejected-save recovery and confirmed settings reset.
+- Packaging consistency of manifest, JavaScript files and DNR JSON.
 
 Mock-based unit tests **do not** prove Chrome rules work in a browser or that real websites are safe.
 

@@ -17,7 +17,7 @@ npm run check
 npm run build
 ```
 
-`npm run check` validates the manifest, file references, DNR JSON, JavaScript syntax and Node unit tests. `npm run build` copies only the extension runtime to `dist/chrome`. No npm installation is required for the two Node-native validation/build commands. The Chromium end-to-end suite uses pinned Playwright development dependencies; run `npm ci --no-audit --no-fund`, `npx playwright install chromium`, and `npm run test:e2e`.
+`npm run check` validates the manifest, file references, DNR JSON, JavaScript syntax and Node unit tests. `npm run build` copies only the extension runtime to `dist/chrome`. No npm installation is required for the two Node-native validation/build commands. The Chromium end-to-end suite uses pinned Playwright development dependencies; run `npm ci --no-audit --no-fund`, `npx playwright install chromium`, and `npm run test:e2e`. The end-to-end command rebuilds `dist/chrome` before starting Chromium so it cannot silently test a stale package. Use `npm run test:all` for the complete structural, unit, build and browser sequence.
 
 ## Install in Chrome
 
