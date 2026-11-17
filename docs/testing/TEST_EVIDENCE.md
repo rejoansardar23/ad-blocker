@@ -1,6 +1,16 @@
 # Grouped test evidence
 
-This record separates what passed from what remains unverified. Results apply only to commit [`ee0519f`](https://github.com/rejoansardar23/ad-blocker/commit/ee0519fabd738059e67e0121d57b1bedd5790326) on `main`; later changes require a new exact-commit run.
+## Recovery mission, 18 November 2026 (Asia/Kolkata)
+
+Baseline `ce77ac5` passed frozen install, lockfile guard, 18 Node tests, matching 11-file build, audit (0 reported vulnerabilities), SBOM, and ten local Chromium scenarios. See [the baseline report](BASELINE_TEST_REPORT.md).
+
+Audit checkpoint `c9e54b2` adds seven inventory and five boundary-check regressions: **30 tests passed**, no failures/skips. [Exact-commit CI 44182569555](https://github.com/rejoansardar23/ad-blocker/actions/runs/44182569555) passed the full pipeline. `npm run audit:repository` accounts for every tracked path and verifies 1,384 imported-file hashes plus both ZIP hashes without executing imports.
+
+Local browser capability changed with the machine: official download and side-loading now pass on Playwright 1.65.0 / Chromium **158.0.8127.18**, Node 24.22.1, npm 11.9.0. Historical HTTP 403 and administrator-policy limitations below describe the earlier workspace only. Actual Chrome Stable toolbar, accessibility, outbound privacy capture, real-site breadth, performance, release, and platform groups remain NOT RUN.
+
+## Historical grouping checkpoint
+
+The following results apply to commit [`ee0519f`](https://github.com/rejoansardar23/ad-blocker/commit/ee0519fabd738059e67e0121d57b1bedd5790326). They are preserved as dated evidence; they do not replace the newer checkpoint above.
 
 - **Recorded:** 17 November 2026 (Asia/Kolkata)
 - **GitHub Actions:** [run 37, success in 46 seconds](https://github.com/rejoansardar23/ad-blocker/actions/runs/44002405205)

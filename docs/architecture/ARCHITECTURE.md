@@ -1,6 +1,6 @@
 # Architecture — original Chrome MV3 preview and future design
 
-**Updated 15 Nov 2026.** The first implementation is a small original-code proof of concept. It has passed synthetic Chromium browser tests in CI; broad real-world compatibility is **not** verified. The future modular monorepo is a design proposal, not an existing package suite.
+**Updated 18 Nov 2026 (Asia/Kolkata).** The implementation is an original-code Chrome MV3 development preview. It has passed synthetic Chromium browser tests in CI; broad real-world compatibility remains unverified. The [handoff](../../HANDOFF.md) owns live task/status information and the [structure map](../../PROJECT_STRUCTURE.md) owns file placement.
 
 ## Current file structure
 
@@ -13,6 +13,8 @@ src/extension/content/cosmetic.js            # narrow CSS-based hiding
 src/extension/popup/                         # action popup UI
 src/extension/options/                       # settings and trusted sites UI
 scripts/verify.mjs             # structural JSON + JS checks
+scripts/verify-repository.mjs  # documentation and active-package boundary checks
+scripts/audit-repository.mjs   # static tracked-file inventory and hashes
 scripts/build.mjs              # dependency-free dist/chrome package
 tests/unit/                    # Node domain/worker/UI tests
 tests/browser/                 # real Chromium fixtures
@@ -42,6 +44,15 @@ Popup/options UI
 DNR is executed in the browser, not a JavaScript webRequest interception proxy. Exceptions have a higher rule priority and **require page reload to ensure frame navigation is re-evaluated**. Pausing global rules disables the packaged ruleset, clears project-created dynamic site rules and causes cosmetic CSS to be removed when storage updates.
 
 The current `normalizeSite` routine supports ordinary DNS hostnames from HTTP(S) URLs; localhost, IP literals, browser-internal pages and wildcard hostname input are not currently supported as user exceptions. Site exceptions include subdomains. The simple known-domain static list has many gaps; it exists to prove mechanics before larger licensed rule lists are integrated.
+
+## Runtime invariants
+
+- A status read does not rewrite Chrome DNR rules. Reapplying unchanged dynamic rules would create unnecessary work and a temporary trusted-site remove/re-add window.
+- Reconciliation compares the complete managed rule with deterministic object keys. It normalizes the order of the set-valued `requestDomains` and `resourceTypes` arrays so browser property/list ordering does not cause churn. Additional stale conditions are detected and repaired; unrelated dynamic-rule IDs are preserved.
+- Cosmetic filtering retains the exact style-node reference it created. Pausing or trusting a site removes only that owned node, never a page element merely because its ID resembles an extension ID. Unit and browser fixtures cover a colliding page-owned element.
+- Settings repair normalizes and deduplicates stored sites and defaults invalid values. Confirmed reset restores protection and clears managed exceptions. Full state-mutation concurrency and DNR/storage failure recovery require their own regressions; serializing reconciliation alone does not prove atomic writes.
+
+These invariants consolidate the former `IDEMPOTENT_RULES.md` note. Its original text remains recoverable from commit `ce77ac5`.
 
 ## Privacy and permissions
 

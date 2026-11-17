@@ -8,6 +8,7 @@ See [the latest grouped test evidence](TEST_EVIDENCE.md) for exact commands, res
 
 ```bash
 npm run verify       # JSON/manifest/files and JavaScript syntax checks
+npm run audit:repository # tracked-file inventory, duplicates and preservation hashes
 npm run test:unit    # all Node unit behavior tests
 npm test             # conventional alias for test:unit
 npm run check        # structural verification plus unit tests
@@ -24,6 +25,7 @@ Node.js 22+ required. `npm ci --no-audit --no-fund` installs lockfile-pinned Pla
 | Group | Primary command | Purpose |
 |---|---|---|
 | Structure and syntax | `npm run verify` | Required runtime files, manifest/rules JSON, references, JavaScript syntax and remote-script guard |
+| Repository integrity | `npm run audit:repository` | CSV/JSON inventory, literal dependency map, duplicate groups and local snapshot hashes; no imported execution |
 | Unit behavior | `npm run test:unit` | Domain matching, service-worker/DNR state, cosmetic ownership and popup/options recovery behavior |
 | Package integrity | `npm run build` | Recreate `dist/chrome` from only the active `src/extension` tree |
 | Browser integration | `npm run test:e2e` | Rebuild, side-load in Playwright Chromium and exercise DNR, controls, cosmetics, exceptions and persistence |
@@ -52,7 +54,7 @@ Mock-based unit tests **do not** prove Chrome rules work in a browser or that re
 5. Test global pause/resume including cosmetic hiding; service worker suspension and browser restart.
 6. Verify popup/options controls, no errors in extension service worker console, keyboard operation and proper disclosures.
 7. Test normal page content isn't hidden or broken.
-8. Save Chromium build version, commands, logs and failures in PR.
+8. Save Chromium build version, commands, logs and failures in the commit evidence or PR requested by the owner.
 
 ## Later testing pyramid
 

@@ -1,5 +1,7 @@
 # AD BLOCKER — PERMANENT MASTER PROJECT HANDOFF
 
+**Historical record:** Status and research below describe the dated snapshot, not current main. Current operations and task priorities are in [HANDOFF.md](../../HANDOFF.md). On 18 November 2026, links to redundant guidance were redirected to their maintained destinations. Original documents and this unmodified snapshot are recoverable from commit `ce77ac5` and remote branch `recovery/pre-mission-ce77ac5`.
+
 > **READ THIS FIRST in any new ChatGPT, Codex, or contributor session.**
 > Updated: **2026-11-16 (Asia/Kolkata)**. Repository snapshot checked from GitHub: main at `10c877039de4f7c41122f882d731a187df6f8a0d`; PR #20 at `13176deab7b2b54d7149f67e2f85247ab16b195c`.
 > Canonical repository: **https://github.com/rejoansardar23/ad-blocker**.
@@ -12,7 +14,7 @@ The owner requested a permanent, repository-native record because long ChatGPT c
 
 ### Fast-start rules for new AI coding agents
 
-1. Fetch current `main`, `AGENTS.md`, `README.md`, this handoff, and `docs/development/START_HERE.md`.
+1. Fetch current `main`, `AGENTS.md`, `README.md`, and [the live operational handoff](../../HANDOFF.md).
 2. Check **current branches, PRs, issues, commit SHA and CI**; the state recorded here is a timestamped snapshot, not a guarantee of today's status.
 3. Read actual code before relying on docs; keep implemented, fixture-verified, manually verified, proposed, and blocked separate.
 4. Never restart this as an empty repository; preserve existing code and merged history.
@@ -257,19 +259,19 @@ After a PR changes code, check **checks for the exact new commit**. Preserve `pa
 | --- | --- |
 | [AGENTS.md](../../AGENTS.md) | Mandatory coding-agent rules |
 | [README.md](../../README.md) | Onboarding and current supported claims |
-| [START_HERE.md](../development/START_HERE.md) | Developer first steps |
+| [README.md](../../README.md) | Current developer first steps; former START_HERE content consolidated here |
 | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) | Code boundaries, runtime flow, constraints |
-| [VISION.md](../product/VISION.md) and [PRODUCT_SPEC.md](../product/PRODUCT_SPEC.md) | Goals, use cases and acceptance requirements |
+| [HANDOFF.md](../../HANDOFF.md) and [PRODUCT_SPEC.md](../product/PRODUCT_SPEC.md) | Current goals, use cases and acceptance requirements; former VISION content consolidated |
 | [FEATURE_MATRIX.md](../product/FEATURE_MATRIX.md) | Implemented vs verified vs planned |
-| [ROADMAP.md](../product/ROADMAP.md) | Stage exit gates |
+| [HANDOFF.md](../../HANDOFF.md) | Current roadmap and stage exit gates |
 | [IMPLEMENTATION_CHECKLIST.md](../product/IMPLEMENTATION_CHECKLIST.md) | All 60 ordered tasks |
-| [PR_EXECUTION_QUEUE.md](../development/PR_EXECUTION_QUEUE.md) | Issue dependency order and PR workflow |
+| [HANDOFF.md](../../HANDOFF.md) | Current issue dependency order and PR workflow |
 | [FOUNDATION_AUDIT.md](../research/FOUNDATION_AUDIT.md) | Reuse audits, legal blockers |
 | [REUSE_AND_LICENSES.md](../governance/REUSE_AND_LICENSES.md) | No-import policy, notice obligations |
 | [DECISIONS.md](../governance/DECISIONS.md) | ADRs and decisions still pending |
 | [OPEN_SOURCE_REFERENCE_REPOS.txt](../research/OPEN_SOURCE_REFERENCE_REPOS.txt) | Original 18 candidates |
-| [CODEX_WORKFLOW.md](../development/CODEX_WORKFLOW.md) | Cost-efficient agent workflow |
-| [RESEARCH_BACKLOG.md](../research/RESEARCH_BACKLOG.md) | Unverified questions |
+| [AGENTS.md](../../AGENTS.md) | Maintained agent workflow and validation rules |
+| [HANDOFF.md](../../HANDOFF.md) | Current unresolved questions and research priorities |
 | [TESTING.md](../testing/TESTING.md) | Test commands and limitations |
 | [COMPETITIVE_BENCHMARK.md](../research/COMPETITIVE_BENCHMARK.md) | Reproducible future benchmark methodology |
 | [CHROMIUM_TEST_GUIDE.md](../testing/CHROMIUM_TEST_GUIDE.md) | Browser fixture guidance |

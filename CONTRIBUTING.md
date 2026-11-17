@@ -1,27 +1,24 @@
 # Contributing
 
-This is an **early Chrome Manifest V3 development preview** with real source code, but no independently recorded browser verification or production release. The mission is to compete with market leaders through privacy-first, dependable blocking. Read [START HERE](docs/development/START_HERE.md), [the 60-task checklist](docs/product/IMPLEMENTATION_CHECKLIST.md), [AGENTS.md](AGENTS.md) and [the developer setup](docs/development/DEVELOPER_SETUP.md).
+This project is a Chrome MV3 development preview with working source and controlled Playwright Chromium evidence. Broad site compatibility, manual Chrome Stable UX, accessibility, security, and production release gates remain open. Start with [README](README.md), [HANDOFF](HANDOFF.md), [developer setup](docs/development/DEVELOPER_SETUP.md), and the [feature matrix](docs/product/FEATURE_MATRIX.md).
 
-## How to contribute
+## Propose one reviewable change
 
-1. Check existing issues and [feature matrix](docs/product/FEATURE_MATRIX.md).
-2. Propose a scoped issue with user problem, acceptance tests, Chrome constraints, data/permission impact and reuse alternatives.
-3. For any proposed library or ruleset, specify pinned commit/version, license, dependencies, provenance and security maintenance.
-4. Agree with maintainer on **contribution and project-wide licensing** before submitting substantial external code. This public repository does not yet have a project-wide license; visibility is not a broad license to redistribute source.
-5. Work on a branch, submit a small PR and use the template with commands actually run and resulting evidence.
+1. Check current main, issues, PRs, and the handoff task queue so work is not duplicated.
+2. Define the user problem, existing behavior, files in scope, acceptance criteria, tests, failure recovery, and rollback.
+3. For proposed code, data, or assets, record the immutable source, license/notices, dependencies, permissions, and security/maintenance impact. Project-wide licensing and contributor terms remain an owner decision; public visibility does not grant arbitrary redistribution rights.
+4. Submit a focused branch/PR using the repository template unless the owner explicitly directs another delivery workflow. Do not combine unrelated research, bulk moves, formatting, and implementation.
+5. Include commands actually run, results for the final commit, browser/OS versions, CI URL, limitations, and the next task. Address findings after every new push; old successful checks do not validate a later commit.
 
 ## Quality bar
 
-- Run `npm run check` and `npm run build` for current source changes.
-- Do relevant browser integration tests (if unavailable, say so and document manual steps).
-- Keep existing valid functionality; no needless rewrites or duplicate filter engines.
-- Do not invent ad-blocking statistics, browser compatibility or competitive performance numbers.
-- Review new permissions, imported filter-data terms, update paths and browser breakage.
-- Do not commit keys, user browsing data, private information, unlicensed assets or remote executable code.
-- Update checklist, feature matrix and ADRs with tested results.
+- Preserve existing valid functionality, unrelated work, notices, and Git history. Never force-push shared history.
+- Run a frozen install, lockfile guard, `npm run check`, `npm run build`, and relevant real-browser tests. Distinguish local policy blocks from application failures.
+- Include targeted positive, negative, failure, and recovery regressions where the change needs them.
+- Keep `AnalyseFuture/` isolated. Its code, hooks, tests, and workflows are not active dependencies and must not be executed during ordinary contribution work.
+- Explain every added dependency, endpoint, permission, data flow, filter source, and license effect.
+- Do not commit credentials, private browsing data, unlicensed assets, remote executable code, or unapproved telemetry.
+- Update the checklist, feature matrix, handoff, and ADRs only where the change alters their facts. Every new maintained document needs a distinct purpose.
+- Report only measured blocking, compatibility, privacy, accessibility, and performance results.
 
-Documentation improvements, security reviews, build reproduction and browser fixture tests are especially welcome. Bugs that disclose security vulnerabilities should follow [SECURITY.md](SECURITY.md), not a public issue.
-
-## Conduct
-
-Contribute constructively, keep reviews technical and respectful, protect users' privacy and explain decisions with reproducible evidence.
+Security vulnerabilities should follow [SECURITY.md](SECURITY.md), not a public issue. Keep reviews technical and respectful, and support conclusions with reproducible evidence.

@@ -2,7 +2,7 @@
 
 This document is the authoritative map for the reorganized repository. The structure separates the active first-party Chrome extension from development support, durable documentation, generated output, and preserved material whose provenance or integration status is uncertain.
 
-The reorganization is functionality-first: files are grouped by what they do and how they relate, not merely by extension. No existing tracked work was intentionally deleted. Uncertain and imported material is retained under [`AnalyseFuture/`](AnalyseFuture/README.txt) instead of being mixed into the active product.
+Files are grouped by functionality, responsibility, and dependency rather than extension. The earlier reorganization preserved existing work. The 18 November documentation cleanup consolidates nine redundant guidance files into maintained destinations; their originals remain recoverable from commit `ce77ac5` and remote branch `recovery/pre-mission-ce77ac5`. Unverified imports remain isolated under [`AnalyseFuture/`](AnalyseFuture/README.txt) pending their provenance and removal/reuse review.
 
 ## Organization principles
 
@@ -21,8 +21,7 @@ The reorganization is functionality-first: files are grouped by what they do and
 ├── .github/
 │   ├── workflows/checks.yml          Active CI for the first-party extension
 │   ├── ISSUE_TEMPLATE/               Bug, feature and research intake
-│   ├── PULL_REQUEST_TEMPLATE.md      Contribution evidence checklist
-│   └── CODEX_REVIEW_GUIDE.md         Coding-agent review handoff
+│   └── PULL_REQUEST_TEMPLATE.md      Contribution evidence checklist
 ├── src/
 │   └── extension/                    Active Chrome Manifest V3 application
 │       ├── manifest.json             Permissions, entry points and DNR resources
@@ -34,19 +33,22 @@ The reorganization is functionality-first: files are grouped by what they do and
 │       └── options/                  Settings and trusted-sites interface
 ├── scripts/
 │   ├── verify.mjs                    Active structure/manifest/source validation
+│   ├── verify-repository.mjs         Active links, package paths and trust boundaries
+│   ├── audit-repository.mjs          Static tracked-file inventory, hashes and references
 │   └── build.mjs                     Builds only src/extension into dist/chrome
 ├── tests/
-│   ├── unit/                         Node tests for domain, worker, cosmetic and UI logic
+│   ├── unit/                         Node runtime and repository-tooling regressions
 │   └── browser/                      Playwright Chromium extension fixtures
 ├── docs/
 │   ├── architecture/                 Current design, flows and invariants
-│   ├── development/                  Setup, workflow, release and execution guidance
+│   ├── audit/                        Static inventory method and reuse decisions
+│   ├── development/                  Developer setup and release guidance
 │   ├── governance/                   Decisions, reuse policy and audit templates
 │   ├── history/                      Durable handoffs and recovered project context
-│   ├── product/                      Vision, requirements, matrix, roadmap and backlog
-│   ├── research/                     Comparative studies and open research questions
-│   ├── security/                     Privacy, permissions and security design
-│   └── testing/                      Test strategy and browser-test guidance
+│   ├── product/                      Requirements, feature matrix and 60-step checklist
+│   ├── research/                     Candidate evidence, catalog and benchmark methodology
+│   ├── security/                     Integrity investigation, privacy and permissions
+│   └── testing/                      Strategy, baseline evidence and browser guidance
 ├── AnalyseFuture/
 │   ├── README.txt                    Quarantine status, provenance and safety gate
 │   ├── OriginalUploads/              Restored original ZIP inputs
@@ -57,6 +59,8 @@ The reorganization is functionality-first: files are grouped by what they do and
 │       ├── tests/                    Preserved upstream-adapter test
 │       └── root-integration/         Frozen disrupted-state root files
 ├── README.md                         Project entry point and honest capability status
+├── HANDOFF.md                        Current operations, roadmap, tasks and review protocol
+├── PROJECT_IDEA.txt                  Detailed long-term product/research charter
 ├── PROJECT_STRUCTURE.md              This structural source of truth
 ├── AGENTS.md                         Persistent coding-agent constraints
 ├── CONTRIBUTING.md                   Contributor workflow and quality bar
@@ -70,10 +74,12 @@ The reorganization is functionality-first: files are grouped by what they do and
 
 ```text
 package.json
-  ├── verify/check ──> scripts/verify.mjs ──> src/extension/
+  ├── verify/check ──> scripts/verify.mjs + verify-repository.mjs
+  │                     └──> src/extension/ and maintained repository references
   ├── test ─────────> tests/unit/ ─────────> src/extension/
   ├── build ────────> scripts/build.mjs ───> src/extension/ ──> dist/chrome/
-  └── test:e2e ─────> tests/browser/ ──────> dist/chrome/
+  ├── test:e2e ─────> build, then tests/browser/ ──> dist/chrome/
+  └── audit:repository ──> static index/file reads ──> ignored build/audit/
 
 .github/workflows/checks.yml ──> the root package commands above
 ```
@@ -89,7 +95,7 @@ Within the extension:
 
 Relative paths inside `src/extension/manifest.json`, extension HTML, and extension JavaScript remain relative to the extension package. They intentionally do not include the repository-level `src/extension/` prefix.
 
-`AnalyseFuture/` has no edge in the active dependency flow. Root scripts, root package commands, and the root workflow do not install, build, test, or package its contents. Nested `.github/workflows/` below imported projects are inert because GitHub only loads workflows from the repository-root `.github/workflows/` directory.
+`AnalyseFuture/` has no runtime or executable build/test edge. Active commands do not install, execute, build, test, or package its contents. The repository audit may read/hash its tracked files as data; it never imports or runs them. Nested `.github/workflows/` below imported projects are inert because GitHub only loads workflows from the repository-root `.github/workflows/` directory.
 
 ## Old-to-new location map
 
@@ -113,12 +119,16 @@ Relative paths inside `src/extension/manifest.json`, extension HTML, and extensi
 
 ## Documentation routing
 
+- `README.md` owns the short introduction and first commands; `AGENTS.md` owns coding-agent operating rules; `CONTRIBUTING.md` owns human contribution guidance.
+- `HANDOFF.md` owns live operations, dependency-ordered tasks, milestones, issue/PR state, and next work. `PROJECT_IDEA.txt` retains distinct long-term research protocols rather than serving as a live status ledger.
+- `docs/product/FEATURE_MATRIX.md` owns capability evidence; `IMPLEMENTATION_CHECKLIST.md` retains the original 60-item program. Update both only where evidence changes.
 - Put system design, data flow, module boundaries, and invariants in `docs/architecture/`.
+- Put inventory scope, static classification limitations, and reviewed reuse/removal conclusions in `docs/audit/`; generate detailed inventories under ignored `build/audit/`.
 - Put setup, contributor execution, CI/release operation, and coding workflow in `docs/development/`.
 - Put durable decisions, licenses, reuse rules, and review templates in `docs/governance/`.
 - Put dated handoffs and reconstructed context in `docs/history/`; do not treat snapshots as current facts without rechecking.
-- Put product goals, requirements, feature evidence, checklists, and delivery phases in `docs/product/`.
-- Put comparative studies, candidate catalogs, benchmarks, and unanswered questions in `docs/research/`.
+- Put product requirements, feature evidence, and the retained checklist in `docs/product/`; current delivery priorities belong in the handoff.
+- Put comparative evidence, candidate catalogs, and benchmark methods in `docs/research/`; open research work belongs in the handoff.
 - Put privacy, threat, permissions, and vulnerability-design material in `docs/security/`.
 - Put test scope, fixtures, commands, limitations, and evidence rules in `docs/testing/`.
 
@@ -128,7 +138,7 @@ Relative paths inside `src/extension/manifest.json`, extension HTML, and extensi
 - Add active first-party automation under root `scripts/`; do not call quarantine scripts from root commands.
 - Put fast isolated Node coverage in `tests/unit/` and real browser/system behavior in `tests/browser/`.
 - Keep only repository entry points and conventional configuration at root.
-- Place uncertain, damaged, unexplained, externally supplied, or unapproved imported work under a clearly described `AnalyseFuture/` subdirectory. Record source, hashes, license, risks, and a review gate.
+- Do not add speculative source dumps or duplicate planning documents. Any proposed import must have a demonstrated need, source/hash/license/security record, isolation boundary, and explicit reuse or removal decision. Existing uncertain evidence stays isolated until reviewed.
 - Never move a file out of `AnalyseFuture/` merely because its name resembles an active component. Integration requires provenance, license, security, architecture, and test evidence.
 - Preserve third-party project layouts as units unless a separately approved vendoring design explicitly maps and verifies every change.
 - Keep generated directories out of Git. The current ignored outputs include `node_modules/`, `dist/`, `build/`, `coverage/`, `playwright-report/`, `test-results/`, `.cache/`, and `.tmp/`.
@@ -136,6 +146,8 @@ Relative paths inside `src/extension/manifest.json`, extension HTML, and extensi
 
 ## Preservation and validation record
 
-The active source, configuration, tests, documentation, imported trees, original ZIP inputs, and disrupted-state files are all retained in the reorganized tree. `AnalyseFuture/README.txt` records the archive hashes and known provenance limitations. Imported codebase internals were deliberately left unchanged so `projects/snapshots.json` and Git blob history can be used for comparison.
+The production source paths are unchanged by the documentation consolidation. Nine redundant files are removed after transferring their useful content and repairing references. `AGENTS.md` and `HANDOFF.md` replace repeated agent/PR prompts; README replaces the extra starting guide; architecture retains the DNR/style invariant note; handoff retains vision, milestone gates, and open research; the reuse worksheet retains research-record fields.
 
-Per the repository owner's instruction for this reorganization, application tests and builds were not run. Validation for this change is limited to path/reference inspection, JSON parsing, Git diff checks, file/hash accounting, and remote branch synchronization. This statement does not claim new runtime behavior or production readiness.
+`AnalyseFuture/README.txt` records archive hashes and unknown upstream revisions. Imported internals, licenses, original ZIPs, and disrupted-state evidence remain unchanged. The static audit compares them with the locally recorded snapshot without asserting upstream authenticity.
+
+The earlier restructuring commit deliberately did not run application tests. Later tests and CI supersede that historical validation scope; see the [baseline report](docs/testing/BASELINE_TEST_REPORT.md), [test evidence](docs/testing/TEST_EVIDENCE.md), and [structure decisions](docs/architecture/STRUCTURE_MIGRATION_PLAN.md) for current results and remaining limits.

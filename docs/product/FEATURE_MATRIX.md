@@ -1,6 +1,6 @@
 # Features — planned versus implemented
 
-**Updated 15 Nov 2026 (Asia/Kolkata).** **Implemented in source** is different from **browser verified**. No current release is certified ready. Status must be updated with test evidence.
+**Updated 18 Nov 2026 (Asia/Kolkata).** Source presence, Node tests, bundled Chromium, and manual Stable-browser evidence are distinct. No current release is certified ready. Audit checkpoint `c9e54b2` passed [CI](https://github.com/rejoansardar23/ad-blocker/actions/runs/44182569555); current local evidence is recorded in [TEST_EVIDENCE](../testing/TEST_EVIDENCE.md).
 
 | Capability | Priority | Status | Evidence / required follow-up |
 |---|---|---|---|
@@ -11,7 +11,10 @@
 | Narrow cosmetic hiding | P0 | Chromium fixture verified | Reversible CSS and page-owned node collision tests; broad site compatibility remains open |
 | Popup and options controls | P0 | Partly verified | Browser options controls and Node pending/error tests; actual toolbar popup and accessibility review remain open |
 | Local preferences, no explicit telemetry | P0 | Source present | privacy review and outbound-traffic check |
-| Node unit, structural checks and build | P0 | CI verified | [Passing run](https://github.com/rejoansardar23/ad-blocker/actions/runs/43469964379) on commit `4a069f6` |
+| Node unit, structural checks and build | P0 | CI verified | 30 Node/tooling tests at audit checkpoint, plus literal boundary/link guards |
+| Settings reset and malformed-state repair | P0 | Chromium + Node verified | Confirmed recovery, cancel, invalid state normalization, unrelated-rule preservation |
+| Complete static inventory and quarantine hashes | P0 | Verified | All tracked files accounted for; 1,384 snapshot file hashes + 2 ZIP hashes match; upstream authenticity remains unknown |
+| Live popup/options synchronization | P0 | Not yet implemented | PR #20 reviewed; focused current-path port is the next feature |
 | CI build artifact | P0 | CI verified | GitHub Actions artifact; automated Chromium loading verified; manual alpha installation pending |
 | Real Chromium integration tests | P0 | CI verified | 10 synthetic cases using locked Playwright 1.65.0 |
 | Complete site compatibility and accessibility review | P0 | Planned | multiple pages, screen reader |
@@ -29,7 +32,7 @@
 | Edge and Firefox | P2 | Planned | separate adapter and browser tests |
 | Desktop, DNS and mobile | P2 | Research only | separate architectures, products and threat models |
 
-Current evidence: [original PR #3](https://github.com/rejoansardar23/ad-blocker/pull/3), [original PR #4](https://github.com/rejoansardar23/ad-blocker/pull/4), and the fork's [14 Node tests and 10 Chromium cases](https://github.com/renoukhan39-bit/ad-blocker/actions/runs/43647171852). The upstream integration CI must also pass on the final commit. See [Chromium guide](../testing/CHROMIUM_TEST_GUIDE.md) for commands and environment limits.
+Current evidence: [pre-mission local baseline](../testing/BASELINE_TEST_REPORT.md), current [test evidence](../testing/TEST_EVIDENCE.md), and exact audit-checkpoint CI above. Earlier PR/fork results remain historical evidence. Every new commit needs fresh validation. See [Chromium guide](../testing/CHROMIUM_TEST_GUIDE.md) for commands and environment limits.
 
 See [full ordered implementation checklist](IMPLEMENTATION_CHECKLIST.md) and [Product Spec](PRODUCT_SPEC.md).
 

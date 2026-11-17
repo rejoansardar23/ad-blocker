@@ -1,5 +1,7 @@
 # AD BLOCKER — RESEARCH AND CHAT HISTORY ARCHIVE
 
+**Historical record:** The dated findings below remain preserved. Current operations and task priorities are in [HANDOFF.md](../../HANDOFF.md). On 18 November 2026, links to consolidated guidance were maintained; the original files are recoverable from commit `ce77ac5` and remote branch `recovery/pre-mission-ce77ac5`.
+
 **Consolidated on 2026-11-16 (Asia/Kolkata).** This is a source-linked **reconstruction of relevant conversations and researched decisions**, not a verbatim archive of every historical ChatGPT message. The original transcript and private ChatGPT message identifiers are not stored in GitHub. Future contributors should prefer current main and CI to any dated observation.
 
 **First read [MASTER_PROJECT_HANDOFF.md](MASTER_PROJECT_HANDOFF.md)**; this companion captures project origin, prior user requirements, research reasoning, rejected alternatives, exact source links and chronological work.
@@ -14,7 +16,7 @@ The owner directed ChatGPT and Codex to develop the existing repository at https
 - Prioritize Chrome Manifest V3, user privacy, security, speed, correct ad blocking, site exceptions and low breakage, with future cross-browser and desktop/DNS research.
 - Maintain the owner's control over code and branding, no surprise licensing or commercial publication, no unapproved GPL-derived proprietary integrations and no unapproved filter-list data.
 
-For an exhaustive engineering task-by-task specification, see [60-step checklist](../product/IMPLEMENTATION_CHECKLIST.md), [product requirements](../product/PRODUCT_SPEC.md), [roadmap](../product/ROADMAP.md), [CI/test plan](../testing/TESTING.md) and [developer rules](../../AGENTS.md).
+For an exhaustive engineering task-by-task specification, see [60-step checklist](../product/IMPLEMENTATION_CHECKLIST.md), [product requirements](../product/PRODUCT_SPEC.md), [current roadmap and handoff](../../HANDOFF.md), [CI/test plan](../testing/TESTING.md) and [developer rules](../../AGENTS.md).
 
 ## B. Historical conversation and implementation timeline
 

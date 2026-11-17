@@ -1,6 +1,6 @@
 # Master implementation checklist — strictly ordered
 
-**Updated:** 15 Nov 2026 (Asia/Kolkata). **Target:** compete credibly with leading ad blockers through measurable, privacy-first reliability.
+**Updated:** 18 Nov 2026 (Asia/Kolkata). **Target:** compete credibly with leading ad blockers through measurable, privacy-first reliability. Current operations/dependencies live in [HANDOFF](../../HANDOFF.md); this retains all 60 original task IDs.
 
 **Status key:** [x] = documentation or source artifact present; [ ] = still pending/requires verification. The presence of source code is **not** a claim that it passed Chromium tests. See [FEATURE_MATRIX](FEATURE_MATRIX.md). Do not skip licensing/security gates before shipping.
 
@@ -8,7 +8,7 @@
 
 - [x] **001** Create the GitHub repository and document the mission for newcomers.
 - [x] **002** Document comprehensive product requirements, competitor set, architecture and risks.
-- [x] **003** Add AGENTS.md, CODEX workflow, contribution templates, vulnerability policy.
+- [x] **003** Add AGENTS.md, contribution templates, vulnerability policy, and workflow guidance consolidated in the handoff.
 - [ ] **004** Choose the product's project-wide source license and contributor terms with the owner.
 - [ ] **005** Decide intended distribution model (proprietary binary, source-available or open source) and brand.
 - [ ] **006** Finalize trademark/name and Chrome Web Store account strategy.
@@ -35,7 +35,7 @@
 - [ ] **024** Run accessibility, permission and security reviews and fix blockers.
 - [ ] **025** Create a developer-installable alpha ZIP with tested install instructions.
 
-**Browser evidence for 020–023:** upstream [PR #3](https://github.com/rejoansardar23/ad-blocker/pull/3) and [PR #4](https://github.com/rejoansardar23/ad-blocker/pull/4), supplemented by the fork's [combined CI run 43647171852](https://github.com/renoukhan39-bit/ad-blocker/actions/runs/43647171852): `npm ci`, 14 Node tests, build, 10 Chromium fixture cases. Includes exact blocking failures/server counts, trusted subdomains and unrelated-domain rejection, pause/exception persistence across restarts, and preservation of page-owned content. Node v22.23.4, Playwright 1.65.0, Chromium 158.0.8127.18. [Post-merge CI for PR #1](https://github.com/renoukhan39-bit/ad-blocker/actions/runs/43647078763) passed on `85e761b4f9bc15de88cacb37816ba9527abb2bde`. No real-site breadth, full accessibility/security audit, or alpha ZIP is claimed.
+**Current evidence for 019–023:** [audit checkpoint CI](https://github.com/rejoansardar23/ad-blocker/actions/runs/44182569555) on `c9e54b2`: 30 Node/tooling tests plus the ten Chromium scenarios. The [pre-change baseline](../testing/BASELINE_TEST_REPORT.md) also ran those ten cases locally on Chromium 158.0.8127.18. Original PR/fork evidence remains in dated history. No broad real-site, complete accessibility/security review, or alpha ZIP is claimed.
 
 **Stage 1 evidence gate:** all of 019–025 pass, with browser version, commands, failure logs and manual verification captured. Do **not** describe the extension as a finished competitor before this gate.
 
@@ -57,7 +57,7 @@
 - [ ] **036** Define optional protection profiles for trackers and nuisance/cookie banners.
 - [ ] **037** Review every content script/permission and test no unapproved network telemetry.
 - [ ] **038** Build an advanced accessible settings dashboard with error recovery.
-- [ ] **039** Add validated settings import/export, reset and schema migration.
+- [ ] **039** Add validated settings import/export, reset and schema migration. Reset/repair already exists and is tested; import/export and migrations remain open.
 - [ ] **040** Add accurate MV3-compatible diagnostics, no invented block counts.
 - [ ] **041** Optimize UI, CPU, memory, list footprint and long-lived DOM performance.
 - [ ] **042** Add release notes, checksums, reproducible CI builds and dependency/license audits.
@@ -88,7 +88,7 @@
 
 ## Immediate next actions
 
-1. Follow [the dependency queue](../development/PR_EXECUTION_QUEUE.md) and finish the pinned reuse/license audit without importing unapproved sources.
+1. Follow [the dependency queue](../../HANDOFF.md) and finish the pinned reuse/license audit without importing unapproved sources.
 2. Obtain the owner's distribution/license choice before closing Stage 0 gates.
 3. Complete settings consistency and MV3 security regressions, including concurrent writes, API failure recovery, and worker suspension.
 4. Preserve `npm ci` and full Chromium validation on every behavior change.

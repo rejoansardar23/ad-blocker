@@ -14,3 +14,21 @@ The active extension already has coherent functional boundaries. No production m
 | Future browser/core/mobile/DNS modules | DEFER until implemented consumers exist | Avoid imaginary architecture | Approved ADR, owner, real code and tests | Maintenance and permission scope | Independent platform matrix |
 
 No active import/build changes are needed for the proposed documentation consolidation. Deeper runtime separation and any move out of quarantine require additional tests or license/security approval. The full baseline remains accessible at remote `recovery/pre-mission-ce77ac5`; removal does not rewrite history.
+
+## Verified redundant-document removal ledger
+
+These nine first-party documents (440 lines in the baseline) have no runtime/build dependencies. Unique useful fields were transferred before removal; inbound Markdown links were redirected and checked. Their complete originals remain in commit `ce77ac5` and the remote recovery branch.
+
+| Removed path | Consolidated destination / retained information |
+|---|---|
+| `.github/CODEX_REVIEW_GUIDE.md` | `AGENTS.md`, `HANDOFF.md`; review rules and existing dated PR history |
+| `docs/development/START_HERE.md` | `README.md`; quick start and contributor entry points |
+| `docs/development/CODEX_WORKFLOW.md` | `AGENTS.md`; task fields, evidence, cost control and done rules |
+| `docs/development/PR_EXECUTION_QUEUE.md` | `HANDOFF.md`; dependencies, issue mapping, owner gates and review protocol |
+| `docs/history/NEXT_CHAT_START.txt` | `AGENTS.md`, `HANDOFF.md`; current continuation replaces stale snapshot prompt |
+| `docs/product/VISION.md` | `HANDOFF.md`, `PROJECT_IDEA.txt`; product goals, users, principles and metrics |
+| `docs/product/ROADMAP.md` | `HANDOFF.md`; six milestone exit gates and dependency order |
+| `docs/architecture/IDEMPOTENT_RULES.md` | `docs/architecture/ARCHITECTURE.md`; full-rule canonical equality and owned-style safety |
+| `docs/research/RESEARCH_BACKLOG.md` | `HANDOFF.md`, `docs/governance/REUSE_AUDIT_TEMPLATE.md`; open questions and research-record fields |
+
+No production source was moved. No unknown import, license, ZIP, or forensic snapshot was deleted. The quarantine removal conditions remain unmet because origin authentication and distribution rights are unresolved.

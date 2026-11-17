@@ -1,6 +1,6 @@
 # Security, privacy and threat model
 
-**Status:** design requirements. No runtime implementation has been audited because there is no application code yet.
+**Status:** active Chrome MV3 code exists. A scoped static source/history review is recorded in [the integrity audit](REPOSITORY_INTEGRITY_AUDIT.md); browser fixtures pass. Formal outbound-traffic capture, manual permissions/accessibility, and a complete release security review remain open. The sections below are requirements, not certification.
 
 ## Security assets and threat actors
 
