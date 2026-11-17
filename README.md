@@ -23,6 +23,24 @@ npm run test:e2e
 
 In this cloud machine use `npm ci --cache /workspace/.cache/npm --no-audit --no-fund` and set `PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright` for browser installation and execution. The current machine passed local Chromium tests; older machines' policy blocks are recorded as dated evidence.
 
+## Recover historical implementation files
+
+The repository retains Git history and a recovery branch. Compare earlier implementation files with the current tree **without deleting or replacing anything**:
+
+```bash
+node scripts/recover-history.mjs compare recovery/pre-mission-ce77ac5
+node scripts/recover-history.mjs compare 6191c3c0e011c7533db7866a991e7336a85f69c6 src
+```
+
+To recover the exact bytes of a particular historical file or an entire historical folder into the ignored staging area:
+
+```bash
+node scripts/recover-history.mjs stage recovery/pre-mission-ce77ac5 src/extension/manifest.json
+node scripts/recover-history.mjs stage-prefix recovery/pre-mission-ce77ac5 AnalyseFuture/ImportedUpstream/projects
+```
+
+Recovered files appear under `build/recovery/<commit>/`. They are **not executed, installed, automatically integrated, or written over the current source tree**. Compare their behavior, source history, dependencies, and applicable license obligations before applying a selected restoration as a reviewed code change. See `tests/unit/recovery-history.test.mjs` for recovery safety regressions.
+
 ## Current scope
 
 The extension has four sample DNR rules and three narrow cosmetic selector families. It supports persistent pause/resume, up to 100 trusted DNS hostnames with subdomain inheritance, malformed-setting repair, and confirmed reset. Controlled real Chromium fixtures verify blocking, benign controls, trust boundaries, cosmetics, persistence, and recovery.
